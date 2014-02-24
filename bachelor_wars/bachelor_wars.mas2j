@@ -1,0 +1,12 @@
+MAS bachelor_wars {
+
+	infrastructure: Centralised
+
+	environment: env.GameEnv(gui)
+
+	agents:
+		simple_ai;
+
+	aslSourcePath:
+		"src/asl";
+}
