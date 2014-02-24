@@ -10,10 +10,14 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import models.GameModel;
+
 
 public class Unit extends GameObject implements Clickable {
 
 	BufferedImage unitPic = null;
+	
+	public static final int[] AVAILABLE_UNITS = {GameModel.FIRST_YEAR_STUDENT};
 	
 	int type; //sets type of unit 
 
