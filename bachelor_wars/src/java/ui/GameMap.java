@@ -105,7 +105,7 @@ public class GameMap extends JPanel {
 		for (int x=0; x < settings.getNumPlayers(); ++x) {
 			base = new Base(settings.getBaseLocations().get(x), baseSize, gridSize);
 			base.setBaseColor(settings.getColors().get(x));
-			base.setBaseType(settings.getPlayers().get(x));
+			base.setType(settings.getPlayers().get(x));
 			baseList.add(base);
 		}
 	}
@@ -199,10 +199,6 @@ public class GameMap extends JPanel {
     	Dimension baseSize = new Dimension(1,1);
     	Dimension cellSize = new Dimension(cellSizeW, cellSizeH);
     	Unit unit = new Unit(location, baseSize, cellSize, type);
-    	
-    	if (type == GameModel.FIRST_YEAR_STUDENT)
-    		unit.setUnitPic(new File("pics/prvak.png"));
-    	
     	unitList.add(unit);
     	repaint();
     }
@@ -211,10 +207,10 @@ public class GameMap extends JPanel {
 	    if ( (GameModel.BASE & object) != 0) {
 	    	for (Base base:baseList) {
 	    		if (x == base.getX() && y == base.getY()) { //seek for painted base
-	    			if (base.getBaseType() == GameModel.PLAYER)
+	    			if (base.getType() == GameModel.PLAYER)
 	    				drawBase(g, x, y, base.getBaseColor(), "Player Base");
 	    			else
-	    				drawBase(g, x, y, base.getBaseColor(), "Agent Base: " + base.getBaseType());
+	    				drawBase(g, x, y, base.getBaseColor(), "Agent Base: " + base.getType());
 	    			
 	    		}
 	    	}
@@ -247,7 +243,8 @@ public class GameMap extends JPanel {
      * This draws a grid - supposed for debug only
      * @param g
      */
-    private void drawGrid(Graphics g) {
+    @SuppressWarnings("unused")
+	private void drawGrid(Graphics g) {
         int mwidth = model.getWidth();
         int mheight = model.getHeight();
     	g.setColor(Color.lightGray);

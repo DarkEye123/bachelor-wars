@@ -15,8 +15,10 @@ public class GameModel extends GridWorldModel {
 	
 	public static final int GSize = 24;
 	
-	public static final int PLAYER = 0;
+	public static final int PLAYER = 0; // types of players - needed for creation of bases
 	public static final int SIMPLE_AI = 1;
+	public static final int MEDIUM_AI = 2;
+	public static final int ADVANCED_AI = 3;
 	
     // constants for the grid objects
     public static final int BASE = 16;

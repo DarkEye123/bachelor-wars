@@ -1,17 +1,35 @@
 package ui;
 import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 
+import mapping.UnitPicMap;
 import objects.Base;
 import objects.Unit;
 
 
 public class GamePanel extends JPanel implements Informative{
 	private static final long serialVersionUID = 1552746400473185110L;
+	public static final int PADDING_X = 20;
+	public static final int PADDING_Y = 10;
+
+	
+	List<JPanel> unitList = new ArrayList<JPanel>();
+	GridBagConstraints constraints;
 	
 	public void init() {
+		this.setLayout(new GridBagLayout());
+		constraints = new GridBagConstraints();
 		
+		for (UnitPicMap map:Unit.AVAILABLE_UNITS) {
+			JPanel panel = new JPanel();
+			panel.setName(map.getUnit()+"");
+			
+		}
 	}
 	
 	/**
@@ -27,7 +45,7 @@ public class GamePanel extends JPanel implements Informative{
 	}
 
 	public void showBaseContext() {
-		for (int unit:Unit.AVAILABLE_UNITS) {
+		for (UnitPicMap map:Unit.AVAILABLE_UNITS) {
 			
 		}
 		

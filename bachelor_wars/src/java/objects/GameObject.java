@@ -13,7 +13,8 @@ public class GameObject implements Clickable{
 	protected int x, y; //coordinates
 	protected int width, height;// object size in cells
 	protected int cellSizeW, cellSizeH; //real cell size - width and height in pixels
-	
+	protected int type; //sets type of object - for example which AI type is used for base etc
+
 	/**
 	 * Constructor of GameObject
 	 * @param location - coordinates in grid where object starts
@@ -78,5 +79,13 @@ public class GameObject implements Clickable{
 
 	public void setCellSizeH(int cellSizeH) {
 		this.cellSizeH = cellSizeH;
+	}
+	
+	public int getType() {
+		return type;
+	}
+	
+	public void setType(int type) {
+		this.type = type;
 	}
 }

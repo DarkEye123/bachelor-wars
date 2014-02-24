@@ -16,7 +16,6 @@ public class Base extends GameObject implements Clickable{
 	public final static int DEFAULT_BASE_SIZE = 2;
 	
 	protected int freeSlots = DEFAULT_SLOT_SIZE; //number of free slots to create new units
-	protected int baseType; //0 - player, 1 simple AI, 2 medium AI, 3 advanced AI
 	protected Color baseColor;
 	
 	/**
@@ -35,14 +34,6 @@ public class Base extends GameObject implements Clickable{
 
 	public void setFreeSlots(int freeSlots) {
 		this.freeSlots = freeSlots;
-	}
-
-	public int getBaseType() {
-		return baseType;
-	}
-
-	public void setBaseType(int baseType) {
-		this.baseType = baseType;
 	}
 
 	public Color getBaseColor() {

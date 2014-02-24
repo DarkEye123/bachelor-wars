@@ -7,17 +7,28 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import mapping.UnitPicMap;
 import models.GameModel;
 
 
 public class Unit extends GameObject implements Clickable {
 
-	BufferedImage unitPic = null;
+	public static final int DEFAULT_LIFE = 50;
 	
-	public static final int[] AVAILABLE_UNITS = {GameModel.FIRST_YEAR_STUDENT};
+	private static int _id_; //identifier of a unit
+	
+	protected String name;
+	protected BufferedImage unitPic = null;
+	protected int id;
+	protected int lives = DEFAULT_LIFE;
+		
+	public static final UnitPicMap [] AVAILABLE_UNITS = {new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/prvak.png"))};
 	
 	int type; //sets type of unit 
 
@@ -42,8 +53,26 @@ public class Unit extends GameObject implements Clickable {
 	public Unit(Location location, Dimension baseSize, Dimension cellSize, int type) {
 		this(location,baseSize,cellSize);
 		this.type = type;
+		_id_++;
+		id = _id_;
+		init();
 	}
 
+	private void init() {
+		for (UnitPicMap map: AVAILABLE_UNITS) {
+			if (type == map.getUnit()) {
+				unitPic = map.getPicture();
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Draws a unit at position on the grid. 
+	 * @param g
+	 * @param width - actual width of visible cell (in pixels)
+	 * @param height - actual height of visible cell (in pixels)
+	 */
 	public void drawUnit(Graphics g, int width, int height) {
 		int nx = x * cellSizeW;
 		int ny = y * cellSizeH;
@@ -53,12 +82,4 @@ public class Unit extends GameObject implements Clickable {
 		g.setColor(Color.lightGray);
         g.drawRect(nx, ny, cellSizeW, cellSizeH);
     }
-
-	public void setUnitPic(File f) {
-		try {
-			unitPic = ImageIO.read(f);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 }
