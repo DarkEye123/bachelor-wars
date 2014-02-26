@@ -79,6 +79,7 @@ public class ControlPanel extends JPanel {
 		gamePanel.setBackground(Color.GREEN);
 		
 		this.add(gamePanel, constraints);
+		gamePanel.init();
 		
 	}
 

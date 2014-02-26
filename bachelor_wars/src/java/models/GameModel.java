@@ -1,5 +1,9 @@
 package models;
+import java.io.File;
+
 import mapping.GameSettings;
+import mapping.UnitNameMap;
+import mapping.UnitPicMap;
 import ui.GameMap;
 import jason.environment.grid.GridWorldModel;
 import jason.environment.grid.Location;
@@ -12,6 +16,22 @@ import jason.environment.grid.Location;
  * Class that represents used game model - it's invisible grid with positions of agents, bases and units etc.
  */
 public class GameModel extends GridWorldModel {
+	
+	//TODO add new units, should be 6 units, but now it's only one
+	public static final UnitPicMap [] AVAILABLE_UNITS = 
+		{
+			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/prvak.png")),
+			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/prvak.png")),
+			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/prvak.png")),
+			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/prvak.png")),
+			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/prvak.png")),
+			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/prvak.png"))
+		};
+	
+	public static final UnitNameMap [] UNIT_NAMES =
+		{
+			new UnitNameMap(GameModel.FIRST_YEAR_STUDENT, "First Year Student")
+		};
 	
 	public static final int GSize = 24;
 	

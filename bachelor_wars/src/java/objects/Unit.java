@@ -28,8 +28,6 @@ public class Unit extends GameObject implements Clickable {
 	protected int id;
 	protected int lives = DEFAULT_LIFE;
 		
-	public static final UnitPicMap [] AVAILABLE_UNITS = {new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/prvak.png"))};
-	
 	int type; //sets type of unit 
 
 	/**
@@ -59,8 +57,8 @@ public class Unit extends GameObject implements Clickable {
 	}
 
 	private void init() {
-		for (UnitPicMap map: AVAILABLE_UNITS) {
-			if (type == map.getUnit()) {
+		for (UnitPicMap map: GameModel.AVAILABLE_UNITS) {
+			if (type == map.getType()) {
 				unitPic = map.getPicture();
 				break;
 			}

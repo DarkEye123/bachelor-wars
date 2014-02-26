@@ -8,10 +8,10 @@ import javax.imageio.ImageIO;
 
 public class UnitPicMap {
 
-	int unit;
+	int type;
 	BufferedImage picture;
 	public UnitPicMap(int unit, File file) {
-		this.unit = unit;
+		this.type = unit;
 		setPic(file);
 	}
 	public void setPic(File file) {
@@ -21,11 +21,11 @@ public class UnitPicMap {
 			e.printStackTrace();
 		}
 	}
-	public int getUnit() {
-		return unit;
+	public int getType() {
+		return type;
 	}
-	public void setUnit(int unit) {
-		this.unit = unit;
+	public void setType(int unit) {
+		this.type = unit;
 	}
 	public BufferedImage getPicture() {
 		return picture;

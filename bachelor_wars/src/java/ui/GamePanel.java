@@ -1,20 +1,29 @@
 package ui;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import mapping.UnitNameMap;
 import mapping.UnitPicMap;
+import models.GameModel;
 import objects.Base;
 import objects.Unit;
 
 
 public class GamePanel extends JPanel implements Informative{
 	private static final long serialVersionUID = 1552746400473185110L;
-	public static final int PADDING_X = 20;
+	public static final float ICON_PADDING_X = 0.2f;
+	public static final float ICON_PADDING_Y = 0.35f;
+	public static final int PADDING_X = 10;
 	public static final int PADDING_Y = 10;
 
 	
@@ -23,12 +32,68 @@ public class GamePanel extends JPanel implements Informative{
 	
 	public void init() {
 		this.setLayout(new GridBagLayout());
+		Random rand = new Random();
 		constraints = new GridBagConstraints();
+		GridBagConstraints iconstraints = new GridBagConstraints();
+		iconstraints.fill = GridBagConstraints.BOTH;
+		iconstraints.anchor = GridBagConstraints.CENTER;
+		constraints.fill = GridBagConstraints.NONE;
+		//constraints.ipadx = ICON_PADDING_X;
+		//constraints.ipady = ICON_PADDING_Y;
+		int x = 0;
+		int y = 0;;
+		int col = GameModel.AVAILABLE_UNITS.length/2;
+		int width = this.getWidth() / col;
+		//System.out.println(width + " " + this.getWidth() + " " + col);
+		width = width + (this.getWidth() % col);
+		//System.out.println(width + " " + this.getWidth() + " " + col);
+		int height = this.getHeight();
 		
-		for (UnitPicMap map:Unit.AVAILABLE_UNITS) {
-			JPanel panel = new JPanel();
-			panel.setName(map.getUnit()+"");
+		int iwidth = Math.round(width - (width * ICON_PADDING_X*2));
+		int iheight = Math.round(height - (height * ICON_PADDING_Y*2));
+		
+		for (UnitPicMap map:GameModel.AVAILABLE_UNITS) {
+			JLabel name = new JLabel();
+			PicturePanel picture = new PicturePanel(map.getPicture(), iwidth, iheight);
 			
+			picture.setName(map.getType()+"");
+			
+			picture.setMinimumSize(new Dimension(iwidth, iheight));
+			picture.setMaximumSize(new Dimension(iwidth,iheight));
+			picture.setPreferredSize(new Dimension(iwidth,iheight));
+			picture.setSize(new Dimension(iwidth,iheight));
+			
+			for (UnitNameMap nmap:GameModel.UNIT_NAMES) {
+				if (nmap.getType() == map.getType())
+					name.setText(nmap.getName());
+			}
+			
+			JPanel panel = new JPanel();
+			panel.setMinimumSize(new Dimension(width,height));
+			panel.setMaximumSize(new Dimension(width,height));
+			panel.setPreferredSize(new Dimension(width,height));
+			panel.setSize(new Dimension(width,height));
+			panel.setLayout(new GridBagLayout());
+			
+			if ( y == 0 && x >= col) {
+				y = 1;
+				x = 0;
+			}
+			
+			constraints.gridx = x;
+			constraints.gridy = y;
+			
+			iconstraints.gridy = 0;
+			iconstraints.gridx = 0;
+			iconstraints.gridheight = GridBagConstraints.RELATIVE;
+			panel.add(name, iconstraints);
+			iconstraints.gridy = 1;
+			iconstraints.gridheight = GridBagConstraints.REMAINDER;
+			panel.add(picture, iconstraints);
+			++x;
+			this.add(panel, constraints);
+			panel.setBackground(new Color(rand.nextFloat(),rand.nextFloat(),rand.nextFloat()));
+			panel.repaint();
 		}
 	}
 	
@@ -45,7 +110,7 @@ public class GamePanel extends JPanel implements Informative{
 	}
 
 	public void showBaseContext() {
-		for (UnitPicMap map:Unit.AVAILABLE_UNITS) {
+		for (UnitPicMap map:GameModel.AVAILABLE_UNITS) {
 			
 		}
 		
