@@ -1,4 +1,5 @@
 package ui;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -35,7 +36,7 @@ public class GamePanel extends JPanel implements Informative{
 		Random rand = new Random();
 		constraints = new GridBagConstraints();
 		GridBagConstraints iconstraints = new GridBagConstraints();
-		iconstraints.fill = GridBagConstraints.BOTH;
+		iconstraints.fill = GridBagConstraints.NONE;
 		iconstraints.anchor = GridBagConstraints.CENTER;
 		constraints.fill = GridBagConstraints.NONE;
 		//constraints.ipadx = ICON_PADDING_X;
@@ -47,10 +48,10 @@ public class GamePanel extends JPanel implements Informative{
 		//System.out.println(width + " " + this.getWidth() + " " + col);
 		width = width + (this.getWidth() % col);
 		//System.out.println(width + " " + this.getWidth() + " " + col);
-		int height = this.getHeight();
+		int height = this.getHeight() / 2;
 		
-		int iwidth = Math.round(width - (width * ICON_PADDING_X*2));
-		int iheight = Math.round(height - (height * ICON_PADDING_Y*2));
+		int iwidth = Math.round(width - (width * ICON_PADDING_X));
+		int iheight = Math.round(height - (height * ICON_PADDING_Y));
 		
 		for (UnitPicMap map:GameModel.AVAILABLE_UNITS) {
 			JLabel name = new JLabel();
@@ -82,13 +83,9 @@ public class GamePanel extends JPanel implements Informative{
 			
 			constraints.gridx = x;
 			constraints.gridy = y;
-			
 			iconstraints.gridy = 0;
-			iconstraints.gridx = 0;
-			iconstraints.gridheight = GridBagConstraints.RELATIVE;
 			panel.add(name, iconstraints);
 			iconstraints.gridy = 1;
-			iconstraints.gridheight = GridBagConstraints.REMAINDER;
 			panel.add(picture, iconstraints);
 			++x;
 			this.add(panel, constraints);
