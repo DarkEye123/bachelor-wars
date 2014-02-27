@@ -75,5 +75,4 @@ public class GameModel extends GridWorldModel {
 	public int[][] getData() {
 		return this.data;
 	}
-
 }

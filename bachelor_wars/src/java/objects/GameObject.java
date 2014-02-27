@@ -15,6 +15,7 @@ public class GameObject implements Clickable{
 	protected int cellSizeW, cellSizeH; //real cell size - width and height in pixels
 	protected int type; //sets type of object - for example which AI type is used for base etc
 	int owner; //owner of GameObject .. it could be Player agent1 .. agentx - it doesn't indicate AI level, that is up to "type"
+	Location location;
 
 	/**
 	 * Constructor of GameObject
@@ -25,6 +26,7 @@ public class GameObject implements Clickable{
 	public GameObject(Location location, Dimension objectSize, Dimension cellSize) {
 		this.x = location.x;
 		this.y = location.y;
+		this.location = location;
 		this.width = objectSize.width;
 		this.height = objectSize.height;
 		cellSizeW = cellSize.width;
@@ -96,5 +98,15 @@ public class GameObject implements Clickable{
 
 	public void setOwner(int owner) {
 		this.owner = owner;
+	}
+	
+	public Location getLocation() {
+		return location;
+	}
+	
+	public void setLocation(Location loc) {
+		this.location = loc;
+		this.x = loc.x;
+		this.y = loc.y;
 	}
 }

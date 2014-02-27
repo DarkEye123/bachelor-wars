@@ -81,4 +81,12 @@ public class Unit extends GameObject implements Clickable {
 		g.setColor(Color.lightGray);
         g.drawRect(nx, ny, cellSizeW, cellSizeH);
     }
+
+	public int getNumMoves() {
+		return numMoves;
+	}
+
+	public void setNumMoves(int numMoves) {
+		this.numMoves = numMoves;
+	}
 }

@@ -6,14 +6,17 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.List;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javax.swing.JPanel;
+import javax.swing.event.MouseInputAdapter;
 
 import mapping.GameSettings;
 import models.GameModel;
@@ -29,6 +32,7 @@ public class GameMap extends JPanel {
 	GameModel model;
 	GameView view;
 	private PopupMenu menu;
+	private Unit cunit = null;
 
 	//protected GridCanvas drawArea;
 	
@@ -37,6 +41,9 @@ public class GameMap extends JPanel {
 	
 	private LinkedList<Unit> unitList = new LinkedList<Unit>();
 	private LinkedList<Base> baseList = new LinkedList<Base>();
+	private LinkedList<Location> movementLocations = new LinkedList<Location>();
+	
+	MapMouseInputAdapter mouseListener;
 	
 	
 	public static final float WIDTH_MULTIPLIER = 1f ;
@@ -53,49 +60,12 @@ public class GameMap extends JPanel {
 	}
 	
 	public void init() {
+		mouseListener = new MapMouseInputAdapter();
 		initBases();
 		menu = new PopupMenu();
 		menu.add(new MenuItem("Test"));
 		this.add(menu);
-		this.addMouseListener(new MouseListener() {
-			
-			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			public void mouseClicked(MouseEvent e) {
-				//System.out.println( (int)(e.getX() / map.getCellSizeW()) + " " + (int)(e.getY() / map.getCellSizeH()) );
-				//System.out.println(map.getCellSizeW() + " " + map.getCellSizeH());
-				//map.drawEmpty(map.getGraphics(), e.getX() / map.getCellSizeW(), e.getY() / map.getCellSizeH());
-				//createUnit(e.getComponent().getGraphics(),e.getX(),  e.getY(), GameModel.FIRST_YEAR_STUDENT);
-				if (e.getButton() == MouseEvent.BUTTON1) {
-					for (Base base:baseList) {
-						//System.out.println(base.wasSelected( e.getX(),  e.getY()));
-						view.controlPanel.statusArea.append(base.wasSelected( e.getX(),  e.getY())+"");
-					}
-				}
-				if (e.getButton() == MouseEvent.BUTTON3) {
-					menu.show(e.getComponent(), e.getX(),  e.getY());
-				}
-				
-			}
-		});
+		this.addMouseListener(mouseListener);
 	}
 	
 	private void initBases() {
@@ -161,6 +131,17 @@ public class GameMap extends JPanel {
         g.fillRect(x * cellSizeW + 1, y * cellSizeH+1, cellSizeW-1, cellSizeH-1);
         g.setColor(Color.lightGray);
         g.drawRect(x * cellSizeW, y * cellSizeH, cellSizeW, cellSizeH);
+    }
+    
+    public void drawMovementGrid(LinkedList<Location> locations) {
+    	Graphics g = this.getGraphics();
+        for (Location location:locations) {
+        	g.setColor(Color.GREEN);
+	        g.fillRect(location.x * cellSizeW + 1, location.y * cellSizeH+1, cellSizeW-1, cellSizeH-1);
+	        g.setColor(Color.lightGray);
+	        g.drawRect(location.x * cellSizeW, location.y * cellSizeH, cellSizeW, cellSizeH);
+        }
+        ///drawString(g, x, y, defaultFont, mov+"");
     }
 
     public void drawBase(Graphics g, int x, int y, Color c, String baseName) {
@@ -265,6 +246,46 @@ public class GameMap extends JPanel {
         }
     }
     
+    private void drawPossibleMovement(Location loc, int act, int max) {
+    	if (act <= max) {
+    		findPossibleLocations(loc, act, max, movementLocations, getForbiddenLocations());
+    		movementLocations.removeAll(getForbiddenLocations());	
+    		drawMovementGrid(movementLocations);
+    		repaint();
+    	}
+    }
+    
+    private void findPossibleLocations(Location loc, int act, int max, LinkedList<Location> locations, LinkedList<Location> forbidden) {
+    	if (act <= max && !forbidden.contains(loc)) {
+    		if (! locations.contains(loc))
+    			locations.add(loc);
+    		if (loc.x + 1 < model.getWidth())
+    			findPossibleLocations(new Location(loc.x + 1, loc.y), act+1, max, locations, forbidden);
+    		if (loc.x - 1 >= 0)
+    			findPossibleLocations(new Location(loc.x - 1, loc.y), act+1, max, locations, forbidden);
+    		if (loc.y + 1 < model.getHeight())
+    			findPossibleLocations(new Location(loc.x, loc.y + 1), act+1, max, locations, forbidden);
+    		if (loc.y - 1 >= 0)
+    			findPossibleLocations(new Location(loc.x, loc.y - 1), act+1, max, locations, forbidden);
+    	}
+    }
+    
+    private LinkedList<Location> getForbiddenLocations() {
+    	LinkedList<Location> sumList = new LinkedList<Location>();
+    	for (Unit unit:unitList) {
+    		if (unit != cunit) {
+    			sumList.add(unit.getLocation());
+    		}
+    	}
+		return sumList;
+    }
+    
+    
+    
+    public void drawPossibleMovement(Unit unit) {
+    	drawPossibleMovement(unit.getLocation(), 1, unit.getNumMoves());
+    }
+    
     public void paint(Graphics g) {
         cellSizeW = this.getWidth() / model.getWidth();
         cellSizeH = this.getHeight() / model.getHeight();
@@ -299,5 +320,42 @@ public class GameMap extends JPanel {
         //super.repaint();
     }
 
+    class MapMouseInputAdapter extends MouseInputAdapter {
+    	Base cbase = null;
+    	
+    	public void mouseClicked(MouseEvent e) {
+			if (e.getButton() == MouseEvent.BUTTON1) { 
+				if (movementLocations.isEmpty()) {
+					for (Base base:baseList) {
+						if ( base.wasSelected( e.getX(),  e.getY()) ) {
+							cbase = base;
+							view.controlPanel.statusArea.append("Base: " + base.wasSelected( e.getX(),  e.getY())+"");
+							break;
+						}
+					}
+					for (Unit unit:unitList) {
+						if ( unit.wasSelected( e.getX(),  e.getY()) ) {
+							cunit = unit;
+							view.controlPanel.statusArea.append("Unit: " + unit.wasSelected( e.getX(),  e.getY())+"");
+							break;
+						}
+					}
+					if (cunit != null)
+						drawPossibleMovement(cunit);
+				} else {
+					Location loc = new Location(e.getX() / cellSizeW, e.getY() / cellSizeH);
+					if (movementLocations.contains(loc))
+						cunit.setLocation(loc);
+					cunit = null;
+					movementLocations.clear();
+					e.getComponent().getParent().repaint();
+				}
+			}
+			if (e.getButton() == MouseEvent.BUTTON3) {
+				menu.show(e.getComponent(), e.getX(),  e.getY());
+			}
+			
+		}
+    }
 	
 }
