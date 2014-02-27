@@ -1,4 +1,5 @@
 package ui;
+import jason.asSyntax.Literal;
 import jason.environment.grid.Location;
 
 import java.awt.Color;
@@ -18,6 +19,7 @@ import java.util.LinkedList;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 
+import env.GameEnv;
 import mapping.GameSettings;
 import models.GameModel;
 import objects.Base;
@@ -280,8 +282,6 @@ public class GameMap extends JPanel {
 		return sumList;
     }
     
-    
-    
     public void drawPossibleMovement(Unit unit) {
     	drawPossibleMovement(unit.getLocation(), 1, unit.getNumMoves());
     }
@@ -320,10 +320,27 @@ public class GameMap extends JPanel {
         //super.repaint();
     }
 
-    class MapMouseInputAdapter extends MouseInputAdapter {
-    	Base cbase = null;
-    	
-    	public void mouseClicked(MouseEvent e) {
+
+	public LinkedList<Unit> getUnitList() {
+		return unitList;
+	}
+
+	public void setUnitList(LinkedList<Unit> unitList) {
+		this.unitList = unitList;
+	}
+
+	public LinkedList<Base> getBaseList() {
+		return baseList;
+	}
+
+	public void setBaseList(LinkedList<Base> baseList) {
+		this.baseList = baseList;
+	}
+	
+	class MapMouseInputAdapter extends MouseInputAdapter {
+		Base cbase = null;
+		
+		public void mouseClicked(MouseEvent e) {
 			if (e.getButton() == MouseEvent.BUTTON1) { 
 				if (movementLocations.isEmpty()) {
 					for (Base base:baseList) {
@@ -344,8 +361,12 @@ public class GameMap extends JPanel {
 						drawPossibleMovement(cunit);
 				} else {
 					Location loc = new Location(e.getX() / cellSizeW, e.getY() / cellSizeH);
-					if (movementLocations.contains(loc))
+					if (movementLocations.contains(loc)) {
 						cunit.setLocation(loc);
+						LinkedList<Literal> list = new LinkedList<Literal>();
+						list.add(GameEnv.CAT);
+						view.env.updatePercepts(list);
+					}
 					cunit = null;
 					movementLocations.clear();
 					e.getComponent().getParent().repaint();
@@ -356,6 +377,5 @@ public class GameMap extends JPanel {
 			}
 			
 		}
-    }
-	
+	}
 }

@@ -1,11 +1,15 @@
 package env;
 
 
+import jason.asSyntax.Literal;
 import jason.asSyntax.Structure;
 import jason.environment.Environment;
+import jason.environment.grid.Location;
 
+import java.util.LinkedList;
 import java.util.logging.Logger;
 
+import objects.Base;
 import ui.GameView;
 import ui.menu.MainMenu;
 import models.GameModel;
@@ -13,6 +17,10 @@ import models.GameModel;
 public class GameEnv extends Environment {
 	
 	public static final String VERSION = "0.0.1";
+	
+	public static final Literal CAT = Literal.parseLiteral("can_act(True)");
+	public static final Literal CAF = Literal.parseLiteral("can_act(False)");
+	public static final Literal CURR = Literal.parseLiteral("create_unit(random,random)");
 
     private Logger logger = Logger.getLogger("bachelor_wars."+GameEnv.class.getName());
     
@@ -34,42 +42,37 @@ public class GameEnv extends Environment {
 
     @Override
     public boolean executeAction(String agName, Structure action) {
-        logger.info("executing: "+action+", but not implemented!");
-        return true;
+        logger.info("executing: "+action);
+        boolean result = false;
+        if (action.equals(CURR)) { // of = open(fridge)
+        	Base base = view.getGameMap().getBaseList().get(1);
+        	Location loc = base.getLocation();
+            view.getGameMap().createUnit(loc, base.getOwner(), GameModel.FIRST_YEAR_STUDENT);
+            result = true;
+        }
+        return result;
     }
 
-    /** Called before the end of MAS execution */
-    @Override
-    public void stop() {
-        super.stop();
-    }
-    
-    public void setModel(GameModel model) {
-    	this.model = model;
-    }
-    
-    public void setView(GameView view) {
-    	this.view = view;
-    	view.init();
-    	model.setView(this.view.getGameMap());
-    	//view.setBackground(Color.pink);
-    	//System.out.println(view.getSize());
-    	//model.setView(view);
-    	updatePercepts();
-    	/*view.getContentPane().add(BorderLayout.EAST,new JPanel().add(new JButton("EAST")));
-    	view.getContentPane().add(BorderLayout.WEST,new JPanel().add(new JButton("WEST")));
-    	JPanel south = new JPanel();
-    	south.setSize(view.getWidth(), 300);
-    	south.add(new JButton("KURVA"));
-    	south.add(new JButton("SOUTH"));
-    	System.out.println(view.getCanvas().getSize());
-    	view.getDrawArea().setMaximumSize(new Dimension(200, 200));
-    	System.out.println(view.getCanvas().getSize());
-    	view.repaint();
-    	view.getContentPane().add(BorderLayout.SOUTH,south);*/
-    }
-
-	private void updatePercepts() {
-		
+	public void updatePercepts(LinkedList<Literal> list) {
+		clearAllPercepts();
+		for (Literal lit:list) {
+			addPercept(lit);
+		}
+	}
+	
+	/** Called before the end of MAS execution */
+	@Override
+	public void stop() {
+		super.stop();
+	}
+	
+	public void setModel(GameModel model) {
+		this.model = model;
+	}
+	
+	public void setView(GameView view) {
+		this.view = view;
+		view.init(this);
+		model.setView(this.view.getGameMap());
 	}
 }

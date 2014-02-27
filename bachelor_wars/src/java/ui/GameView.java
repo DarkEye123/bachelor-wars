@@ -12,6 +12,7 @@ import java.awt.GridBagLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import env.GameEnv;
 import ui.ControlMenu;
 import ui.ControlPanel;
 import ui.menu.MainMenu;
@@ -34,6 +35,7 @@ public class GameView extends JPanel {
 	JFrame frame;
 	ControlMenu controlMenu;
 	ControlPanel controlPanel;
+	GameEnv env;
 	
 	GridBagConstraints constraints;
 	
@@ -51,6 +53,7 @@ public class GameView extends JPanel {
 		frame.setVisible(true);
 		setComponentSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT), frame);
 		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH | JFrame.MAXIMIZED_VERT);
+		frame.setAlwaysOnTop(true);
 		frame.setLayout(new BorderLayout());
 		frame.setLocationRelativeTo(null);
 		frame.getContentPane().add(this, BorderLayout.CENTER);
@@ -65,7 +68,8 @@ public class GameView extends JPanel {
 		this.settings = settings;
 	}
 	
-	public void init() {
+	public void init(GameEnv env) {
+		this.env = env;
 		this.setLayout(new GridBagLayout());
 		constraints = new GridBagConstraints();
 		//constraints.gridheight = 3;
