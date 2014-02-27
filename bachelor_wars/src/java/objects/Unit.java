@@ -20,6 +20,8 @@ import models.GameModel;
 public class Unit extends GameObject implements Clickable {
 
 	public static final int DEFAULT_LIFE = 50;
+	public static final int DEFAULT_NUM_MOVES = 4;
+	public static final Dimension DEFAULT_UNIT_SIZE = new Dimension(1,1); //size on grid (x,y)
 	
 	private static int _id_; //identifier of a unit
 	
@@ -27,9 +29,8 @@ public class Unit extends GameObject implements Clickable {
 	protected BufferedImage unitPic = null;
 	protected int id;
 	protected int lives = DEFAULT_LIFE;
+	protected int numMoves = DEFAULT_NUM_MOVES;
 		
-	int type; //sets type of unit 
-
 	/**
 	 * Constructor of Unit
 	 * @param location - coordinates in grid where unit starts
@@ -43,13 +44,13 @@ public class Unit extends GameObject implements Clickable {
 	/**
 	 * Constructor of Unit
 	 * @param location - coordinates in grid where unit starts
-	 * @param baseSize - width and height of unit in cells in grid
+	 * @param unitSize - width and height of unit in cells in grid
 	 * @param cellSize - real cell size - width and height in pixels
 	 * @param type - set a type of unit -> this type sets GameModel class
 	 * @see GameModel
 	 */
-	public Unit(Location location, Dimension baseSize, Dimension cellSize, int type) {
-		this(location,baseSize,cellSize);
+	public Unit(Location location, Dimension unitSize, Dimension cellSize, int type) {
+		this(location,unitSize,cellSize);
 		this.type = type;
 		_id_++;
 		id = _id_;

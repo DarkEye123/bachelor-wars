@@ -41,8 +41,10 @@ public class GameModel extends GridWorldModel {
 	public static final int ADVANCED_AI = 3;
 	
     // constants for the grid objects
-    public static final int BASE = 16;
-    public static final int FIRST_YEAR_STUDENT = 32;
+    public static final int BASE = 16; //common id for Bases
+    public static final int UNIT = 32; //common id for UNITs
+    
+    public static final int FIRST_YEAR_STUDENT = 64;
     
     protected GameMap view;
     protected GameSettings settings;

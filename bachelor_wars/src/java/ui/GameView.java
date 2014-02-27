@@ -3,6 +3,7 @@ import jason.environment.grid.GridWorldModel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -36,13 +37,20 @@ public class GameView extends JPanel {
 	
 	GridBagConstraints constraints;
 	
+	public static void setComponentSize(Dimension dim, Component com) {
+		com.setMinimumSize(dim);
+		com.setMaximumSize(dim);
+		com.setPreferredSize(dim);
+		com.setSize(dim);
+	}
+	
 	public GameView(GridWorldModel model, String title) {
 		
 		frame = new JFrame(title);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
-		frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+		setComponentSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT), frame);
+		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH | JFrame.MAXIMIZED_VERT);
 		frame.setLayout(new BorderLayout());
 		frame.setLocationRelativeTo(null);
 		frame.getContentPane().add(this, BorderLayout.CENTER);

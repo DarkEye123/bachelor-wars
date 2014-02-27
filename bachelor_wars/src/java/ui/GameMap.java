@@ -99,13 +99,13 @@ public class GameMap extends JPanel {
 	}
 	
 	private void initBases() {
-		Dimension baseSize = new Dimension(Base.DEFAULT_BASE_SIZE,Base.DEFAULT_BASE_SIZE);
 		Dimension gridSize = new Dimension(cellSizeW,cellSizeH);
 		Base base = null;
 		for (int x=0; x < settings.getNumPlayers(); ++x) {
-			base = new Base(settings.getBaseLocations().get(x), baseSize, gridSize);
-			base.setBaseColor(settings.getColors().get(x));
+			base = new Base(settings.getBaseLocations().get(x), Base.DEFAULT_BASE_SIZE, gridSize);
+			base.setColor(settings.getColors().get(x));
 			base.setType(settings.getPlayers().get(x));
+			base.setOwner(x);
 			baseList.add(base);
 		}
 	}
@@ -194,6 +194,7 @@ public class GameMap extends JPanel {
     	return y;
     }
     
+    @SuppressWarnings("unused")
     public void createUnit(Graphics g, int x, int y, int type) {
     	Location location = new Location(x / cellSizeW, y / cellSizeH);
     	Dimension baseSize = new Dimension(1,1);
@@ -203,14 +204,22 @@ public class GameMap extends JPanel {
     	repaint();
     }
     
+    public void createUnit(Location gridLocation, int owner, int type) {
+    	Dimension cellSize = new Dimension(cellSizeW, cellSizeH);
+    	Unit unit = new Unit(gridLocation, Unit.DEFAULT_UNIT_SIZE, cellSize, type);
+    	unit.setOwner(owner);
+    	unitList.add(unit);
+    	repaint();
+    }
+    
     public void draw(Graphics g, int x, int y, int object) {
 	    if ( (GameModel.BASE & object) != 0) {
 	    	for (Base base:baseList) {
 	    		if (x == base.getX() && y == base.getY()) { //seek for painted base
 	    			if (base.getType() == GameModel.PLAYER)
-	    				drawBase(g, x, y, base.getBaseColor(), "Player Base");
+	    				drawBase(g, x, y, base.getColor(), "Player Base");
 	    			else
-	    				drawBase(g, x, y, base.getBaseColor(), "Agent Base: " + base.getType());
+	    				drawBase(g, x, y, base.getColor(), "Agent Base: " + base.getType());
 	    			
 	    		}
 	    	}

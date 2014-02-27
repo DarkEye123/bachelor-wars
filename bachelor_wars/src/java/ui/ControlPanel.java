@@ -42,42 +42,26 @@ public class ControlPanel extends JPanel {
 		statusArea = new BTextPane();
 		statusArea.setEditable(false);
 		scrollArea = new JScrollPane(statusArea);
-		
-		
-		scrollArea.setMinimumSize(new Dimension(Math.round(getWidth() * TEXT_AREA_WIDTH_MULTIPLIER), getHeight()) );
-		scrollArea.setMaximumSize(new Dimension(Math.round(getWidth() * TEXT_AREA_WIDTH_MULTIPLIER), getHeight()) );
-		scrollArea.setPreferredSize(new Dimension(Math.round(getWidth() * TEXT_AREA_WIDTH_MULTIPLIER), getHeight()) );
-		scrollArea.setSize(new Dimension(Math.round(getWidth() * TEXT_AREA_WIDTH_MULTIPLIER), getHeight()) );
-		
+		GameView.setComponentSize(new Dimension(Math.round(getWidth() * TEXT_AREA_WIDTH_MULTIPLIER), getHeight()), scrollArea);
 		this.add(scrollArea, constraints);
 		
 		constraints.gridx = 1;
 		constraints.weightx = 2;
 		constraints.anchor = GridBagConstraints.CENTER;
 		
-		infoPanel = new InfoPanel();
-		infoPanel.setMinimumSize(new Dimension(Math.round(getWidth() * INFO_PANEL_WIDTH_MULTIPLIER), getHeight()) );
-		infoPanel.setMaximumSize(new Dimension(Math.round(getWidth() * INFO_PANEL_WIDTH_MULTIPLIER), getHeight()) );
-		infoPanel.setPreferredSize(new Dimension(Math.round(getWidth() * INFO_PANEL_WIDTH_MULTIPLIER), getHeight()) );
-		infoPanel.setSize(new Dimension(Math.round(getWidth() * INFO_PANEL_WIDTH_MULTIPLIER), getHeight()) );
-		
+		infoPanel = new InfoPanel(this);
+		GameView.setComponentSize(new Dimension(Math.round(getWidth() * INFO_PANEL_WIDTH_MULTIPLIER), getHeight()), infoPanel);
 		infoPanel.setBackground(Color.GRAY);
-		
 		this.add(infoPanel, constraints);
+		infoPanel.init();
 		
 		constraints.gridx = 2;
 		constraints.gridwidth = GridBagConstraints.REMAINDER;
 		constraints.weightx = 0;
 		
-		gamePanel = new GamePanel();
-		
-		gamePanel.setMinimumSize(new Dimension(Math.round(getWidth() * GAME_PANEL_WIDTH_MULTIPLIER), getHeight()) );
-		gamePanel.setMaximumSize(new Dimension(Math.round(getWidth() * GAME_PANEL_WIDTH_MULTIPLIER), getHeight()) );
-		gamePanel.setPreferredSize(new Dimension(Math.round(getWidth() * GAME_PANEL_WIDTH_MULTIPLIER), getHeight()) );
-		gamePanel.setSize(new Dimension(Math.round(getWidth() * GAME_PANEL_WIDTH_MULTIPLIER), getHeight()) );
-		
+		gamePanel = new GamePanel(this);
+		GameView.setComponentSize(new Dimension(Math.round(getWidth() * GAME_PANEL_WIDTH_MULTIPLIER), getHeight()), gamePanel);
 		gamePanel.setBackground(Color.GREEN);
-		
 		this.add(gamePanel, constraints);
 		gamePanel.init();
 		

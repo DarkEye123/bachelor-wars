@@ -9,8 +9,9 @@ import models.GameModel;
 
 public class GameSettings {
 	public static final int DEFAULT_PLAYERS = 2;
+	public static final int PLAYER_ID = 0; //living player has always ID 1 as an owner of base
 	
-	private int numPlayers;
+	private int numPlayers; // used to set ID's for players (agents and living player) up to this number from 0 - indicates owners of bases
 	private ArrayList<Integer> players; //players in game
 	private ArrayList<Color> colors;
 	private ArrayList<Location> baseLocations;

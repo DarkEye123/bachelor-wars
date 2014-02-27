@@ -14,18 +14,19 @@ public class GameObject implements Clickable{
 	protected int width, height;// object size in cells
 	protected int cellSizeW, cellSizeH; //real cell size - width and height in pixels
 	protected int type; //sets type of object - for example which AI type is used for base etc
+	int owner; //owner of GameObject .. it could be Player agent1 .. agentx - it doesn't indicate AI level, that is up to "type"
 
 	/**
 	 * Constructor of GameObject
 	 * @param location - coordinates in grid where object starts
-	 * @param baseSize - width and height of object in cells in grid
+	 * @param objectSize - width and height of object in cells in grid
 	 * @param cellSize - real cell size - width and height in pixels
 	 */
-	public GameObject(Location location, Dimension baseSize, Dimension cellSize) {
+	public GameObject(Location location, Dimension objectSize, Dimension cellSize) {
 		this.x = location.x;
 		this.y = location.y;
-		this.width = baseSize.width;
-		this.height = baseSize.height;
+		this.width = objectSize.width;
+		this.height = objectSize.height;
 		cellSizeW = cellSize.width;
 		cellSizeH = cellSize.height;
 	}
@@ -87,5 +88,13 @@ public class GameObject implements Clickable{
 	
 	public void setType(int type) {
 		this.type = type;
+	}
+	
+	public int getOwner() {
+		return owner;
+	}
+
+	public void setOwner(int owner) {
+		this.owner = owner;
 	}
 }

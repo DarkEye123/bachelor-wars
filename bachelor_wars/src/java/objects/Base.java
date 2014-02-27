@@ -13,10 +13,11 @@ import jason.environment.grid.Location;
 public class Base extends GameObject implements Clickable{
 	
 	public final static int DEFAULT_SLOT_SIZE = 6;
-	public final static int DEFAULT_BASE_SIZE = 2;
+	public final static Dimension DEFAULT_BASE_SIZE = new Dimension(2,2); //size on grid (x,y)
 	
 	protected int freeSlots = DEFAULT_SLOT_SIZE; //number of free slots to create new units
-	protected Color baseColor;
+	protected Color color;
+	
 	
 	/**
 	 * Constructor of Base
@@ -36,11 +37,11 @@ public class Base extends GameObject implements Clickable{
 		this.freeSlots = freeSlots;
 	}
 
-	public Color getBaseColor() {
-		return baseColor;
+	public Color getColor() {
+		return color;
 	}
 
-	public void setBaseColor(Color baseColor) {
-		this.baseColor = baseColor;
+	public void setColor(Color baseColor) {
+		this.color = baseColor;
 	}
 }

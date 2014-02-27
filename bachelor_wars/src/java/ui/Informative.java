@@ -1,9 +1,7 @@
 package ui;
 
-import java.awt.Component;
-
 public interface Informative {
-	public void showContext(Component component);
-	public void showBaseContext();
-	public void showUnitContext();
+	public void showContext(int component, int type);
+	public void showBaseContext(int type);
+	public void showUnitContext(int type);
 }

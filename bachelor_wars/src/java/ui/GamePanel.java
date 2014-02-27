@@ -5,13 +5,17 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.MouseInputAdapter;
 
 import mapping.UnitNameMap;
 import mapping.UnitPicMap;
@@ -27,12 +31,18 @@ public class GamePanel extends JPanel implements Informative{
 	public static final int PADDING_X = 10;
 	public static final int PADDING_Y = 10;
 
-	
+	ControlPanel controlPanel;
 	List<JPanel> unitList = new ArrayList<JPanel>();
 	GridBagConstraints constraints;
+	IconMouseInputAdapter iconMouseInputAdapter;
 	
+	public GamePanel(ControlPanel controlPanel) {
+		this.controlPanel = controlPanel;
+	}
+
 	public void init() {
 		this.setLayout(new GridBagLayout());
+		iconMouseInputAdapter = new IconMouseInputAdapter();
 		Random rand = new Random();
 		constraints = new GridBagConstraints();
 		GridBagConstraints iconstraints = new GridBagConstraints();
@@ -45,35 +55,28 @@ public class GamePanel extends JPanel implements Informative{
 		int y = 0;;
 		int col = GameModel.AVAILABLE_UNITS.length/2;
 		int width = this.getWidth() / col;
-		//System.out.println(width + " " + this.getWidth() + " " + col);
 		width = width + (this.getWidth() % col);
-		//System.out.println(width + " " + this.getWidth() + " " + col);
 		int height = this.getHeight() / 2;
 		
 		int iwidth = Math.round(width - (width * ICON_PADDING_X));
 		int iheight = Math.round(height - (height * ICON_PADDING_Y));
 		
 		for (UnitPicMap map:GameModel.AVAILABLE_UNITS) {
-			JLabel name = new JLabel();
+			
 			PicturePanel picture = new PicturePanel(map.getPicture(), iwidth, iheight);
-			
 			picture.setName(map.getType()+"");
+			GameView.setComponentSize(new Dimension(iwidth, iheight), picture);
+			picture.setOpaque(true);
+			picture.addMouseListener(iconMouseInputAdapter);
 			
-			picture.setMinimumSize(new Dimension(iwidth, iheight));
-			picture.setMaximumSize(new Dimension(iwidth,iheight));
-			picture.setPreferredSize(new Dimension(iwidth,iheight));
-			picture.setSize(new Dimension(iwidth,iheight));
-			
+			JLabel name = new JLabel();
 			for (UnitNameMap nmap:GameModel.UNIT_NAMES) {
 				if (nmap.getType() == map.getType())
 					name.setText(nmap.getName());
 			}
 			
 			JPanel panel = new JPanel();
-			panel.setMinimumSize(new Dimension(width,height));
-			panel.setMaximumSize(new Dimension(width,height));
-			panel.setPreferredSize(new Dimension(width,height));
-			panel.setSize(new Dimension(width,height));
+			GameView.setComponentSize(new Dimension(width,height), panel);
 			panel.setLayout(new GridBagLayout());
 			
 			if ( y == 0 && x >= col) {
@@ -98,23 +101,43 @@ public class GamePanel extends JPanel implements Informative{
 	 * Shows context menu for component - for example if Base is selected it shows menu with a possible units to create
 	 * @param component
 	 */
-	public void showContext(Component component) {
-		if (component.getClass().equals(Base.class)) {
-			showBaseContext();
-		} else if (component.getClass().equals(Unit.class)) {
-			showUnitContext();
+	public void showContext(int component, int type) {
+		if (component == GameModel.BASE) {
+			showBaseContext(type);
+		} else if (component == GameModel.UNIT) {
+			showUnitContext(type);
 		}
 	}
 
-	public void showBaseContext() {
-		for (UnitPicMap map:GameModel.AVAILABLE_UNITS) {
-			
-		}
+	public void showBaseContext(int type) {
 		
 	}
 
-	public void showUnitContext() {
-		// TODO Auto-generated method stub
+	public void showUnitContext(int type) {
+		
+	}
+	
+	class IconMouseInputAdapter extends MouseInputAdapter {
+		Color bak;
+		
+		public void mouseClicked(MouseEvent e) {
+			if (e.getComponent().getName().equals(GameModel.FIRST_YEAR_STUDENT+"")) {
+				controlPanel.infoPanel.showContext(GameModel.UNIT, GameModel.FIRST_YEAR_STUDENT);
+			}
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			bak = e.getComponent().getBackground();
+			e.getComponent().setBackground(new Color(220, 208, 242));
+			((PicturePanel) e.getComponent()).setCanDraw(true);
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			e.getComponent().setBackground(bak);
+			((PicturePanel) e.getComponent()).setCanDraw(false);
+		}
 		
 	}
 
