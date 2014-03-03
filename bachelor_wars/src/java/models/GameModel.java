@@ -20,12 +20,12 @@ public class GameModel extends GridWorldModel {
 	//TODO add new units, should be 6 units, but now it's only one
 	public static final UnitPicMap [] AVAILABLE_UNITS = 
 		{
-			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/prvak.png")),
-			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/prvak.png")),
-			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/prvak.png")),
-			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/prvak.png")),
-			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/prvak.png")),
-			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/prvak.png"))
+			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/first_class128.png")),
+			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/first_class128.png")),
+			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/first_class128.png")),
+			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/first_class128.png")),
+			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/first_class128.png")),
+			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/first_class128.png"))
 		};
 	
 	public static final UnitNameMap [] UNIT_NAMES =

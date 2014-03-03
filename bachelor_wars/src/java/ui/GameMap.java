@@ -7,23 +7,19 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.List;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.File;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 
-import env.GameEnv;
 import mapping.GameSettings;
 import models.GameModel;
 import objects.Base;
 import objects.Unit;
+import env.GameEnv;
 
 
 public class GameMap extends JPanel {
@@ -364,8 +360,9 @@ public class GameMap extends JPanel {
 					if (movementLocations.contains(loc)) {
 						cunit.setLocation(loc);
 						LinkedList<Literal> list = new LinkedList<Literal>();
-						list.add(GameEnv.CAT);
-						view.env.updatePercepts(list);
+						//list.add(GameEnv.CAT);
+						//view.env.updatePercepts(list);
+						view.env.addPercept(GameEnv.CA);
 					}
 					cunit = null;
 					movementLocations.clear();
