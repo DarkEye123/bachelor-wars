@@ -16,6 +16,7 @@ public class GameObject implements Clickable{
 	protected int type; //sets type of object - for example which AI type is used for base etc
 	int owner; //owner of GameObject .. it could be Player agent1 .. agentx - it doesn't indicate AI level, that is up to "type"
 	Location location;
+	String name; //Objects name - TODO generate some file with names and read it
 
 	/**
 	 * Constructor of GameObject
@@ -33,6 +34,13 @@ public class GameObject implements Clickable{
 		cellSizeH = cellSize.height;
 	}
 	
+	/**
+	 * Can tell, if player clicked on object or not.
+	 * @param x - x coordinates of point, where mouse clicked
+	 * @param y - y coordinates of point, where mouse clicked
+	 * @return - true if given coordinates are within area that belongs to the object
+	 * @see Clickable
+	 */
 	public boolean wasSelected(int x, int y) {
 		int minX = this.x * cellSizeW; //get cell most left side
 		int maxX = minX + (width * cellSizeW); //get cell most right side
@@ -108,5 +116,13 @@ public class GameObject implements Clickable{
 		this.location = loc;
 		this.x = loc.x;
 		this.y = loc.y;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }

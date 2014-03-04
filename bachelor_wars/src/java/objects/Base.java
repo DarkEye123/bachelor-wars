@@ -17,6 +17,7 @@ public class Base extends GameObject implements Clickable{
 	
 	protected int freeSlots = DEFAULT_SLOT_SIZE; //number of free slots to create new units
 	protected Color color;
+	int videoRecords = 0; //this represents how many resources on the map player owns. 
 	
 	
 	/**

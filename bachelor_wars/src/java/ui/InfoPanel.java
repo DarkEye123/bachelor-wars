@@ -16,15 +16,29 @@ import models.GameModel;
 
 public class InfoPanel extends JPanel implements Informative{
 	private static final long serialVersionUID = 1895792502596588154L;
+	public static final int NOTHING = 0;
+	public static final int UNIT = 1;
 
 	ControlPanel controlPanel;
+	BaseInfoPanel basePanel;
 	ButtonMouseInputAdapter buttonMouseInputAdapter;
+	
+	int actualType = NOTHING;
 	
 	public InfoPanel(ControlPanel controlPanel) {
 		this.controlPanel = controlPanel;
 	}
 
+	/**
+	 * Initialize info panel for different types of information.
+	 * Info panel contains panel displaying information
+	 * about actual chosen unit, about actual chosen base.
+	 * By default information about players base is displayed.
+	 */
 	public void init() {
+		/*
+		 * Initialize panel for base
+		 */
 		buttonMouseInputAdapter = new ButtonMouseInputAdapter();
 
 		JButton addButton = new JButton("add");
