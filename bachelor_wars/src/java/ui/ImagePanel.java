@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
-public class PicturePanel extends JPanel {
+public class ImagePanel extends JPanel {
 	private static final long serialVersionUID = 6644886751888735917L;
 	
 	BufferedImage picture;
@@ -13,7 +13,7 @@ public class PicturePanel extends JPanel {
 	int height;
 	boolean canDraw = false;
 	
-	public PicturePanel(BufferedImage picture, int width, int height) {
+	public ImagePanel(BufferedImage picture, int width, int height) {
 		this.picture = picture;
 		this.width = width;
 		this.height = height;

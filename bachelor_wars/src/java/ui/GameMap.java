@@ -69,11 +69,28 @@ public class GameMap extends JPanel {
 	private void initBases() {
 		Dimension gridSize = new Dimension(cellSizeW,cellSizeH);
 		Base base = null;
+		int[] indexes = {0, 0, 0};
 		for (int x=0; x < settings.getNumPlayers(); ++x) {
 			base = new Base(settings.getBaseLocations().get(x), Base.DEFAULT_BASE_SIZE, gridSize);
 			base.setColor(settings.getColors().get(x));
 			base.setType(settings.getPlayers().get(x));
 			base.setOwner(x);
+			
+			
+			//set names for players (AI, real player ..) 
+			if (base.getType() == GameModel.PLAYER) {
+				base.setName(settings.getPlayerName());
+			} else if (base.getType() == GameModel.SIMPLE_AI) {
+				indexes[0]++;
+				base.setName(GameSettings.AI_NAMES[0]+indexes[0]);
+			} else if (base.getType() == GameModel.MEDIUM_AI) {
+				indexes[1]++;
+				base.setName(GameSettings.AI_NAMES[1]+indexes[1]);
+			} else {
+				indexes[2]++;
+				base.setName(GameSettings.AI_NAMES[2]+indexes[2]);
+			}
+			
 			baseList.add(base);
 		}
 	}

@@ -10,7 +10,7 @@ import models.GameModel;
 public class GameSettings {
 	public static final int DEFAULT_PLAYERS = 2;
 	public static final int PLAYER_ID = 0; //living player has always ID 1 as an owner of base
-	public static final String PLAYER_NAME = "Player";
+	public static final String PLAYER_NAME = "DarkEye";
 	public static final String [] AI_NAMES = {"Simple AI", "Medium AI", "Advanced AI"};
 	
 	
@@ -18,6 +18,7 @@ public class GameSettings {
 	private ArrayList<Integer> players; //players in game
 	private ArrayList<Color> colors;
 	private ArrayList<Location> baseLocations;
+	String playerName;
 	
 	public GameSettings() {
 		setPlayers(new ArrayList<Integer>());
@@ -36,6 +37,7 @@ public class GameSettings {
 		getColors().add(Color.RED);
 		getBaseLocations().add(new Location(0,0));
 		getBaseLocations().add(new Location(GameModel.GSize-2,GameModel.GSize-2));
+		playerName = PLAYER_NAME;
 	}
 
 	public int getNumPlayers() {
@@ -68,5 +70,13 @@ public class GameSettings {
 
 	public void setPlayers(ArrayList<Integer> players) {
 		this.players = players;
+	}
+
+	public String getPlayerName() {
+		return playerName;
+	}
+
+	public void setPlayerName(String playerName) {
+		this.playerName = playerName;
 	}
 }

@@ -63,7 +63,7 @@ public class GamePanel extends JPanel implements Informative{
 		
 		for (UnitPicMap map:GameModel.AVAILABLE_UNITS) {
 			
-			PicturePanel picture = new PicturePanel(map.getPicture(), iwidth, iheight);
+			ImagePanel picture = new ImagePanel(map.getPicture(), iwidth, iheight);
 			picture.setName(map.getType()+"");
 			GameView.setComponentSize(new Dimension(iwidth, iheight), picture);
 			picture.setOpaque(true);
@@ -130,13 +130,13 @@ public class GamePanel extends JPanel implements Informative{
 		public void mouseEntered(MouseEvent e) {
 			bak = e.getComponent().getBackground();
 			e.getComponent().setBackground(new Color(220, 208, 242));
-			((PicturePanel) e.getComponent()).setCanDraw(true);
+			((ImagePanel) e.getComponent()).setCanDraw(true);
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
 			e.getComponent().setBackground(bak);
-			((PicturePanel) e.getComponent()).setCanDraw(false);
+			((ImagePanel) e.getComponent()).setCanDraw(false);
 		}
 		
 	}

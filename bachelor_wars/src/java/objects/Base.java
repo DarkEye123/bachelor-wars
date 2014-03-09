@@ -16,8 +16,9 @@ public class Base extends GameObject implements Clickable{
 	public final static Dimension DEFAULT_BASE_SIZE = new Dimension(2,2); //size on grid (x,y)
 	
 	protected int freeSlots = DEFAULT_SLOT_SIZE; //number of free slots to create new units
+	protected int maxSlots = DEFAULT_SLOT_SIZE; //actual maximum possible slots.
 	protected Color color;
-	int videoRecords = 0; //this represents how many resources on the map player owns. 
+	int knowledge = 0; //this represents how many resources on the map player owns. 
 	
 	
 	/**
@@ -33,9 +34,26 @@ public class Base extends GameObject implements Clickable{
 	public int getFreeSlots() {
 		return freeSlots;
 	}
+	
 
 	public void setFreeSlots(int freeSlots) {
 		this.freeSlots = freeSlots;
+	}
+	
+	/**
+	 * Increase usable slot space by 1. Can't be higher than maxSlots
+	 */
+	public void addFreeSlot() {
+		if (freeSlots < maxSlots)
+			++freeSlots;
+	}
+	
+	/**
+	 * Decrease usable slot space by 1. Can't be lower than 0.
+	 */
+	public void deleteFreeSlot() {
+		if (freeSlots > 0)
+			freeSlots--;
 	}
 
 	public Color getColor() {
@@ -44,5 +62,21 @@ public class Base extends GameObject implements Clickable{
 
 	public void setColor(Color baseColor) {
 		this.color = baseColor;
+	}
+
+	public int getKnowledge() {
+		return knowledge;
+	}
+
+	public void setKnowledge(int knowledge) {
+		this.knowledge = knowledge;
+	}
+
+	public int getMaxSlots() {
+		return maxSlots;
+	}
+
+	public void setMaxSlots(int maxSlots) {
+		this.maxSlots = maxSlots;
 	}
 }
