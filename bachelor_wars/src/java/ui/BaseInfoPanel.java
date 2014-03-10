@@ -1,24 +1,18 @@
 package ui;
 
-import jason.environment.grid.Location;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.MouseEvent;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.event.MouseInputAdapter;
 
-import mapping.GameSettings;
 import objects.Base;
 
 public class BaseInfoPanel extends JPanel {
 	private static final long serialVersionUID = -8594392739063585185L;
+	private static final int INTERNAL_PADDING_Y = 20;
+	private static final Insets DEFAULT_INSETS = new Insets(0, 20, 0, 20);
 	
 	Base base;
 	
@@ -37,8 +31,8 @@ public class BaseInfoPanel extends JPanel {
 		
 		constraints.gridwidth = GridBagConstraints.REMAINDER;
 		constraints.fill = GridBagConstraints.NONE;
-		constraints.ipady = 20;
-		constraints.insets = new Insets(0, 20, 0, 20);
+		constraints.ipady = INTERNAL_PADDING_Y;
+		constraints.insets = DEFAULT_INSETS;
 		constraints.anchor = GridBagConstraints.CENTER;
 		
 		this.setLayout(new GridBagLayout());

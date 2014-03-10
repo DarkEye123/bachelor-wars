@@ -1,8 +1,10 @@
 package models;
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
+import mapping.Dictionary;
 import mapping.GameSettings;
-import mapping.UnitNameMap;
 import mapping.UnitPicMap;
 import ui.GameMap;
 import jason.environment.grid.GridWorldModel;
@@ -28,10 +30,10 @@ public class GameModel extends GridWorldModel {
 			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/first_class128.png"))
 		};
 	
-	public static final UnitNameMap [] UNIT_NAMES =
-		{
-			new UnitNameMap(GameModel.FIRST_YEAR_STUDENT, "First Year Student")
-		};
+	public static List<Dictionary<Integer, String>> UNIT_NAMES = new LinkedList<Dictionary<Integer, String>>();
+	public static List<Dictionary<Integer, Integer>> UNIT_COST = new LinkedList<Dictionary<Integer, Integer>>();
+	public static List<Dictionary<Integer, Integer>> UNIT_ATK = new LinkedList<Dictionary<Integer, Integer>>();
+	
 	
 	public static final int GSize = 24;
 	
@@ -45,6 +47,9 @@ public class GameModel extends GridWorldModel {
     public static final int UNIT = 32; //common id for UNITs
     
     public static final int FIRST_YEAR_STUDENT = 64;
+    public static final int FIRST_YEAR_STUDENT_COST = 20;
+    public static final int FIRST_YEAR_STUDENT_ATK = 5;
+    public static final String FIRST_YEAR_STUDENT_NAME = "First Year Student";
     
     protected GameMap view;
     protected GameSettings settings;
@@ -52,12 +57,21 @@ public class GameModel extends GridWorldModel {
 	public GameModel (GameSettings settings) {
 		this(GSize, GSize, settings.getNumPlayers());
 		this.settings = settings;
+		initUnits();
+		
 		initBases();
 		setAgPos(0, 5, 5);
 	}
 
 	protected GameModel(int w, int h, int nbAgs) {
 		super(GSize, GSize, nbAgs);
+	}
+	
+	private void initUnits() {
+		UNIT_NAMES.add(new Dictionary<Integer, String>(GameModel.FIRST_YEAR_STUDENT, FIRST_YEAR_STUDENT_NAME));
+		UNIT_COST.add(new Dictionary<Integer, Integer>(GameModel.FIRST_YEAR_STUDENT, FIRST_YEAR_STUDENT_COST));
+		UNIT_ATK.add(new Dictionary<Integer, Integer>(GameModel.FIRST_YEAR_STUDENT, FIRST_YEAR_STUDENT_ATK));
+		
 	}
 	
 	//TODO - need to be rewritten, it's temporary code

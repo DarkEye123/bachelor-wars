@@ -296,7 +296,7 @@ public class GameMap extends JPanel {
     }
     
     public void drawPossibleMovement(Unit unit) {
-    	drawPossibleMovement(unit.getLocation(), 1, unit.getNumMoves());
+    	drawPossibleMovement(unit.getLocation(), 1, unit.getMoveRange());
     }
     
     public void paint(Graphics g) {

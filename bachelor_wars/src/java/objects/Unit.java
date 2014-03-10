@@ -5,14 +5,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.Map;
 
-import javax.imageio.ImageIO;
-
+import mapping.Dictionary;
 import mapping.UnitPicMap;
 import models.GameModel;
 
@@ -20,16 +14,17 @@ import models.GameModel;
 public class Unit extends GameObject implements Clickable {
 
 	public static final int DEFAULT_LIFE = 50;
-	public static final int DEFAULT_NUM_MOVES = 4;
+	public static final int DEFAULT_MOVE_RANGE = 4;
 	public static final Dimension DEFAULT_UNIT_SIZE = new Dimension(1,1); //size on grid (x,y)
 	
 	private static int _id_; //identifier of a unit
 	
-	protected String name;
 	protected BufferedImage unitPic = null;
 	protected int id;
-	protected int lives = DEFAULT_LIFE;
-	protected int numMoves = DEFAULT_NUM_MOVES;
+	protected int hp = DEFAULT_LIFE;
+	protected int moveRange = DEFAULT_MOVE_RANGE;
+	protected int cost;
+	protected int atk;
 		
 	/**
 	 * Constructor of Unit
@@ -58,10 +53,29 @@ public class Unit extends GameObject implements Clickable {
 	}
 
 	private void init() {
+		//set picture for unit
 		for (UnitPicMap map: GameModel.AVAILABLE_UNITS) {
 			if (type == map.getType()) {
 				unitPic = map.getPicture();
 				break;
+			}
+		}
+		//set name for unit
+		for (Dictionary<Integer, String> map:GameModel.UNIT_NAMES) {
+			if (map.getIndex() == type) {
+				name = map.getValue()+" "+id;
+			}
+		}
+		
+		for (Dictionary<Integer, Integer> map:GameModel.UNIT_COST) {
+			if (map.getIndex() == type) {
+				cost = map.getValue();
+			}
+		}
+		
+		for (Dictionary<Integer, Integer> map:GameModel.UNIT_ATK) {
+			if (map.getIndex() == type) {
+				atk = map.getValue();
 			}
 		}
 	}
@@ -82,11 +96,27 @@ public class Unit extends GameObject implements Clickable {
         g.drawRect(nx, ny, cellSizeW, cellSizeH);
     }
 
-	public int getNumMoves() {
-		return numMoves;
+	public int getMoveRange() {
+		return moveRange;
 	}
 
-	public void setNumMoves(int numMoves) {
-		this.numMoves = numMoves;
+	public void setMoveRange(int numMoves) {
+		this.moveRange = numMoves;
+	}
+
+	public int getCost() {
+		return cost;
+	}
+
+	public void setCost(int cost) {
+		this.cost = cost;
+	}
+
+	public int getHp() {
+		return hp;
+	}
+
+	public void setHp(int hp) {
+		this.hp = hp;
 	}
 }

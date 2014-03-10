@@ -1,27 +1,20 @@
 package ui;
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseEvent;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 
-import mapping.UnitNameMap;
+import mapping.Dictionary;
 import mapping.UnitPicMap;
 import models.GameModel;
-import objects.Base;
-import objects.Unit;
 
 
 public class GamePanel extends JPanel implements Informative{
@@ -70,9 +63,9 @@ public class GamePanel extends JPanel implements Informative{
 			picture.addMouseListener(iconMouseInputAdapter);
 			
 			JLabel name = new JLabel();
-			for (UnitNameMap nmap:GameModel.UNIT_NAMES) {
-				if (nmap.getType() == map.getType())
-					name.setText(nmap.getName());
+			for (Dictionary<Integer, String> nmap:GameModel.UNIT_NAMES) {
+				if (nmap.getIndex() == map.getType())
+					name.setText(nmap.getValue());
 			}
 			
 			JPanel panel = new JPanel();
