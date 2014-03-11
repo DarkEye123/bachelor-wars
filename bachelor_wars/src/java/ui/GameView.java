@@ -94,10 +94,7 @@ public class GameView extends JPanel {
 		ControlMenu controlMenu = new ControlMenu(this);
 		controlMenu.setBackground(Color.yellow);
 		Dimension size = new Dimension(this.getWidth(), Math.round(this.getHeight() * ControlMenu.HEIGHT_MULTIPLIER));
-		controlMenu.setMinimumSize(size);
-		controlMenu.setMaximumSize(size);
-		controlMenu.setPreferredSize(size);
-		controlMenu.setSize(size);
+		setComponentSize(size, controlMenu);
 		this.add(controlMenu, constraints);
 		return controlMenu;
 	}
@@ -106,10 +103,7 @@ public class GameView extends JPanel {
 		GameMap gameMap = new GameMap(this);
 		gameMap.setBackground(Color.green);
 		Dimension size = new Dimension(Math.round(this.getWidth() * GameMap.WIDTH_MULTIPLIER), Math.round(this.getHeight() * GameMap.HEIGHT_MULTIPLIER));
-		gameMap.setMinimumSize(size);
-		gameMap.setMaximumSize(size);
-		gameMap.setPreferredSize(size);
-		gameMap.setSize(size);
+		setComponentSize(size, gameMap);
 		this.add(gameMap, constraints);
 		gameMap.init();
 		return gameMap;
@@ -119,10 +113,7 @@ public class GameView extends JPanel {
 		ControlPanel controlPanel = new ControlPanel(this);
 		controlPanel.setBackground(Color.red);
 		Dimension size = new Dimension(this.getWidth(), Math.round(this.getHeight() * ControlPanel.HEIGHT_MULTIPLIER));
-		controlPanel.setMinimumSize(size);
-		controlPanel.setMaximumSize(size);
-		controlPanel.setPreferredSize(size);
-		controlPanel.setSize(size);
+		setComponentSize(size, controlPanel);
 		this.add(controlPanel, constraints);
 		controlPanel.init();
 		return controlPanel;

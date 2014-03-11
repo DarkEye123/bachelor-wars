@@ -22,6 +22,7 @@ public class Unit extends GameObject implements Clickable {
 	protected BufferedImage unitPic = null;
 	protected int id;
 	protected int hp = DEFAULT_LIFE;
+	protected int maxHp = hp;
 	protected int moveRange = DEFAULT_MOVE_RANGE;
 	protected int cost;
 	protected int atk;
@@ -118,5 +119,41 @@ public class Unit extends GameObject implements Clickable {
 
 	public void setHp(int hp) {
 		this.hp = hp;
+	}
+	
+	public void addDamage(int damage) {
+		hp = hp - damage >= 0 ? hp - damage : 0;
+	}
+	
+	public void addHeal(int heal) {
+		hp = hp + heal >= maxHp ? hp + heal : maxHp;
+	}
+	
+	public boolean isDead() {
+		return hp == 0;
+	}
+
+	public int getMaxHp() {
+		return maxHp;
+	}
+
+	public void setMaxHp(int maxHp) {
+		this.maxHp = maxHp;
+	}
+
+	public int getAtk() {
+		return atk;
+	}
+
+	public void setAtk(int atk) {
+		this.atk = atk;
+	}
+
+	public BufferedImage getPicture() {
+		return unitPic;
+	}
+
+	public void setPicture(BufferedImage unitPic) {
+		this.unitPic = unitPic;
 	}
 }

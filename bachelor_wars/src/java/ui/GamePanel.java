@@ -58,7 +58,7 @@ public class GamePanel extends JPanel implements Informative{
 			
 			ImagePanel picture = new ImagePanel(map.getPicture(), iwidth, iheight);
 			picture.setName(map.getType()+"");
-			GameView.setComponentSize(new Dimension(iwidth, iheight), picture);
+			//GameView.setComponentSize(new Dimension(iwidth, iheight), picture);
 			picture.setOpaque(true);
 			picture.addMouseListener(iconMouseInputAdapter);
 			
