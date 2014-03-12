@@ -9,14 +9,18 @@ import java.awt.Dimension;
  * @author DarkEye
  *
  */
-public class GameObject implements Clickable{
+public abstract class GameObject implements Clickable{
 	protected int x, y; //coordinates
 	protected int width, height;// object size in cells
 	protected int cellSizeW, cellSizeH; //real cell size - width and height in pixels
 	protected int type; //sets type of object - for example which AI type is used for base etc
-	int owner; //owner of GameObject .. it could be Player agent1 .. agentx - it doesn't indicate AI level, that is up to "type"
-	Location location;
-	String name; //Objects name - TODO generate some file with names and read it
+	protected int owner; //owner of GameObject .. it could be Player agent1 .. agentx - it doesn't indicate AI level, that is up to "type"
+	protected Location location;
+	protected String name; //Objects name - TODO generate some file with names and read it
+	
+	public GameObject() {
+		
+	}
 
 	/**
 	 * Constructor of GameObject

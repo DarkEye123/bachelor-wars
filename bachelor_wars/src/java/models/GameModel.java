@@ -1,14 +1,15 @@
 package models;
-import java.io.File;
+import jason.environment.grid.GridWorldModel;
+import jason.environment.grid.Location;
+
 import java.util.LinkedList;
 import java.util.List;
 
 import mapping.Dictionary;
 import mapping.GameSettings;
-import mapping.UnitPicMap;
+import objects.units.FirstYear;
+import objects.units.Unit;
 import ui.GameMap;
-import jason.environment.grid.GridWorldModel;
-import jason.environment.grid.Location;
 
 
 /**
@@ -20,20 +21,7 @@ import jason.environment.grid.Location;
 public class GameModel extends GridWorldModel {
 	
 	//TODO add new units, should be 6 units, but now it's only one
-	public static final UnitPicMap [] AVAILABLE_UNITS = 
-		{
-			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/first_class128.png")),
-			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/first_class128.png")),
-			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/first_class128.png")),
-			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/first_class128.png")),
-			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/first_class128.png")),
-			new UnitPicMap(GameModel.FIRST_YEAR_STUDENT,new File("pics/first_class128.png"))
-		};
-	
-	public static List<Dictionary<Integer, String>> UNIT_NAMES = new LinkedList<Dictionary<Integer, String>>();
-	public static List<Dictionary<Integer, Integer>> UNIT_COST = new LinkedList<Dictionary<Integer, Integer>>();
-	public static List<Dictionary<Integer, Integer>> UNIT_ATK = new LinkedList<Dictionary<Integer, Integer>>();
-	
+	public static final List<Dictionary<Integer, Unit>> AVAILABLE_UNITS = new LinkedList<Dictionary<Integer, Unit>>();
 	
 	public static final int GSize = 24;
 	
@@ -47,9 +35,6 @@ public class GameModel extends GridWorldModel {
     public static final int UNIT = 32; //common id for UNITs
     
     public static final int FIRST_YEAR_STUDENT = 64;
-    public static final int FIRST_YEAR_STUDENT_COST = 20;
-    public static final int FIRST_YEAR_STUDENT_ATK = 5;
-    public static final String FIRST_YEAR_STUDENT_NAME = "First Year Student";
     
     protected GameMap view;
     protected GameSettings settings;
@@ -58,7 +43,6 @@ public class GameModel extends GridWorldModel {
 		this(GSize, GSize, settings.getNumPlayers());
 		this.settings = settings;
 		initUnits();
-		
 		initBases();
 		setAgPos(0, 5, 5);
 	}
@@ -68,10 +52,12 @@ public class GameModel extends GridWorldModel {
 	}
 	
 	private void initUnits() {
-		UNIT_NAMES.add(new Dictionary<Integer, String>(GameModel.FIRST_YEAR_STUDENT, FIRST_YEAR_STUDENT_NAME));
-		UNIT_COST.add(new Dictionary<Integer, Integer>(GameModel.FIRST_YEAR_STUDENT, FIRST_YEAR_STUDENT_COST));
-		UNIT_ATK.add(new Dictionary<Integer, Integer>(GameModel.FIRST_YEAR_STUDENT, FIRST_YEAR_STUDENT_ATK));
-		
+		AVAILABLE_UNITS.add(new Dictionary<Integer, Unit>(GameModel.FIRST_YEAR_STUDENT,FirstYear.getPrototype()));
+		AVAILABLE_UNITS.add(new Dictionary<Integer, Unit>(GameModel.FIRST_YEAR_STUDENT,FirstYear.getPrototype()));
+		AVAILABLE_UNITS.add(new Dictionary<Integer, Unit>(GameModel.FIRST_YEAR_STUDENT,FirstYear.getPrototype()));
+		AVAILABLE_UNITS.add(new Dictionary<Integer, Unit>(GameModel.FIRST_YEAR_STUDENT,FirstYear.getPrototype()));
+		AVAILABLE_UNITS.add(new Dictionary<Integer, Unit>(GameModel.FIRST_YEAR_STUDENT,FirstYear.getPrototype()));
+		AVAILABLE_UNITS.add(new Dictionary<Integer, Unit>(GameModel.FIRST_YEAR_STUDENT,FirstYear.getPrototype()));
 	}
 	
 	//TODO - need to be rewritten, it's temporary code

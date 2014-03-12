@@ -12,8 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 
+import objects.units.Unit;
 import mapping.Dictionary;
-import mapping.UnitPicMap;
 import models.GameModel;
 
 
@@ -46,7 +46,7 @@ public class GamePanel extends JPanel implements Informative{
 		//constraints.ipady = ICON_PADDING_Y;
 		int x = 0;
 		int y = 0;;
-		int col = GameModel.AVAILABLE_UNITS.length/2;
+		int col = GameModel.AVAILABLE_UNITS.size()/2;
 		int width = this.getWidth() / col;
 		width = width + (this.getWidth() % col);
 		int height = this.getHeight() / 2;
@@ -54,19 +54,16 @@ public class GamePanel extends JPanel implements Informative{
 		int iwidth = Math.round(width - (width * ICON_PADDING_X));
 		int iheight = Math.round(height - (height * ICON_PADDING_Y));
 		
-		for (UnitPicMap map:GameModel.AVAILABLE_UNITS) {
+		for (Dictionary<Integer, Unit> map:GameModel.AVAILABLE_UNITS) {
 			
-			ImagePanel picture = new ImagePanel(map.getPicture(), iwidth, iheight);
-			picture.setName(map.getType()+"");
+			ImagePanel picture = new ImagePanel(map.getValue().getImage(), iwidth, iheight);
+			picture.setName(map.getIndex()+"");
 			//GameView.setComponentSize(new Dimension(iwidth, iheight), picture);
 			picture.setOpaque(true);
 			picture.addMouseListener(iconMouseInputAdapter);
 			
 			JLabel name = new JLabel();
-			for (Dictionary<Integer, String> nmap:GameModel.UNIT_NAMES) {
-				if (nmap.getIndex() == map.getType())
-					name.setText(nmap.getValue());
-			}
+			name.setText(map.getValue().getName());
 			
 			JPanel panel = new JPanel();
 			GameView.setComponentSize(new Dimension(width,height), panel);

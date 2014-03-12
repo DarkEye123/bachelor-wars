@@ -1,20 +1,14 @@
 package ui;
 
 
-import jason.environment.grid.Location;
-
-import java.awt.event.MouseEvent;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.util.List;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.event.MouseInputAdapter;
 
-import objects.Base;
-import mapping.GameSettings;
 import models.GameModel;
+import objects.Base;
 
 public class InfoPanel extends JPanel implements Informative{
 	private static final long serialVersionUID = 1895792502596588154L;
@@ -70,31 +64,10 @@ public class InfoPanel extends JPanel implements Informative{
 	}
 
 	public void showUnitContext(int type) {
-		//buttonMouseInputAdapter.text = "Player: created unit " + type;
-		//buttonMouseInputAdapter.type = type;
+		for (Component comp:this.getComponents()) {
+			comp.setVisible(false);
+		}
+		this.add(new UnitInfoPanel(type, controlPanel), BorderLayout.CENTER);
 	}
-	class ButtonMouseInputAdapter extends MouseInputAdapter {
-		Date dNow = new Date( );
-	    SimpleDateFormat ft = new SimpleDateFormat ("hh:mm:ss");
-	    String text;
-	    int type;
-	    
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			if (e.getComponent().getName().equals("add unit")) {
-				controlPanel.statusArea.append(ft.format(dNow) + ": " + text);
-				Location loc = controlPanel.view.settings.getBaseLocations().get(0); //player location must be EVERYTIME FIRST
-				controlPanel.view.gameMap.createUnit(loc, GameSettings.PLAYER_ID, type);
-			}
-		}
-
-		@Override
-		public void mouseEntered(MouseEvent e) {
-		}
-
-		@Override
-		public void mouseExited(MouseEvent e) {
-		}
-		
-	}
+	
 }

@@ -18,7 +18,8 @@ import javax.swing.event.MouseInputAdapter;
 import mapping.GameSettings;
 import models.GameModel;
 import objects.Base;
-import objects.Unit;
+import objects.units.FirstYear;
+import objects.units.Unit;
 import env.GameEnv;
 
 
@@ -190,22 +191,23 @@ public class GameMap extends JPanel {
     	return y;
     }
     
-    @SuppressWarnings("unused")
-    public void createUnit(Graphics g, int x, int y, int type) {
-    	Location location = new Location(x / cellSizeW, y / cellSizeH);
-    	Dimension baseSize = new Dimension(1,1);
-    	Dimension cellSize = new Dimension(cellSizeW, cellSizeH);
-    	Unit unit = new Unit(location, baseSize, cellSize, type);
-    	unitList.add(unit);
-    	repaint();
-    }
+//    @SuppressWarnings("unused")
+//    public void createUnit(Graphics g, int x, int y, int type) {
+//    	Location location = new Location(x / cellSizeW, y / cellSizeH);
+//    	Dimension baseSize = new Dimension(1,1);
+//    	Dimension cellSize = new Dimension(cellSizeW, cellSizeH);
+//    	Unit unit = new Unit(location, baseSize, cellSize, type);
+//    	unitList.add(unit);
+//    	repaint();
+//    }
     
-    public void createUnit(Location gridLocation, int owner, int type) {
+    public Unit createUnit(Location gridLocation, int owner, int type) {
     	Dimension cellSize = new Dimension(cellSizeW, cellSizeH);
-    	Unit unit = new Unit(gridLocation, Unit.DEFAULT_UNIT_SIZE, cellSize, type);
+    	Unit unit = new FirstYear(gridLocation, Unit.DEFAULT_UNIT_SIZE, cellSize);
     	unit.setOwner(owner);
     	unitList.add(unit);
     	repaint();
+    	return unit;
     }
     
     public void draw(Graphics g, int x, int y, int object) {
@@ -296,7 +298,7 @@ public class GameMap extends JPanel {
     }
     
     public void drawPossibleMovement(Unit unit) {
-    	drawPossibleMovement(unit.getLocation(), 1, unit.getMoveRange());
+    	drawPossibleMovement(unit.getLocation(), 1, unit.getMov());
     }
     
     public void paint(Graphics g) {

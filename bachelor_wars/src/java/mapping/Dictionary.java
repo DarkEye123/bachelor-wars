@@ -1,5 +1,7 @@
 package mapping;
 
+import objects.units.FirstYear;
+
 public class Dictionary<K, M> {
 	K index;
 	M value;

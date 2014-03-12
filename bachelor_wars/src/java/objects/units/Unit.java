@@ -1,4 +1,4 @@
-package objects;
+package objects.units;
 import jason.environment.grid.Location;
 
 import java.awt.Color;
@@ -6,26 +6,28 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import mapping.Dictionary;
-import mapping.UnitPicMap;
 import models.GameModel;
+import objects.Clickable;
+import objects.GameObject;
 
 
-public class Unit extends GameObject implements Clickable {
+public abstract class Unit extends GameObject implements Clickable {
 
-	public static final int DEFAULT_LIFE = 50;
-	public static final int DEFAULT_MOVE_RANGE = 4;
 	public static final Dimension DEFAULT_UNIT_SIZE = new Dimension(1,1); //size on grid (x,y)
 	
 	private static int _id_; //identifier of a unit
 	
-	protected BufferedImage unitPic = null;
+	protected static BufferedImage image = null;
 	protected int id;
-	protected int hp = DEFAULT_LIFE;
-	protected int maxHp = hp;
-	protected int moveRange = DEFAULT_MOVE_RANGE;
-	protected int cost;
-	protected int atk;
+	protected int hp;
+	protected static int maxHp;
+	protected static int mov;
+	protected static int cost;
+	protected static int atk;
+	
+	public Unit() {
+		
+	}
 		
 	/**
 	 * Constructor of Unit
@@ -50,35 +52,6 @@ public class Unit extends GameObject implements Clickable {
 		this.type = type;
 		_id_++;
 		id = _id_;
-		init();
-	}
-
-	private void init() {
-		//set picture for unit
-		for (UnitPicMap map: GameModel.AVAILABLE_UNITS) {
-			if (type == map.getType()) {
-				unitPic = map.getPicture();
-				break;
-			}
-		}
-		//set name for unit
-		for (Dictionary<Integer, String> map:GameModel.UNIT_NAMES) {
-			if (map.getIndex() == type) {
-				name = map.getValue()+" "+id;
-			}
-		}
-		
-		for (Dictionary<Integer, Integer> map:GameModel.UNIT_COST) {
-			if (map.getIndex() == type) {
-				cost = map.getValue();
-			}
-		}
-		
-		for (Dictionary<Integer, Integer> map:GameModel.UNIT_ATK) {
-			if (map.getIndex() == type) {
-				atk = map.getValue();
-			}
-		}
 	}
 
 	/**
@@ -92,25 +65,17 @@ public class Unit extends GameObject implements Clickable {
 		int ny = y * cellSizeH;
 		cellSizeW = width;
 		cellSizeH = height;
-		g.drawImage(unitPic, nx + 1, ny + 1, cellSizeW - 1, cellSizeH - 1, null);
+		g.drawImage(image, nx + 1, ny + 1, cellSizeW - 1, cellSizeH - 1, null);
 		g.setColor(Color.lightGray);
         g.drawRect(nx, ny, cellSizeW, cellSizeH);
     }
 
-	public int getMoveRange() {
-		return moveRange;
-	}
-
-	public void setMoveRange(int numMoves) {
-		this.moveRange = numMoves;
+	public int getMov() {
+		return mov;
 	}
 
 	public int getCost() {
 		return cost;
-	}
-
-	public void setCost(int cost) {
-		this.cost = cost;
 	}
 
 	public int getHp() {
@@ -137,23 +102,19 @@ public class Unit extends GameObject implements Clickable {
 		return maxHp;
 	}
 
-	public void setMaxHp(int maxHp) {
-		this.maxHp = maxHp;
-	}
-
 	public int getAtk() {
 		return atk;
 	}
 
-	public void setAtk(int atk) {
-		this.atk = atk;
+	public BufferedImage getImage() {
+		return image;
 	}
 
-	public BufferedImage getPicture() {
-		return unitPic;
+	public void setImage(BufferedImage image) {
+		Unit.image = image;
 	}
-
-	public void setPicture(BufferedImage unitPic) {
-		this.unitPic = unitPic;
+	
+	public static Unit getPrototype() {
+		return null;
 	}
 }
