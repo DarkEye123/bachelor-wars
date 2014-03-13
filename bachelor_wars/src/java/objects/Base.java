@@ -1,7 +1,9 @@
 package objects;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.LinkedList;
 
+import objects.units.Unit;
 import jason.environment.grid.Location;
 
 /**
@@ -14,6 +16,9 @@ public class Base extends GameObject implements Clickable{
 	
 	public final static int DEFAULT_SLOT_SIZE = 6;
 	public final static Dimension DEFAULT_BASE_SIZE = new Dimension(2,2); //size on grid (x,y)
+	
+	
+	private LinkedList<Unit> unitList = new LinkedList<Unit>();
 	
 	protected int freeSlots = DEFAULT_SLOT_SIZE; //number of free slots to create new units
 	protected int maxSlots = DEFAULT_SLOT_SIZE; //actual maximum possible slots.
@@ -78,5 +83,27 @@ public class Base extends GameObject implements Clickable{
 
 	public void setMaxSlots(int maxSlots) {
 		this.maxSlots = maxSlots;
+	}
+
+	public LinkedList<Unit> getUnitList() {
+		return unitList;
+	}
+
+	public void setUnitList(LinkedList<Unit> unitList) {
+		this.unitList = unitList;
+	}
+	
+	/**
+	 * Seek for instance of base with given owner
+	 * @param owner - id of owner (PLAYER, Agent1 etc...)
+	 * @param baseList - list of bases where to seek
+	 * @return
+	 */
+	public static Base getOwnerBase(int owner, LinkedList<Base> baseList) {
+		for (Base base:baseList) {
+			if (base.owner == owner)
+				return base;
+		}
+		return null;
 	}
 }

@@ -7,13 +7,12 @@ import jason.environment.Environment;
 import jason.environment.grid.Location;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.logging.Logger;
 
+import models.GameModel;
 import objects.Base;
 import ui.GameView;
 import ui.menu.MainMenu;
-import models.GameModel;
 
 public class GameEnv extends Environment {
 	
@@ -21,6 +20,9 @@ public class GameEnv extends Environment {
 	
 	public static final Literal CA = Literal.parseLiteral("can_act");
 	public static final Literal CU = Literal.parseLiteral("create_unit");
+	public static final Literal UPDATE = Literal.parseLiteral("update_percepts");
+	public static final Literal MOV = Literal.parseLiteral("move_units");
+	public static final Literal EKNOW = Literal.parseLiteral("enough_knowledge");
 
     private Logger logger = Logger.getLogger("bachelor_wars."+GameEnv.class.getName());
     
@@ -43,12 +45,24 @@ public class GameEnv extends Environment {
     @Override
     public boolean executeAction(String agName, Structure action) {
         logger.info("["+agName+"] executing: "+action);
-        if (action.equals(CU)) { // of = open(fridge)
+        if (action.equals(UPDATE) && view.getGameMap().getBaseList().size() > 0) {
+	        Base base = view.getGameMap().getBaseList().get(1);
+	        addPercept(Literal.parseLiteral("actualKnowledge("+10+")"));
+	        addPercept(Literal.parseLiteral("freeSlots("+base.getFreeSlots()+")"));
+	        addPercept(Literal.parseLiteral("maximumSlots("+base.getMaxSlots()+")"));
+	        addPercept(EKNOW);
+	        System.out.println("updating percepts");
+        }
+        if (action.equals(CU)) { 
         	Base base = view.getGameMap().getBaseList().get(1);
         	Location loc = base.getLocation();
             view.getGameMap().createUnit(loc, base.getOwner(), GameModel.FIRST_YEAR_STUDENT);
             clearPercepts();
             return true;
+        } else if (action.equals(MOV)) {
+        	System.out.println("moving unit");
+        	clearPercepts();
+        	return true;
         } else {
         	clearPercepts();
         	return true;

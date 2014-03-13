@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 
 import models.GameModel;
 import objects.Base;
+import objects.units.Unit;
 
 public class InfoPanel extends JPanel implements Informative{
 	private static final long serialVersionUID = 1895792502596588154L;
@@ -62,12 +63,22 @@ public class InfoPanel extends JPanel implements Informative{
 	public void showBaseContext(int type) {
 		
 	}
-
-	public void showUnitContext(int type) {
+	
+	//TODO try real erase
+	private void eraseContainer() {
 		for (Component comp:this.getComponents()) {
 			comp.setVisible(false);
 		}
+	}
+
+	public void showUnitContext(int type) {
+		eraseContainer();
 		this.add(new UnitInfoPanel(type, controlPanel), BorderLayout.CENTER);
+	}
+	
+	public void showUnitContext(Unit unit) {
+		eraseContainer();
+		this.add(new UnitInfoPanel(unit, controlPanel), BorderLayout.CENTER);
 	}
 	
 }

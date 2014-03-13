@@ -22,6 +22,13 @@
 
 /* Initial beliefs and rules */
 
+actualKnowledge(unknown).
+freeSlots(unknown).
+maximumSlots(unknown).
+
+//TODO here it fails
+can_create_unit :- freeSlots < maximumSlots.
+
 /* Initial goals */
 
 !start.
@@ -46,8 +53,10 @@
 +!wait: can_act <- .print("can act").
 +!wait: not can_act <- !wait.
 
-+can_act <- .print("preparing creation");
-		create_unit.
++can_act <- .print("preparing action"); update_percepts; !check_action.
+
+//is possible buy even the cheapest unit
++!check_action: can_create_unit & enough_knowledge <-  create_unit; move_units.
 		
--can_act <- .print("can_act removed, waintig for next turn").
+-can_act <- .print("can_act removed, waiting for next turn").
 

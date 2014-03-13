@@ -1,5 +1,4 @@
 package ui;
-import jason.asSyntax.Literal;
 import jason.environment.grid.Location;
 
 import java.awt.Color;
@@ -205,7 +204,8 @@ public class GameMap extends JPanel {
     	Dimension cellSize = new Dimension(cellSizeW, cellSizeH);
     	Unit unit = new FirstYear(gridLocation, Unit.DEFAULT_UNIT_SIZE, cellSize);
     	unit.setOwner(owner);
-    	unitList.add(unit);
+    	Base.getOwnerBase(owner,baseList).getUnitList().add(unit); //list of units of actual player
+    	unitList.add(unit); //list of all units
     	repaint();
     	return unit;
     }
@@ -369,6 +369,7 @@ public class GameMap extends JPanel {
 						if ( unit.wasSelected( e.getX(),  e.getY()) ) {
 							cunit = unit;
 							view.controlPanel.statusArea.append("Unit: " + unit.wasSelected( e.getX(),  e.getY())+"");
+							view.controlPanel.infoPanel.showUnitContext(cunit);
 							break;
 						}
 					}
@@ -378,13 +379,10 @@ public class GameMap extends JPanel {
 					Location loc = new Location(e.getX() / cellSizeW, e.getY() / cellSizeH);
 					if (movementLocations.contains(loc)) {
 						cunit.setLocation(loc);
-						LinkedList<Literal> list = new LinkedList<Literal>();
-						//list.add(GameEnv.CAT);
-						//view.env.updatePercepts(list);
 						view.env.addPercept(GameEnv.CA);
 					}
-					cunit = null;
 					movementLocations.clear();
+					cunit = null;
 					e.getComponent().getParent().repaint();
 				}
 			}
