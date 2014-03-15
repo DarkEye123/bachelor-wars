@@ -9,8 +9,10 @@ import jason.environment.grid.Location;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
+import mapping.GameSettings;
 import models.GameModel;
 import objects.Base;
+import objects.units.Unit;
 import ui.GameView;
 import ui.menu.MainMenu;
 
@@ -46,35 +48,53 @@ public class GameEnv extends Environment {
     public boolean executeAction(String agName, Structure action) {
         logger.info("["+agName+"] executing: "+action);
         if (action.equals(UPDATE) && view.getGameMap().getBaseList().size() > 0) {
+        	clearPercepts();
 	        Base base = view.getGameMap().getBaseList().get(1);
 	        addPercept(Literal.parseLiteral("actualKnowledge("+10+")"));
 	        addPercept(Literal.parseLiteral("freeSlots("+base.getFreeSlots()+")"));
 	        addPercept(Literal.parseLiteral("maximumSlots("+base.getMaxSlots()+")"));
 	        addPercept(EKNOW);
 	        System.out.println("updating percepts");
-        }
-        if (action.equals(CU)) { 
+	        return true;
+        } else if (action.equals(CU)) {
         	Base base = view.getGameMap().getBaseList().get(1);
         	Location loc = base.getLocation();
             view.getGameMap().createUnit(loc, base.getOwner(), GameModel.FIRST_YEAR_STUDENT);
             clearPercepts();
             return true;
         } else if (action.equals(MOV)) {
-        	System.out.println("moving unit");
+        	for (Base base:view.getGameMap().getBaseList()) {
+        		if (base.getOwner() != GameSettings.PLAYER_ID) {
+        			for (Unit unit:base.getUnitList()) {
+        				view.getGameMap().drawPossibleMovement(unit);
+        				boolean repeat = true;
+        				while (repeat) {
+//        					System.out.println("Unit: " + unit.getName());
+        					for (Location loc:view.getGameMap().getMovementLocations()) {
+        						double test = Math.random();
+        						System.out.println("Generated number: " + test);
+        						if (test > 0.5) {
+        							unit.setLocation(loc);
+        							repeat = false;
+        							System.out.println("moving unit:" + unit.getName()  + " on:" + loc);
+        							break;
+        						}
+        					}
+        				}
+//        				try {
+//							wait(300);
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//						}
+        			}
+        		}
+        	}
         	clearPercepts();
         	return true;
         } else {
         	clearPercepts();
         	return true;
         }
-    	
-//    	if (action.equals(CU)) {
-//    		clearPercepts();
-//    		return true;
-//    	} else {
-//    		clearPercepts();
-//    		return true;
-//    	}
     }
 
 	public void updatePercepts(LinkedList<Literal> list) {

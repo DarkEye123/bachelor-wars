@@ -268,6 +268,7 @@ public class GameMap extends JPanel {
     		findPossibleLocations(loc, act, max, movementLocations, getForbiddenLocations());
     		movementLocations.removeAll(getForbiddenLocations());	
     		drawMovementGrid(movementLocations);
+    		System.out.println(movementLocations);
     		repaint();
     	}
     }
@@ -352,6 +353,14 @@ public class GameMap extends JPanel {
 		this.baseList = baseList;
 	}
 	
+	public LinkedList<Location> getMovementLocations() {
+		return movementLocations;
+	}
+
+	public void setMovementLocations(LinkedList<Location> movementLocations) {
+		this.movementLocations = movementLocations;
+	}
+
 	class MapMouseInputAdapter extends MouseInputAdapter {
 		Base cbase = null;
 		
@@ -379,9 +388,10 @@ public class GameMap extends JPanel {
 					Location loc = new Location(e.getX() / cellSizeW, e.getY() / cellSizeH);
 					if (movementLocations.contains(loc)) {
 						cunit.setLocation(loc);
+						movementLocations.clear();
 						view.env.addPercept(GameEnv.CA);
-					}
-					movementLocations.clear();
+					} else
+						movementLocations.clear();
 					cunit = null;
 					e.getComponent().getParent().repaint();
 				}
