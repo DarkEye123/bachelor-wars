@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 
 import mapping.GameSettings;
+import mapping.Node;
 import objects.Base;
 import objects.units.FirstYear;
 import objects.units.Unit;
@@ -53,6 +54,7 @@ public class GameMap extends JPanel {
 	}
 	
 	public void init() {
+		Node.generateGrid(settings.getMapColumns(), settings.getMapRows());
 		mouseListener = new MapMouseInputAdapter();
 		initBases();
 		menu = new PopupMenu();

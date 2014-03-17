@@ -38,6 +38,8 @@ public class GameSettings {
 	private ArrayList<Location> baseLocations;
 	String playerName;
 	
+	
+	private int mapColumns, mapRows;
 	private int width = GSize, height = GSize;
 	
 	public GameSettings() {
@@ -59,7 +61,8 @@ public class GameSettings {
 		getBaseLocations().add(new Location(GSize-2,GSize-2));
 		playerName = PLAYER_NAME;
 		
-		
+		mapRows = GSize;
+		mapColumns = GSize;
 		
 		initUnits();
 	}
@@ -119,5 +122,13 @@ public class GameSettings {
 
 	public void setPlayerName(String playerName) {
 		this.playerName = playerName;
+	}
+
+	public int getMapColumns() {
+		return mapColumns;
+	}
+
+	public int getMapRows() {
+		return mapRows;
 	}
 }
