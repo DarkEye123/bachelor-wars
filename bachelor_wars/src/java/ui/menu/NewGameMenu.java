@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 import ui.GameView;
 import env.GameEnv;
 import mapping.GameSettings;
-import models.GameModel;
 
 
 public class NewGameMenu extends Menu {
@@ -40,9 +39,7 @@ public class NewGameMenu extends Menu {
 				//TODO add window with game settings
 				GameSettings settings = new GameSettings();
 				settings.defaultInit();
-				GameModel model = new GameModel(settings);
-				env.setModel(model);
-				env.setView(new GameView(model,settings));
+				env.setView(new GameView(settings));
 			}
 		});
 		

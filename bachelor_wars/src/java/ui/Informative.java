@@ -1,7 +1,10 @@
 package ui;
 
+import objects.Base;
+import objects.units.Unit;
+
+//TODO make revision
 public interface Informative {
-	public void showContext(int component, int type);
-	public void showBaseContext(int type);
-	public void showUnitContext(int type);
+	public void showBaseContext(Base base);
+	public void showUnitContext(Unit unit);
 }

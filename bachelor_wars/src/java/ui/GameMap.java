@@ -4,7 +4,6 @@ import jason.environment.grid.Location;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
@@ -15,7 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 
 import mapping.GameSettings;
-import models.GameModel;
 import objects.Base;
 import objects.units.FirstYear;
 import objects.units.Unit;
@@ -27,7 +25,6 @@ public class GameMap extends JPanel {
 	private static final long serialVersionUID = 6282676586123792528L;
 	public static final int BASE_DEFAULT_SIZE = 2;
 	
-	GameModel model;
 	GameView view;
 	private PopupMenu menu;
 	private Unit cunit = null;
@@ -47,12 +44,10 @@ public class GameMap extends JPanel {
 	public static final float WIDTH_MULTIPLIER = 1f ;
 	public static final float HEIGHT_MULTIPLIER = 0.7f ;
 	
-    private static int limit = (int)Math.pow(2,14);
 	protected Font defaultFont = new Font("Arial", Font.BOLD, 10);
 	protected GameSettings settings;
 	
 	public GameMap(GameView gameView) {
-		model = gameView.model;
 		view = gameView;
 		settings = view.settings;
 	}
@@ -78,12 +73,12 @@ public class GameMap extends JPanel {
 			
 			
 			//set names for players (AI, real player ..) 
-			if (base.getType() == GameModel.PLAYER) {
+			if (base.getType() == GameSettings.PLAYER) {
 				base.setName(settings.getPlayerName());
-			} else if (base.getType() == GameModel.SIMPLE_AI) {
+			} else if (base.getType() == GameSettings.SIMPLE_AI) {
 				indexes[0]++;
 				base.setName(GameSettings.AI_NAMES[0]+indexes[0]);
-			} else if (base.getType() == GameModel.MEDIUM_AI) {
+			} else if (base.getType() == GameSettings.MEDIUM_AI) {
 				indexes[1]++;
 				base.setName(GameSettings.AI_NAMES[1]+indexes[1]);
 			} else {
@@ -135,10 +130,7 @@ public class GameMap extends JPanel {
     
     public void drawString(Graphics g, int x, int y, Font f, String s) {
         g.setFont(f);
-        FontMetrics metrics = g.getFontMetrics();
-        int width = metrics.stringWidth( s );
-        int height = metrics.getHeight();
-        g.drawString( s, x*cellSizeW+(cellSizeW/2-width/2), y*cellSizeH+(cellSizeH/2+height/2));
+        g.drawString(s, x, y);
     }
 
     public void drawEmpty(Graphics g, int x, int y) {
@@ -161,8 +153,8 @@ public class GameMap extends JPanel {
 
     public void drawBase(Graphics g, int x, int y, Color c, String baseName) {
         g.setColor(c);
-        int width = model.getWidth()*cellSizeW; //we need width of grid not width of component
-        int height = model.getHeight()*cellSizeH; // we need height of grid not height of component
+        int width = settings.getMapWidth()*cellSizeW; //we need width of grid not width of component
+        int height = settings.getMapHeight()*cellSizeH; // we need height of grid not height of component
         int posX = x * cellSizeW;
         int posY = y * cellSizeH;
         
@@ -175,7 +167,7 @@ public class GameMap extends JPanel {
         g.setColor(Color.lightGray);
         g.drawRect(posX, posY, cellSizeW*2, cellSizeH*2);
         g.setColor(Color.black);
-    	drawString(g, x, y, defaultFont, baseName);
+    	drawString(g, Math.round(posX+(0.3f*cellSizeW)), Math.round(posY+(0.5f*cellSizeH)), defaultFont, baseName);
     }
     
     public int getNormalizedX(int x) {
@@ -190,59 +182,30 @@ public class GameMap extends JPanel {
     	return y;
     }
     
-//    @SuppressWarnings("unused")
-//    public void createUnit(Graphics g, int x, int y, int type) {
-//    	Location location = new Location(x / cellSizeW, y / cellSizeH);
-//    	Dimension baseSize = new Dimension(1,1);
-//    	Dimension cellSize = new Dimension(cellSizeW, cellSizeH);
-//    	Unit unit = new Unit(location, baseSize, cellSize, type);
-//    	unitList.add(unit);
-//    	repaint();
-//    }
-    
     public Unit createUnit(Location gridLocation, int owner, int type) {
     	Dimension cellSize = new Dimension(cellSizeW, cellSizeH);
     	Unit unit = new FirstYear(gridLocation, Unit.DEFAULT_UNIT_SIZE, cellSize);
     	unit.setOwner(owner);
-    	Base.getOwnerBase(owner,baseList).getUnitList().add(unit); //list of units of actual player
+    	Base.getOwnerBase(owner,baseList).addUnit(unit); //list of units of actual player
     	unitList.add(unit); //list of all units
     	repaint();
     	return unit;
     }
     
     public void draw(Graphics g, int x, int y, int object) {
-	    if ( (GameModel.BASE & object) != 0) {
+	    if ( (GameSettings.BASE & object) != 0) {
 	    	for (Base base:baseList) {
 	    		if (x == base.getX() && y == base.getY()) { //seek for painted base
-	    			if (base.getType() == GameModel.PLAYER)
+	    			if (base.getType() == GameSettings.PLAYER)
 	    				drawBase(g, x, y, base.getColor(), "Player Base");
 	    			else
 	    				drawBase(g, x, y, base.getColor(), "Agent Base: " + base.getType());
-	    			
 	    		}
 	    	}
 	    }
 	}
     
     private void draw(Graphics g, int x, int y) {
-    	if (model.getData()[x][y] != GameModel.CLEAN) {
-	    	if ((model.getData()[x][y] & GameModel.OBSTACLE) != 0) {
-	    		drawObstacle(g, x, y);
-	    	}
-	    	
-	    	else if ((model.getData()[x][y] & GameModel.AGENT) != 0) {
-	    		//System.out.println("drawing agent at: " + x + " " + y);
-	    		drawAgent(g, x, y, Color.blue, model.getAgAtPos(x, y));
-	    	}
-	   
-	    	int vl = GameModel.OBSTACLE*2;
-	    	while (vl < limit) {
-	    		if ((model.getData()[x][y] & vl) != 0) {
-	    			draw(g, x, y, vl);
-	    		}
-	    		vl *= 2;
-	    	}
-    	}
     	
     }
     
@@ -252,8 +215,8 @@ public class GameMap extends JPanel {
      */
     @SuppressWarnings("unused")
 	private void drawGrid(Graphics g) {
-        int mwidth = model.getWidth();
-        int mheight = model.getHeight();
+        int mwidth = settings.getMapWidth();
+        int mheight = settings.getMapHeight();
     	g.setColor(Color.lightGray);
         for (int l = 1; l <= mheight; l++) { //paint rows
             g.drawLine(0, l * cellSizeH, mwidth * cellSizeW, l * cellSizeH);
@@ -263,25 +226,23 @@ public class GameMap extends JPanel {
         }
     }
     
-    private void drawPossibleMovement(Location loc, int act, int max) {
-    	if (act <= max) {
-    		findPossibleLocations(loc, act, max, movementLocations, getForbiddenLocations());
-    		movementLocations.removeAll(getForbiddenLocations());	
-    		drawMovementGrid(movementLocations);
-    		System.out.println(movementLocations);
-    		repaint();
-    	}
+    private void drawPossibleMovement(Location loc, int max) {
+    	findPossibleLocations(loc, 1, max, movementLocations, getForbiddenLocations());
+    	movementLocations.removeAll(getForbiddenLocations());	
+    	movementLocations.remove(loc);
+    	drawMovementGrid(movementLocations);
+    	repaint();
     }
     
     private void findPossibleLocations(Location loc, int act, int max, LinkedList<Location> locations, LinkedList<Location> forbidden) {
     	if (act <= max && !forbidden.contains(loc)) {
     		if (! locations.contains(loc))
     			locations.add(loc);
-    		if (loc.x + 1 < model.getWidth())
+    		if (loc.x + 1 < settings.getMapWidth())
     			findPossibleLocations(new Location(loc.x + 1, loc.y), act+1, max, locations, forbidden);
     		if (loc.x - 1 >= 0)
     			findPossibleLocations(new Location(loc.x - 1, loc.y), act+1, max, locations, forbidden);
-    		if (loc.y + 1 < model.getHeight())
+    		if (loc.y + 1 < settings.getMapHeight())
     			findPossibleLocations(new Location(loc.x, loc.y + 1), act+1, max, locations, forbidden);
     		if (loc.y - 1 >= 0)
     			findPossibleLocations(new Location(loc.x, loc.y - 1), act+1, max, locations, forbidden);
@@ -299,14 +260,15 @@ public class GameMap extends JPanel {
     }
     
     public void drawPossibleMovement(Unit unit) {
-    	drawPossibleMovement(unit.getLocation(), 1, unit.getMov());
+    	cunit = unit;
+    	drawPossibleMovement(unit.getLocation(), unit.getMov());
     }
     
     public void paint(Graphics g) {
-        cellSizeW = this.getWidth() / model.getWidth();
-        cellSizeH = this.getHeight() / model.getHeight();
-        int mwidth = model.getWidth();
-        int mheight = model.getHeight();
+    	int mwidth = settings.getMapWidth();
+    	int mheight = settings.getMapHeight();
+        cellSizeW = this.getWidth() / mwidth;
+        cellSizeH = this.getHeight() / mheight;
 
         //drawGrid(g);
         
@@ -323,8 +285,8 @@ public class GameMap extends JPanel {
     
     public void repaint() {
         if (view != null) {
-	    	cellSizeW = this.getWidth() / model.getWidth();
-	        cellSizeH = this.getHeight() / model.getHeight();
+	    	cellSizeW = this.getWidth() / settings.getMapWidth();
+	        cellSizeH = this.getHeight() / settings.getMapHeight();
 	        for (Unit unit:unitList) {
 	        	unit.drawUnit(this.getGraphics(), cellSizeW, cellSizeH);
 	        }
@@ -370,14 +332,13 @@ public class GameMap extends JPanel {
 					for (Base base:baseList) {
 						if ( base.wasSelected( e.getX(),  e.getY()) ) {
 							cbase = base;
-							view.controlPanel.statusArea.append("Base: " + base.wasSelected( e.getX(),  e.getY())+"");
+							view.controlPanel.infoPanel.showBaseContext(base);
 							break;
 						}
 					}
 					for (Unit unit:unitList) {
 						if ( unit.wasSelected( e.getX(),  e.getY()) ) {
 							cunit = unit;
-							view.controlPanel.statusArea.append("Unit: " + unit.wasSelected( e.getX(),  e.getY())+"");
 							view.controlPanel.infoPanel.showUnitContext(cunit);
 							break;
 						}
@@ -393,7 +354,7 @@ public class GameMap extends JPanel {
 					} else
 						movementLocations.clear();
 					cunit = null;
-					e.getComponent().getParent().repaint();
+					e.getComponent().getParent().repaint(); //view
 				}
 			}
 			if (e.getButton() == MouseEvent.BUTTON3) {

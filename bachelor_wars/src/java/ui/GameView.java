@@ -1,5 +1,4 @@
 package ui;
-import jason.environment.grid.GridWorldModel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -17,7 +16,6 @@ import ui.ControlMenu;
 import ui.ControlPanel;
 import ui.menu.MainMenu;
 import mapping.GameSettings;
-import models.GameModel;
 
 
 public class GameView extends JPanel {
@@ -29,7 +27,6 @@ public class GameView extends JPanel {
 	
 	protected Font defaultFont = new Font("Arial", Font.BOLD, 10);
 	
-	GameModel model;
 	GameMap gameMap;
 	GameSettings settings;
 	JFrame frame;
@@ -46,7 +43,7 @@ public class GameView extends JPanel {
 		com.setSize(dim);
 	}
 	
-	public GameView(GridWorldModel model, String title) {
+	public GameView(String title) {
 		
 		frame = new JFrame(title);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -62,9 +59,8 @@ public class GameView extends JPanel {
 
 	}
 
-	public GameView(GameModel model, GameSettings settings) {
-		this(model, MainMenu.TITLE);
-		this.model = model;
+	public GameView(GameSettings settings) {
+		this(MainMenu.TITLE);
 		this.settings = settings;
 	}
 	
@@ -117,14 +113,6 @@ public class GameView extends JPanel {
 		this.add(controlPanel, constraints);
 		controlPanel.init();
 		return controlPanel;
-	}
-
-	public GameModel getModel() {
-		return model;
-	}
-
-	public void setModel(GameModel model) {
-		this.model = model;
 	}
 
 	public GameMap getGameMap() {

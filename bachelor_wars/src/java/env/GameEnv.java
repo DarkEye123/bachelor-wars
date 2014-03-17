@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.logging.Logger;
 
 import mapping.GameSettings;
-import models.GameModel;
 import objects.Base;
 import objects.units.Unit;
 import ui.GameView;
@@ -20,6 +19,8 @@ public class GameEnv extends Environment {
 	
 	public static final String VERSION = "0.0.1";
 	
+	private static final int TIME_TO_WAIT = 800;
+	
 	public static final Literal CA = Literal.parseLiteral("can_act");
 	public static final Literal CU = Literal.parseLiteral("create_unit");
 	public static final Literal UPDATE = Literal.parseLiteral("update_percepts");
@@ -28,7 +29,6 @@ public class GameEnv extends Environment {
 
     private Logger logger = Logger.getLogger("bachelor_wars."+GameEnv.class.getName());
     
-    GameModel model;
     GameView view;
 
     /** Called before the MAS execution with the args informed in .mas2j */
@@ -42,6 +42,16 @@ public class GameEnv extends Environment {
         	menu.init();
         }
         
+    }
+    
+    public void waitForDraw() {
+    	synchronized(this) {
+			try {
+				this.wait(TIME_TO_WAIT);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
     }
 
     @Override
@@ -59,7 +69,7 @@ public class GameEnv extends Environment {
         } else if (action.equals(CU)) {
         	Base base = view.getGameMap().getBaseList().get(1);
         	Location loc = base.getLocation();
-            view.getGameMap().createUnit(loc, base.getOwner(), GameModel.FIRST_YEAR_STUDENT);
+            view.getGameMap().createUnit(loc, base.getOwner(), GameSettings.FIRST_YEAR_STUDENT);
             clearPercepts();
             return true;
         } else if (action.equals(MOV)) {
@@ -67,25 +77,19 @@ public class GameEnv extends Environment {
         		if (base.getOwner() != GameSettings.PLAYER_ID) {
         			for (Unit unit:base.getUnitList()) {
         				view.getGameMap().drawPossibleMovement(unit);
+        				waitForDraw();
         				boolean repeat = true;
         				while (repeat) {
-//        					System.out.println("Unit: " + unit.getName());
         					for (Location loc:view.getGameMap().getMovementLocations()) {
         						double test = Math.random();
-        						System.out.println("Generated number: " + test);
         						if (test > 0.5) {
         							unit.setLocation(loc);
         							repeat = false;
-        							System.out.println("moving unit:" + unit.getName()  + " on:" + loc);
+        							view.repaint();
         							break;
         						}
         					}
         				}
-//        				try {
-//							wait(300);
-//						} catch (InterruptedException e) {
-//							e.printStackTrace();
-//						}
         			}
         		}
         	}
@@ -98,10 +102,7 @@ public class GameEnv extends Environment {
     }
 
 	public void updatePercepts(LinkedList<Literal> list) {
-		//clearPercepts("simple_ai");
-//		for (Literal lit:list) {
-//			addPercept("simple_ai",lit);
-//		}
+		
 	}
 	
 	/** Called before the end of MAS execution */
@@ -110,13 +111,8 @@ public class GameEnv extends Environment {
 		super.stop();
 	}
 	
-	public void setModel(GameModel model) {
-		this.model = model;
-	}
-	
 	public void setView(GameView view) {
 		this.view = view;
 		view.init(this);
-		model.setView(this.view.getGameMap());
 	}
 }

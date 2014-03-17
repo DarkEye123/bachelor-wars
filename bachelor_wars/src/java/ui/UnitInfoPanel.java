@@ -16,7 +16,6 @@ import javax.swing.event.MouseInputAdapter;
 
 import mapping.Dictionary;
 import mapping.GameSettings;
-import models.GameModel;
 import objects.units.Unit;
 
 
@@ -45,7 +44,7 @@ public class UnitInfoPanel extends JPanel {
 	
 	public UnitInfoPanel(int type, ControlPanel controlPanel) {
 		this.controlPanel = controlPanel;
-		for (Dictionary<Integer, Unit> map:GameModel.AVAILABLE_UNITS) {
+		for (Dictionary<Integer, Unit> map:GameSettings.AVAILABLE_UNITS) {
 			if (map.getIndex() == type) {
 				unit = map.getValue();
 				image = new ImagePanel(unit.getImage(), controlPanel.getWidth() * PIC_WIDTH, controlPanel.getHeight() * PIC_HEIGHT);

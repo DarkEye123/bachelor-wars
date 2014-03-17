@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-import models.GameModel;
+import mapping.GameSettings;
 import objects.Base;
 import objects.units.Unit;
 
@@ -40,7 +40,7 @@ public class InfoPanel extends JPanel implements Informative{
 		baseList = controlPanel.view.gameMap.getBaseList();
 		
 		for (Base base:baseList) {
-			if (base.getOwner() == GameModel.PLAYER) {
+			if (base.getOwner() == GameSettings.PLAYER) {
 				actualBase = base;
 				break;
 			}
@@ -52,16 +52,17 @@ public class InfoPanel extends JPanel implements Informative{
 	 * Shows context information for component - for example if Base is selected it shows a possible amount of units to create, how much resources is available etc.
 	 * @param component
 	 */
-	public void showContext(int component, int type) {
-		if (component == GameModel.BASE) {
-			showBaseContext(type);
-		} else if (component == GameModel.UNIT) {
-			showUnitContext(type);
-		}
-	}
+//	public void showContext(int component, int type) {
+//		if (component == GameModel.BASE) {
+//			showBaseContext(type);
+//		} else if (component == GameModel.UNIT) {
+//			showUnitContext(type);
+//		}
+//	}
 
-	public void showBaseContext(int type) {
-		
+	public void showBaseContext(Base base) {
+		eraseContainer();
+		this.add(new BaseInfoPanel(base, controlPanel));
 	}
 	
 	//TODO try real erase
@@ -71,11 +72,19 @@ public class InfoPanel extends JPanel implements Informative{
 		}
 	}
 
+	/**
+	 * Shows context information for Unit (after click on GamePanel) how much resources costs etc.
+	 * @param type - type of unit to exactly identify which information to show
+	 */
 	public void showUnitContext(int type) {
 		eraseContainer();
 		this.add(new UnitInfoPanel(type, controlPanel), BorderLayout.CENTER);
 	}
 	
+	/**
+	 * Shows context information for Unit how much hp left etc.
+	 * @param unit - unit object to show info about
+	 */
 	public void showUnitContext(Unit unit) {
 		eraseContainer();
 		this.add(new UnitInfoPanel(unit, controlPanel), BorderLayout.CENTER);

@@ -93,6 +93,11 @@ public class Base extends GameObject implements Clickable{
 		this.unitList = unitList;
 	}
 	
+	public void addUnit(Unit unit) {
+		unitList.add(unit);
+		deleteFreeSlot();
+	}
+	
 	/**
 	 * Seek for instance of base with given owner
 	 * @param owner - id of owner (PLAYER, Agent1 etc...)

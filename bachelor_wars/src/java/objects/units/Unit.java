@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import models.GameModel;
 import objects.Clickable;
 import objects.GameObject;
 

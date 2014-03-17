@@ -5,10 +5,8 @@ import jason.environment.grid.Location;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
-
-import models.GameModel;
+import mapping.GameSettings;
 
 public class FirstYear extends Unit {
 	
@@ -25,7 +23,7 @@ public class FirstYear extends Unit {
 	}
     
     public FirstYear(Location location, Dimension baseSize, Dimension cellSize) {
-		super(location, baseSize, cellSize, GameModel.FIRST_YEAR_STUDENT);
+		super(location, baseSize, cellSize, GameSettings.FIRST_YEAR_STUDENT);
 		init();
 		name = name + " " + id;
 	}

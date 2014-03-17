@@ -22,16 +22,19 @@
 
 /* Initial beliefs and rules */
 
-actualKnowledge(unknown).
-freeSlots(unknown).
-maximumSlots(unknown).
+//HERE IS VERY IMPORTANT NOTE!!!! if you have freeSlots(unknown) for example and you update it for some value like 10 there is a note as [source(percept)] 
+//so you need to use it that way
+
+actualKnowledge(unknown)[source(percept)].
+freeSlots(unknown)[source(percept)].
+maximumSlots(unknown)[source(percept)].
 
 //TODO here it fails
-can_create_unit :- freeSlots < maximumSlots.
+can_create_unit :- freeSlots(N)[source(percept)] & N > 0 & .print(N).
 
 /* Initial goals */
 
-!start.
+//!start.
 
 /* Plans */
 
@@ -48,15 +51,13 @@ can_create_unit :- freeSlots < maximumSlots.
 //+can_act <- .print("pridane"); create_unit.
 //-can_act <- .print("odobrane").
 
-+!start : true <- !wait.
-
-+!wait: can_act <- .print("can act").
-+!wait: not can_act <- !wait.
+//+!start : true <- !wait.
+//+!wait: not can_act <- !wait.
 
 +can_act <- .print("preparing action"); update_percepts; !check_action.
 
 //is possible buy even the cheapest unit
-+!check_action: can_create_unit & enough_knowledge <-  create_unit; move_units.
++!check_action: can_create_unit & enough_knowledge <- create_unit; move_units.
 		
 -can_act <- .print("can_act removed, waiting for next turn").
 
