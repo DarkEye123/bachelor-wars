@@ -5,7 +5,9 @@ import jason.environment.grid.Location;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
+
 import mapping.GameSettings;
 
 public class FirstYear extends Unit {
@@ -44,5 +46,4 @@ public class FirstYear extends Unit {
 	public static FirstYear getPrototype() {
 		return prototype;
 	}
-
 }

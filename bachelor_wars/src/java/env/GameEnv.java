@@ -86,6 +86,7 @@ public class GameEnv extends Environment {
         							unit.setLocation(loc);
         							repeat = false;
         							view.repaint();
+        							view.getGameMap().repaint();
         							break;
         						}
         					}

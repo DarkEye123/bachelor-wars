@@ -1,6 +1,5 @@
 package mapping;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,6 +41,28 @@ public class Node {
 			return true;
 		else
 			return false;
+	}
+	
+	public void remove(GameObject o) {
+		gameObjects.remove(o);
+	}
+	
+	/**
+	 * Adds GameObject into the node. There can be more objects in one node, but there are exceptions too - like in the same node can't coexists two units at same time.
+	 * @param object - game object to add to the node
+	 * @return - true if object was successfully added or false if action failed - like as it is redundant object like another unit on the same field etc.
+	 */
+	public boolean add(GameObject object) { 
+		if (Unit.class.isInstance(object) && containUnit()) 
+			return false; //can't add two units into same node
+		
+		//TODO if it is base - it seizes more nodes, it should be added to all of them
+		if (Base.class.isInstance(object) && containBase()) 
+			return false; //can't add two bases into same node
+		
+		Node.getNode(object.getX(), object.getY()).remove(object); //remove from previous node
+		gameObjects.add(object);
+		return true;
 	}
 	
 	public boolean containUnit() {

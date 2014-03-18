@@ -1,9 +1,11 @@
 package objects;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.util.LinkedList;
 
 import objects.units.Unit;
+import ui.GameMap;
 import jason.environment.grid.Location;
 
 /**
@@ -24,6 +26,7 @@ public class Base extends GameObject implements Clickable{
 	protected int maxSlots = DEFAULT_SLOT_SIZE; //actual maximum possible slots.
 	protected Color color;
 	int knowledge = 0; //this represents how many resources on the map player owns. 
+	int mapWidth, mapHeight; //set number of cells in a row and column
 	
 	
 	/**
@@ -102,7 +105,7 @@ public class Base extends GameObject implements Clickable{
 	 * Seek for instance of base with given owner
 	 * @param owner - id of owner (PLAYER, Agent1 etc...)
 	 * @param baseList - list of bases where to seek
-	 * @return
+	 * @return {@link Base} Base of given owner or null if this owner doesn't have a base - in this case owner doesn't exist
 	 */
 	public static Base getOwnerBase(int owner, LinkedList<Base> baseList) {
 		for (Base base:baseList) {
@@ -110,5 +113,43 @@ public class Base extends GameObject implements Clickable{
 				return base;
 		}
 		return null;
+	}
+	
+	@Override
+	public void draw(Graphics g, int cellSizeW, int cellSizeH) {
+		Color bak = g.getColor();
+        g.setColor(getColor());
+        int width = mapWidth * cellSizeW; //we need width of grid not width of component
+        int height = mapHeight * cellSizeH; // we need height of grid not height of component
+        int posX = x * cellSizeW;
+        int posY = y * cellSizeH;
+        
+        if (posX + cellSizeW * 2 > width)
+        	posX = width - cellSizeW * 2;
+        if (posY + cellSizeH * 2 > height)
+        	posY = height - cellSizeH * 2;
+        
+        g.fillRect(posX + 1, posY + 1, cellSizeW*2-1, cellSizeH*2-1);
+        g.setColor(Color.lightGray);
+        g.drawRect(posX, posY, cellSizeW*2, cellSizeH*2);
+        g.setColor(Color.black);
+    	GameMap.drawString(g, Math.round(posX+(0.3f*cellSizeW)), Math.round(posY+(0.5f*cellSizeH)), GameMap.defaultFont, getName());
+    	g.setColor(bak);
+    }
+
+	/**
+	 * Sets a width of gameMap - for computation of size
+	 * @param mapWidth - basically it's a number of cells in a single row
+	 */
+	public void setMapWidth(int mapWidth) {
+		this.mapWidth = mapWidth;
+	}
+	
+	/**
+	 * Sets a height of gameMap - for computation of size
+	 * @param mapHeight - basically it's a number of cells in a single column
+	 */
+	public void setMapHeight(int mapHeight) {
+		this.mapHeight = mapHeight;
 	}
 }

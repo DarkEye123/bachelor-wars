@@ -86,6 +86,12 @@ public class GameView extends JPanel {
 		
 	}
 	
+	public void repaint() {
+		super.repaint();
+		if (gameMap != null)
+			gameMap.repaint();
+	}
+	
 	public ControlMenu createControlMenu(GridBagConstraints constraints) {
 		ControlMenu controlMenu = new ControlMenu(this);
 		controlMenu.setBackground(Color.yellow);

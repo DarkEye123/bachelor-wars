@@ -2,6 +2,9 @@ package objects;
 import jason.environment.grid.Location;
 
 import java.awt.Dimension;
+import java.awt.Graphics;
+
+import mapping.Node;
 
 /**
  * Represents object on game map
@@ -10,7 +13,7 @@ import java.awt.Dimension;
  *
  */
 public abstract class GameObject implements Clickable{
-	protected int x, y; //coordinates
+	protected int x, y; //coordinates in grid
 	protected int width, height;// object size in cells
 	protected int cellSizeW, cellSizeH; //real cell size - width and height in pixels
 	protected int type; //sets type of object - for example which AI type is used for base etc
@@ -55,6 +58,8 @@ public abstract class GameObject implements Clickable{
 		else
 			return false;
 	}
+	
+	public abstract void draw(Graphics g, int x, int y);
 	
 	public int getX() {
 		return x;
@@ -118,6 +123,7 @@ public abstract class GameObject implements Clickable{
 	
 	public void setLocation(Location loc) {
 		this.location = loc;
+		Node.getNode(loc.x, loc.y).add(this); //add this unit to the new node, but before its grid coordinates are changed (old coordinates are for knowing in which node to delete unit)
 		this.x = loc.x;
 		this.y = loc.y;
 	}

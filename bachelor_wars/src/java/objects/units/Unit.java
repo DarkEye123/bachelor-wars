@@ -6,10 +6,14 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+import mapping.GameSettings;
 import objects.Clickable;
 import objects.GameObject;
 
-
+/**
+ * Abstract class that represents a unit in general view. It provide fields that all units should share.
+ * @author Matej Leško <xlesko04@stud.fit.vutbr.cz>
+ */
 public abstract class Unit extends GameObject implements Clickable {
 
 	public static final Dimension DEFAULT_UNIT_SIZE = new Dimension(1,1); //size on grid (x,y)
@@ -43,8 +47,8 @@ public abstract class Unit extends GameObject implements Clickable {
 	 * @param location - coordinates in grid where unit starts
 	 * @param unitSize - width and height of unit in cells in grid
 	 * @param cellSize - real cell size - width and height in pixels
-	 * @param type - set a type of unit -> this type sets GameModel class
-	 * @see GameModel
+	 * @param type - set a type of unit -> this type sets GameSettings class
+	 * @see GameSettings
 	 */
 	public Unit(Location location, Dimension unitSize, Dimension cellSize, int type) {
 		this(location,unitSize,cellSize);
@@ -59,7 +63,8 @@ public abstract class Unit extends GameObject implements Clickable {
 	 * @param width - actual width of visible cell (in pixels)
 	 * @param height - actual height of visible cell (in pixels)
 	 */
-	public void drawUnit(Graphics g, int width, int height) {
+	@Override
+	public void draw(Graphics g, int width, int height) {
 		int nx = x * cellSizeW;
 		int ny = y * cellSizeH;
 		cellSizeW = width;
