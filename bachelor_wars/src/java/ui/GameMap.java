@@ -145,13 +145,14 @@ public class GameMap extends JPanel {
         g.drawRect(x * cellSizeW, y * cellSizeH, cellSizeW, cellSizeH);
     }
     
+    //TODO change it to the circles or something
     public void drawMovementGrid(LinkedList<Location> locations) {
     	Graphics g = this.getGraphics();
         for (Location location:locations) {
         	g.setColor(Color.GREEN);
-	        g.fillRect(location.x * cellSizeW + 1, location.y * cellSizeH+1, cellSizeW-1, cellSizeH-1);
-	        g.setColor(Color.lightGray);
-	        g.drawRect(location.x * cellSizeW, location.y * cellSizeH, cellSizeW, cellSizeH);
+        	int centerX = Math.round(location.x * cellSizeW);
+        	int centerY = Math.round(location.y * cellSizeH);
+        	g.fillOval(centerX, centerY, cellSizeW, cellSizeH);
         }
         ///drawString(g, x, y, defaultFont, mov+"");
     }

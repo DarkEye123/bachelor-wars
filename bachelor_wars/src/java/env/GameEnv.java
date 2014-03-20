@@ -76,6 +76,7 @@ public class GameEnv extends Environment {
         	for (Base base:view.getGameMap().getBaseList()) {
         		if (base.getOwner() != GameSettings.PLAYER_ID) {
         			for (Unit unit:base.getUnitList()) {
+        				waitForDraw();
         				view.getGameMap().drawPossibleMovement(unit);
         				waitForDraw();
         				boolean repeat = true;
