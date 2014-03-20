@@ -117,7 +117,8 @@ public class Base extends GameObject implements Clickable{
 	
 	@Override
 	public void draw(Graphics g, int cellSizeW, int cellSizeH) {
-		Color bak = g.getColor();
+		this.cellSizeW = cellSizeW;
+		this.cellSizeH = cellSizeH;
         g.setColor(getColor());
         int width = mapWidth * cellSizeW; //we need width of grid not width of component
         int height = mapHeight * cellSizeH; // we need height of grid not height of component
@@ -134,7 +135,6 @@ public class Base extends GameObject implements Clickable{
         g.drawRect(posX, posY, cellSizeW*2, cellSizeH*2);
         g.setColor(Color.black);
     	GameMap.drawString(g, Math.round(posX+(0.3f*cellSizeW)), Math.round(posY+(0.5f*cellSizeH)), GameMap.defaultFont, getName());
-    	g.setColor(bak);
     }
 
 	/**

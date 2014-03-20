@@ -79,13 +79,13 @@ public class GameMap extends JPanel {
 				base.setName(settings.getPlayerName());
 			} else if (base.getType() == GameSettings.SIMPLE_AI) {
 				indexes[0]++;
-				base.setName(GameSettings.AI_NAMES[0]+indexes[0]);
+				base.setName(GameSettings.AI_NAMES[0] + " " + indexes[0]);
 			} else if (base.getType() == GameSettings.MEDIUM_AI) {
 				indexes[1]++;
-				base.setName(GameSettings.AI_NAMES[1]+indexes[1]);
+				base.setName(GameSettings.AI_NAMES[1] + " " + indexes[1]);
 			} else {
 				indexes[2]++;
-				base.setName(GameSettings.AI_NAMES[2]+indexes[2]);
+				base.setName(GameSettings.AI_NAMES[2] + " " + indexes[2]);
 			}
 			
 			baseList.add(base);
@@ -303,10 +303,10 @@ public class GameMap extends JPanel {
 		Base cbase = null;
 		
 		public void mouseClicked(MouseEvent e) {
-			repaint();
 			if (e.getButton() == MouseEvent.BUTTON1) { 
 				if (movementLocations.isEmpty()) {
 					for (Base base:baseList) {
+						System.out.println(base.getName() + " " + base.wasSelected( e.getX(),  e.getY()));
 						if ( base.wasSelected( e.getX(),  e.getY()) ) {
 							cbase = base;
 							view.controlPanel.infoPanel.showBaseContext(base);
