@@ -29,6 +29,7 @@ public class GameView extends JPanel {
 	
 	GameMap gameMap;
 	GameSettings settings;
+
 	JFrame frame;
 	ControlMenu controlMenu;
 	ControlPanel controlPanel;
@@ -153,4 +154,11 @@ public class GameView extends JPanel {
 		this.controlPanel = controlPanel;
 	}
 	
+	public GameSettings getSettings() {
+		return settings;
+	}
+	
+	public void setSettings(GameSettings settings) {
+		this.settings = settings;
+	}
 }

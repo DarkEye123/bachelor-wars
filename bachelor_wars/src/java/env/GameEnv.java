@@ -26,8 +26,10 @@ public class GameEnv extends Environment {
 	public static final Literal UPDATE = Literal.parseLiteral("update_percepts");
 	public static final Literal MOV = Literal.parseLiteral("move_units");
 	public static final Literal EKNOW = Literal.parseLiteral("enough_knowledge");
+	public static final Literal MD = Literal.parseLiteral("mark_done");
 
     private Logger logger = Logger.getLogger("bachelor_wars."+GameEnv.class.getName());
+    private int marker;
     
     GameView view;
 
@@ -101,6 +103,14 @@ public class GameEnv extends Environment {
         			}
         			clearPercepts(base.getAgent());
         		}
+        	}
+        	return true;
+        } else if (action.equals(MD)) {
+        	marker++;
+//        	System.out.println(view.getSettings().getNumPlayers() -1 + " and marker is: " + marker);
+        	if (marker == view.getSettings().getNumPlayers() -1 ) { //-1 cos we have a living player too 
+        		view.getGameMap().setEnabled(true);
+        		marker = 0;
         	}
         	return true;
         } else {

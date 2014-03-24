@@ -338,42 +338,44 @@ public class GameMap extends JPanel {
 		Base cbase = null;
 		
 		public void mouseClicked(MouseEvent e) {
-			if (e.getButton() == MouseEvent.BUTTON1) { 
-				if (movementLocations.isEmpty()) {
-					for (Base base:baseList) {
-//						System.out.println(base.getName() + " " + base.wasSelected( e.getX(),  e.getY()));
-						if ( base.wasSelected( e.getX(),  e.getY()) ) {
-							cbase = base;
-							view.controlPanel.infoPanel.showBaseContext(base);
-							break;
+			if (isEnabled()) {
+				if (e.getButton() == MouseEvent.BUTTON1) { 
+					if (movementLocations.isEmpty()) {
+						for (Base base:baseList) {
+	//						System.out.println(base.getName() + " " + base.wasSelected( e.getX(),  e.getY()));
+							if ( base.wasSelected( e.getX(),  e.getY()) ) {
+								cbase = base;
+								view.controlPanel.infoPanel.showBaseContext(base);
+								break;
+							}
 						}
-					}
-					for (Unit unit:unitList) {
-						if ( unit.wasSelected( e.getX(),  e.getY()) ) {
-							cunit = unit;
-							view.controlPanel.infoPanel.showUnitContext(cunit);
-							break;
+						for (Unit unit:unitList) {
+							if ( unit.wasSelected( e.getX(),  e.getY()) ) {
+								cunit = unit;
+								view.controlPanel.infoPanel.showUnitContext(cunit);
+								break;
+							}
 						}
+						if (cunit != null)
+							drawPossibleMovement(cunit);
+					} else {
+						Location loc = new Location(e.getX() / cellSizeW, e.getY() / cellSizeH); //get a cell where mouse clicked
+						if (movementLocations.contains(loc)) {
+							cunit.setLocation(loc);
+							movementLocations.clear();
+							view.getGameMap().setEnabled(false);
+							allowActions();
+						} else
+							movementLocations.clear();
+						cunit = null;
+						e.getComponent().getParent().repaint(); //view
+	//					e.getComponent().repaint();
 					}
-					if (cunit != null)
-						drawPossibleMovement(cunit);
-				} else {
-					Location loc = new Location(e.getX() / cellSizeW, e.getY() / cellSizeH); //get a cell where mouse clicked
-					if (movementLocations.contains(loc)) {
-						cunit.setLocation(loc);
-						movementLocations.clear();
-						allowActions();
-					} else
-						movementLocations.clear();
-					cunit = null;
-					e.getComponent().getParent().repaint(); //view
-//					e.getComponent().repaint();
+				}
+				if (e.getButton() == MouseEvent.BUTTON3) {
+					menu.show(e.getComponent(), e.getX(),  e.getY());
 				}
 			}
-			if (e.getButton() == MouseEvent.BUTTON3) {
-				menu.show(e.getComponent(), e.getX(),  e.getY());
-			}
-			
 		}
 	}
 }

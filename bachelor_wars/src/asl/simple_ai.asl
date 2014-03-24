@@ -57,7 +57,7 @@ can_create_unit :- freeSlots(N)[source(percept)] & N > 0 & .print(N).
 +can_act <- .print("preparing action"); update_percepts; !check_action.
 
 //is possible buy even the cheapest unit
-+!check_action: can_create_unit & enough_knowledge <- create_unit; move_units.
++!check_action: can_create_unit & enough_knowledge <- create_unit; move_units; mark_done.
 		
 -can_act <- .print("can_act removed, waiting for next turn").
 
