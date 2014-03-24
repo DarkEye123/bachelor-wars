@@ -9,6 +9,7 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.event.MouseEvent;
 import java.util.LinkedList;
+import java.util.Random;
 
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
@@ -16,6 +17,7 @@ import javax.swing.event.MouseInputAdapter;
 import mapping.GameSettings;
 import mapping.Node;
 import objects.Base;
+import objects.Knowledge;
 import objects.units.FirstYear;
 import objects.units.Unit;
 import env.GameEnv;
@@ -37,6 +39,7 @@ public class GameMap extends JPanel {
 	
 	private LinkedList<Unit> unitList = new LinkedList<Unit>();
 	private LinkedList<Base> baseList = new LinkedList<Base>();
+	private LinkedList<Knowledge> knowledgeList = new LinkedList<Knowledge>();
 	private LinkedList<Location> movementLocations = new LinkedList<Location>();
 	
 	MapMouseInputAdapter mouseListener;
@@ -57,12 +60,27 @@ public class GameMap extends JPanel {
 		Node.generateGrid(settings.getMapColumns(), settings.getMapRows());
 		mouseListener = new MapMouseInputAdapter();
 		initBases();
+		generateKnowledgeResources(settings.getNumKnowledgeResources());
 		menu = new PopupMenu();
 		menu.add(new MenuItem("Test"));
 		this.add(menu);
 		this.addMouseListener(mouseListener);
 	}
 	
+	private void generateKnowledgeResources(int numKnowledgeResources) {
+		Random rand = new Random();
+		int x;
+		int y;
+		
+		for (int i = 0; i < numKnowledgeResources; ++i) {
+			x = rand.nextInt( (settings.getMapColumns() - 2 * GameSettings.DEFAULT_KNOWLEDGE_PADDING) + GameSettings.DEFAULT_KNOWLEDGE_PADDING - 1);
+			y = rand.nextInt( (settings.getMapRows() - 2 * GameSettings.DEFAULT_KNOWLEDGE_PADDING) + GameSettings.DEFAULT_KNOWLEDGE_PADDING - 1);
+			Knowledge knowledge = new Knowledge(new Location(x,y), new Dimension(cellSizeW,cellSizeH));
+			knowledgeList.add( knowledge );
+			Node.getNode(x, y).add(knowledge);
+		}
+	}
+
 	private void initBases() {
 		Dimension gridSize = new Dimension(cellSizeW,cellSizeH);
 		Base base = null;
@@ -78,19 +96,22 @@ public class GameMap extends JPanel {
 			if (base.getType() == GameSettings.PLAYER) {
 				base.setName(settings.getPlayerName());
 			} else if (base.getType() == GameSettings.SIMPLE_AI) {
-				indexes[0]++;
-				base.setName(GameSettings.AI_NAMES[0] + " " + indexes[0]);
+				indexes[GameSettings.SIMPLE_AI - 1]++;
+				base.setName(GameSettings.AI_NAMES[GameSettings.SIMPLE_AI - 1] + " " + indexes[GameSettings.SIMPLE_AI - 1]);
+				base.setAgent(GameSettings.AI_AGENTS[GameSettings.SIMPLE_AI - 1]);
 			} else if (base.getType() == GameSettings.MEDIUM_AI) {
-				indexes[1]++;
-				base.setName(GameSettings.AI_NAMES[1] + " " + indexes[1]);
+				indexes[GameSettings.MEDIUM_AI - 1]++;
+				base.setName(GameSettings.AI_NAMES[GameSettings.MEDIUM_AI - 1] + " " + indexes[GameSettings.MEDIUM_AI - 1]);
+				base.setAgent(GameSettings.AI_AGENTS[GameSettings.MEDIUM_AI - 1]);
 			} else {
-				indexes[2]++;
-				base.setName(GameSettings.AI_NAMES[2] + " " + indexes[2]);
+				indexes[GameSettings.ADVANCED_AI - 1]++;
+				base.setName(GameSettings.AI_NAMES[GameSettings.ADVANCED_AI - 1] + " " + indexes[GameSettings.ADVANCED_AI - 1]);
+				base.setAgent(GameSettings.AI_AGENTS[GameSettings.ADVANCED_AI - 1]);
 			}
 			
 			baseList.add(base);
-			base.setMapWidth(settings.getMapHeight()); //set number of cells in a row
-			base.setMapHeight(settings.getMapHeight()); //set number of cells in a column
+			base.setMapWidth(settings.getMapColumns()); //set number of cells in a row
+			base.setMapHeight(settings.getMapRows()); //set number of cells in a column
 			Node.getNode(base.getX(), base.getY()).add(base);
 		}
 		repaint();
@@ -200,8 +221,8 @@ public class GameMap extends JPanel {
      */
     @SuppressWarnings("unused")
 	private void drawGrid(Graphics g) {
-        int mwidth = settings.getMapWidth();
-        int mheight = settings.getMapHeight();
+        int mwidth = settings.getMapColumns();
+        int mheight = settings.getMapRows();
     	g.setColor(Color.lightGray);
         for (int l = 1; l <= mheight; l++) { //paint rows
             g.drawLine(0, l * cellSizeH, mwidth * cellSizeW, l * cellSizeH);
@@ -223,11 +244,11 @@ public class GameMap extends JPanel {
     	if (act <= max && !forbidden.contains(loc)) {
     		if (! locations.contains(loc))
     			locations.add(loc);
-    		if (loc.x + 1 < settings.getMapWidth())
+    		if (loc.x + 1 < settings.getMapColumns())
     			findPossibleLocations(new Location(loc.x + 1, loc.y), act+1, max, locations, forbidden);
     		if (loc.x - 1 >= 0)
     			findPossibleLocations(new Location(loc.x - 1, loc.y), act+1, max, locations, forbidden);
-    		if (loc.y + 1 < settings.getMapHeight())
+    		if (loc.y + 1 < settings.getMapRows())
     			findPossibleLocations(new Location(loc.x, loc.y + 1), act+1, max, locations, forbidden);
     		if (loc.y - 1 >= 0)
     			findPossibleLocations(new Location(loc.x, loc.y - 1), act+1, max, locations, forbidden);
@@ -250,12 +271,15 @@ public class GameMap extends JPanel {
     }
     
     public void paint(Graphics g) {
-    	int mwidth = settings.getMapWidth();
-    	int mheight = settings.getMapHeight();
+    	int mwidth = settings.getMapColumns();
+    	int mheight = settings.getMapRows();
         cellSizeW = this.getWidth() / mwidth;
         cellSizeH = this.getHeight() / mheight;
         for (Base base:baseList) {
         	base.draw(g, cellSizeW, cellSizeH);
+        }
+        for (Knowledge knowledge:knowledgeList) {
+        	knowledge.draw(g, cellSizeW, cellSizeH);
         }
         for (Unit unit:unitList) {
         	unit.draw(g, cellSizeW, cellSizeH);
@@ -264,10 +288,13 @@ public class GameMap extends JPanel {
     
     public void repaint() {
         if (view != null) {
-	    	cellSizeW = this.getWidth() / settings.getMapWidth();
-	        cellSizeH = this.getHeight() / settings.getMapHeight();
+	    	cellSizeW = this.getWidth() / settings.getMapColumns();
+	        cellSizeH = this.getHeight() / settings.getMapRows();
 	        for (Base base:baseList) {
 	        	base.draw(this.getGraphics(), cellSizeW, cellSizeH);
+	        }
+	        for (Knowledge knowledge:knowledgeList) {
+	        	knowledge.draw(this.getGraphics(), cellSizeW, cellSizeH);
 	        }
 	        for (Unit unit:unitList) {
 	        	unit.draw(this.getGraphics(), cellSizeW, cellSizeH);
@@ -307,7 +334,7 @@ public class GameMap extends JPanel {
 			if (e.getButton() == MouseEvent.BUTTON1) { 
 				if (movementLocations.isEmpty()) {
 					for (Base base:baseList) {
-						System.out.println(base.getName() + " " + base.wasSelected( e.getX(),  e.getY()));
+//						System.out.println(base.getName() + " " + base.wasSelected( e.getX(),  e.getY()));
 						if ( base.wasSelected( e.getX(),  e.getY()) ) {
 							cbase = base;
 							view.controlPanel.infoPanel.showBaseContext(base);
@@ -324,7 +351,7 @@ public class GameMap extends JPanel {
 					if (cunit != null)
 						drawPossibleMovement(cunit);
 				} else {
-					Location loc = new Location(e.getX() / cellSizeW, e.getY() / cellSizeH);
+					Location loc = new Location(e.getX() / cellSizeW, e.getY() / cellSizeH); //get a cell where mouse clicked
 					if (movementLocations.contains(loc)) {
 						cunit.setLocation(loc);
 						movementLocations.clear();
@@ -333,6 +360,7 @@ public class GameMap extends JPanel {
 						movementLocations.clear();
 					cunit = null;
 					e.getComponent().getParent().repaint(); //view
+//					e.getComponent().repaint();
 				}
 			}
 			if (e.getButton() == MouseEvent.BUTTON3) {

@@ -25,8 +25,9 @@ public class Base extends GameObject implements Clickable{
 	protected int freeSlots = DEFAULT_SLOT_SIZE; //number of free slots to create new units
 	protected int maxSlots = DEFAULT_SLOT_SIZE; //actual maximum possible slots.
 	protected Color color;
-	int knowledge = 0; //this represents how many resources on the map player owns. 
-	int mapWidth, mapHeight; //set number of cells in a row and column
+	protected int knowledge = 0; //this represents how many resources on the map player owns. 
+	protected int mapWidth, mapHeight; //set number of cells in a row and column
+	protected String agent;
 	
 	
 	/**
@@ -151,5 +152,13 @@ public class Base extends GameObject implements Clickable{
 	 */
 	public void setMapHeight(int mapHeight) {
 		this.mapHeight = mapHeight;
+	}
+
+	public String getAgent() {
+		return agent;
+	}
+
+	public void setAgent(String agent) {
+		this.agent = agent;
 	}
 }

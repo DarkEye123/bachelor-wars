@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import objects.Base;
 import objects.units.FirstYear;
 import objects.units.Unit;
 
@@ -14,6 +15,11 @@ public class GameSettings {
 	//TODO add new units, should be 6 units, but now it's only one
 	public static final List<Dictionary<Integer, Unit>> AVAILABLE_UNITS = new LinkedList<Dictionary<Integer, Unit>>();
 	public static final int GSize = 24;
+	
+	
+	public static final int DEFAULT_KNOWLEDGE_RESOURCES = 6;
+	public static final int DEFAULT_KNOWLEDGE_PADDING = Base.DEFAULT_BASE_SIZE.width + 1; //how much space in cells should be to be able insert knowledge
+	
 	
 	public static final int PLAYER = 0; // types of players - needed for creation of bases
 	public static final int SIMPLE_AI = 1;
@@ -30,6 +36,7 @@ public class GameSettings {
 	public static final int PLAYER_ID = 0; //living player has always ID 1 as an owner of base
 	public static final String PLAYER_NAME = "DarkEye";
 	public static final String [] AI_NAMES = {"Simple AI", "Medium AI", "Advanced AI"};
+	public static final String [] AI_AGENTS = {"simple_ai", "medium_ai", "advanced_ai"};
 	
 	
 	private int numPlayers; // used to set ID's for players (agents and living player) up to this number from 0 - indicates owners of bases
@@ -39,8 +46,9 @@ public class GameSettings {
 	String playerName;
 	
 	
-	private int mapColumns, mapRows;
-	private int width = GSize, height = GSize;
+	private int mapColumns = GSize, mapRows = GSize; //grid size
+	private int width, height; // pixel size of screen
+	private int numKnowledgeResources = DEFAULT_KNOWLEDGE_RESOURCES;
 	
 	public GameSettings() {
 		setPlayers(new ArrayList<Integer>());
@@ -130,5 +138,13 @@ public class GameSettings {
 
 	public int getMapRows() {
 		return mapRows;
+	}
+
+	public int getNumKnowledgeResources() {
+		return numKnowledgeResources;
+	}
+
+	public void setNumKnowledgeResources(int numKnowledgeResources) {
+		this.numKnowledgeResources = numKnowledgeResources;
 	}
 }
