@@ -73,8 +73,8 @@ public class GameMap extends JPanel {
 		int y;
 		
 		for (int i = 0; i < numKnowledgeResources; ++i) {
-			x = rand.nextInt( (settings.getMapColumns() - 2 * GameSettings.DEFAULT_KNOWLEDGE_PADDING) + GameSettings.DEFAULT_KNOWLEDGE_PADDING - 1);
-			y = rand.nextInt( (settings.getMapRows() - 2 * GameSettings.DEFAULT_KNOWLEDGE_PADDING) + GameSettings.DEFAULT_KNOWLEDGE_PADDING - 1);
+			x = rand.nextInt( (settings.getMapColumns() - 2 * GameSettings.DEFAULT_KNOWLEDGE_PADDING) ) + GameSettings.DEFAULT_KNOWLEDGE_PADDING - 1;
+			y = rand.nextInt( (settings.getMapRows() - 2 * GameSettings.DEFAULT_KNOWLEDGE_PADDING) ) + GameSettings.DEFAULT_KNOWLEDGE_PADDING - 1;
 			Knowledge knowledge = new Knowledge(new Location(x,y), new Dimension(cellSizeW,cellSizeH));
 			knowledgeList.add( knowledge );
 			Node.getNode(x, y).add(knowledge);
@@ -326,6 +326,13 @@ public class GameMap extends JPanel {
 	public void setMovementLocations(LinkedList<Location> movementLocations) {
 		this.movementLocations = movementLocations;
 	}
+	
+	public void allowActions() {
+		for (Integer player:settings.getPlayers()) {
+			if (player != GameSettings.PLAYER)
+				view.env.addPercept(GameSettings.AI_AGENTS[player - 1], GameEnv.CA); //add percept to every agent in a game in a proper order
+		}
+	}
 
 	class MapMouseInputAdapter extends MouseInputAdapter {
 		Base cbase = null;
@@ -355,7 +362,7 @@ public class GameMap extends JPanel {
 					if (movementLocations.contains(loc)) {
 						cunit.setLocation(loc);
 						movementLocations.clear();
-						view.env.addPercept(GameEnv.CA);
+						allowActions();
 					} else
 						movementLocations.clear();
 					cunit = null;

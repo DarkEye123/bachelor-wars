@@ -57,20 +57,26 @@ public class GameEnv extends Environment {
     @Override
     public boolean executeAction(String agName, Structure action) {
         logger.info("["+agName+"] executing: "+action);
-        if (action.equals(UPDATE) && view.getGameMap().getBaseList().size() > 0) {
-        	clearPercepts();
-	        Base base = view.getGameMap().getBaseList().get(1);
-	        addPercept(Literal.parseLiteral("actualKnowledge("+10+")"));
-	        addPercept(Literal.parseLiteral("freeSlots("+base.getFreeSlots()+")"));
-	        addPercept(Literal.parseLiteral("maximumSlots("+base.getMaxSlots()+")"));
-	        addPercept(EKNOW);
-	        System.out.println("updating percepts");
+        if (action.equals(UPDATE)) {
+        	for (Base base:view.getGameMap().getBaseList()) {
+        		if (base.getOwner() != GameSettings.PLAYER_ID) {
+        			clearPercepts(base.getAgent());
+			        addPercept(base.getAgent(), Literal.parseLiteral("actualKnowledge("+10+")"));
+			        addPercept(base.getAgent(), Literal.parseLiteral("freeSlots("+base.getFreeSlots()+")"));
+			        addPercept(base.getAgent(), Literal.parseLiteral("maximumSlots("+base.getMaxSlots()+")"));
+			        addPercept(base.getAgent(), EKNOW);
+			        System.out.println("updating percepts for: " + base.getAgent());
+        		}
+        	}
 	        return true;
         } else if (action.equals(CU)) {
-        	Base base = view.getGameMap().getBaseList().get(1);
-        	Location loc = base.getLocation();
-            view.getGameMap().createUnit(loc, base.getOwner(), GameSettings.FIRST_YEAR_STUDENT);
-            clearPercepts();
+        	for (Base base:view.getGameMap().getBaseList()) {
+        		if (base.getOwner() != GameSettings.PLAYER_ID) {
+		        	Location loc = base.getLocation();
+		            view.getGameMap().createUnit(loc, base.getOwner(), GameSettings.FIRST_YEAR_STUDENT);
+		            clearPercepts(base.getAgent());
+        		}
+        	}
             return true;
         } else if (action.equals(MOV)) {
         	for (Base base:view.getGameMap().getBaseList()) {
@@ -93,12 +99,16 @@ public class GameEnv extends Environment {
         					}
         				}
         			}
+        			clearPercepts(base.getAgent());
         		}
         	}
-        	clearPercepts();
         	return true;
         } else {
-        	clearPercepts();
+        	for (Base base:view.getGameMap().getBaseList()) {
+        		if (base.getOwner() != GameSettings.PLAYER_ID) {
+        			clearPercepts(base.getAgent());
+        		}
+        	}
         	return true;
         }
     }
