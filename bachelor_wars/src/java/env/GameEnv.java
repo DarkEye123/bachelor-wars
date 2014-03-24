@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import mapping.GameSettings;
 import objects.Base;
+import objects.Knowledge;
 import objects.units.Unit;
 import ui.GameView;
 import ui.menu.MainMenu;
@@ -63,7 +64,7 @@ public class GameEnv extends Environment {
         	for (Base base:view.getGameMap().getBaseList()) {
         		if (base.getOwner() != GameSettings.PLAYER_ID) {
         			clearPercepts(base.getAgent());
-			        addPercept(base.getAgent(), Literal.parseLiteral("actualKnowledge("+10+")"));
+			        addPercept(base.getAgent(), Literal.parseLiteral("actualKnowledge("+base.getKnowledge()+")"));
 			        addPercept(base.getAgent(), Literal.parseLiteral("freeSlots("+base.getFreeSlots()+")"));
 			        addPercept(base.getAgent(), Literal.parseLiteral("maximumSlots("+base.getMaxSlots()+")"));
 			        addPercept(base.getAgent(), EKNOW);
@@ -111,6 +112,13 @@ public class GameEnv extends Environment {
         	if (marker == view.getSettings().getNumPlayers() -1 ) { //-1 cos we have a living player too 
         		view.getGameMap().setEnabled(true);
         		marker = 0;
+        		int sum = view.getSettings().getIncomePerRound();
+        		for (Base base:view.getGameMap().getBaseList()) {
+        			for (Knowledge knowledge:base.getKnowledgeList())
+        				sum += knowledge.getKnowledgePerRound();
+        			base.addKnowledge(sum);
+        		}
+        		
         	}
         	return true;
         } else {

@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import mapping.GameSettings;
+import objects.Base;
 import objects.Clickable;
 import objects.GameObject;
 
@@ -27,6 +28,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	protected static int mov;
 	protected static int cost;
 	protected static int atk;
+	public Base base; //it's like owner from GameObject but due to some dependencies is better set a base on it's own too
 	
 	public Unit() {
 		

@@ -205,7 +205,9 @@ public class GameMap extends JPanel {
 	    	Dimension cellSize = new Dimension(cellSizeW, cellSizeH);
 	    	Unit unit = new FirstYear(gridLocation, Unit.DEFAULT_UNIT_SIZE, cellSize);
 	    	unit.setOwner(owner);
-	    	Base.getOwnerBase(owner,baseList).addUnit(unit); //list of units of actual player
+	    	Base base = Base.getOwnerBase(owner,baseList); //seek for base
+	    	base.addUnit(unit); //list of units of actual player
+	    	unit.base = base; //set a base for unit (it's like owner from GameObject but due to some dependencies is better set a base on it's own too)
 	    	unitList.add(unit); //list of all units
 	    	Node.getNode(unit.getX(),unit.getY()).add(unit);
 	    	repaint();

@@ -43,8 +43,8 @@ public class GameSettings {
 	private ArrayList<Integer> players; //players in game
 	private ArrayList<Color> colors;
 	private ArrayList<Location> baseLocations;
-	String playerName;
-	
+	private String playerName;
+	private int IncomePerRound = 10;
 	
 	private int mapColumns = GSize, mapRows = GSize; //grid size
 	private int width, height; // pixel size of screen
@@ -146,5 +146,13 @@ public class GameSettings {
 
 	public void setNumKnowledgeResources(int numKnowledgeResources) {
 		this.numKnowledgeResources = numKnowledgeResources;
+	}
+
+	public int getIncomePerRound() {
+		return IncomePerRound;
+	}
+
+	public void setIncomePerRound(int incomePerRound) {
+		IncomePerRound = incomePerRound;
 	}
 }

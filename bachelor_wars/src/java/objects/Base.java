@@ -21,6 +21,7 @@ public class Base extends GameObject implements Clickable{
 	
 	
 	private LinkedList<Unit> unitList = new LinkedList<Unit>();
+	private LinkedList<Knowledge> knowledgeList = new LinkedList<Knowledge>();
 	
 	protected int freeSlots = DEFAULT_SLOT_SIZE; //number of free slots to create new units
 	protected int maxSlots = DEFAULT_SLOT_SIZE; //actual maximum possible slots.
@@ -77,8 +78,8 @@ public class Base extends GameObject implements Clickable{
 		return knowledge;
 	}
 
-	public void setKnowledge(int knowledge) {
-		this.knowledge = knowledge;
+	public void addKnowledge(int knowledge) {
+		this.knowledge += knowledge;
 	}
 
 	public int getMaxSlots() {
@@ -102,41 +103,6 @@ public class Base extends GameObject implements Clickable{
 		deleteFreeSlot();
 	}
 	
-	/**
-	 * Seek for instance of base with given owner
-	 * @param owner - id of owner (PLAYER, Agent1 etc...)
-	 * @param baseList - list of bases where to seek
-	 * @return {@link Base} Base of given owner or null if this owner doesn't have a base - in this case owner doesn't exist
-	 */
-	public static Base getOwnerBase(int owner, LinkedList<Base> baseList) {
-		for (Base base:baseList) {
-			if (base.owner == owner)
-				return base;
-		}
-		return null;
-	}
-	
-	@Override
-	public void draw(Graphics g, int cellSizeW, int cellSizeH) {
-		this.cellSizeW = cellSizeW;
-		this.cellSizeH = cellSizeH;
-        g.setColor(getColor());
-        int width = mapWidth * cellSizeW; //we need width of grid not width of component
-        int height = mapHeight * cellSizeH; // we need height of grid not height of component
-        int posX = x * cellSizeW;
-        int posY = y * cellSizeH;
-        
-        if (posX + cellSizeW * 2 > width)
-        	posX = width - cellSizeW * 2;
-        if (posY + cellSizeH * 2 > height)
-        	posY = height - cellSizeH * 2;
-        
-        g.fillRect(posX + 1, posY + 1, cellSizeW*2-1, cellSizeH*2-1);
-        g.setColor(Color.lightGray);
-        g.drawRect(posX, posY, cellSizeW*2, cellSizeH*2);
-        g.setColor(Color.black);
-    	GameMap.drawString(g, Math.round(posX+(0.3f*cellSizeW)), Math.round(posY+(0.5f*cellSizeH)), GameMap.defaultFont, getName());
-    }
 
 	/**
 	 * Sets a width of gameMap - for computation of size
@@ -160,5 +126,49 @@ public class Base extends GameObject implements Clickable{
 
 	public void setAgent(String agent) {
 		this.agent = agent;
+	}
+
+	public LinkedList<Knowledge> getKnowledgeList() {
+		return knowledgeList;
+	}
+
+	public void setKnowledgeList(LinkedList<Knowledge> knowledgeList) {
+		this.knowledgeList = knowledgeList;
+	}
+	
+	/**
+	 * Seek for instance of base with given owner
+	 * @param owner - id of owner (PLAYER, Agent1 etc...)
+	 * @param baseList - list of bases where to seek
+	 * @return {@link Base} Base of given owner or null if this owner doesn't have a base - in this case owner doesn't exist
+	 */
+	public static Base getOwnerBase(int owner, LinkedList<Base> baseList) {
+		for (Base base:baseList) {
+			if (base.owner == owner)
+				return base;
+		}
+		return null;
+	}
+	
+	@Override
+	public void draw(Graphics g, int cellSizeW, int cellSizeH) {
+		this.cellSizeW = cellSizeW;
+		this.cellSizeH = cellSizeH;
+		g.setColor(getColor());
+		int width = mapWidth * cellSizeW; //we need width of grid not width of component
+		int height = mapHeight * cellSizeH; // we need height of grid not height of component
+		int posX = x * cellSizeW;
+		int posY = y * cellSizeH;
+		
+		if (posX + cellSizeW * 2 > width)
+			posX = width - cellSizeW * 2;
+		if (posY + cellSizeH * 2 > height)
+			posY = height - cellSizeH * 2;
+		
+		g.fillRect(posX + 1, posY + 1, cellSizeW*2-1, cellSizeH*2-1);
+		g.setColor(Color.lightGray);
+		g.drawRect(posX, posY, cellSizeW*2, cellSizeH*2);
+		g.setColor(Color.black);
+		GameMap.drawString(g, Math.round(posX+(0.3f*cellSizeW)), Math.round(posY+(0.5f*cellSizeH)), GameMap.defaultFont, getName());
 	}
 }
