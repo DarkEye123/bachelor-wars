@@ -50,6 +50,7 @@ public class GameMap extends JPanel {
 	
 	public static Font defaultFont = new Font("Arial", Font.BOLD, 10);
 	protected GameSettings settings;
+	public static int ROUND = 1;
 	
 	public GameMap(GameView gameView) {
 		view = gameView;

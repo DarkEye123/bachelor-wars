@@ -5,6 +5,7 @@ import java.util.List;
 
 import objects.Base;
 import objects.GameObject;
+import objects.Knowledge;
 import objects.units.FirstYear;
 import objects.units.Unit;
 
@@ -60,25 +61,65 @@ public class Node {
 		if (Base.class.isInstance(object) && containBase()) 
 			return false; //can't add two bases into same node
 		
+		
+		if (Unit.class.isInstance(object) && containKnowledge()) {
+			System.out.println(((Unit)object).base);
+			getKnowledge().setBase(((Unit)object).base);
+		}
+		
 		Node.getNode(object.getX(), object.getY()).remove(object); //remove from previous node
 		gameObjects.add(object);
 		return true;
 	}
 	
-	public boolean containUnit() {
+	public Unit getUnit() {
 		for (GameObject object:gameObjects) {
 			if (Unit.class.isInstance(object))
-				return true;
+				return (Unit) object;
 		}
-		return false;
+		return null;
+	}
+	
+	public Base getBase() {
+		return (Base) getSpecificObject(Base.class);
+	}
+	
+	public Knowledge getKnowledge() {
+		return (Knowledge) getSpecificObject(Knowledge.class);
+	}
+	
+	public boolean containUnit() {
+		if (getUnit() != null)
+			return true;
+		else
+			return false;
 	}
 	
 	public boolean containBase() {
+		if (getSpecificObject(Base.class) != null)
+			return true;
+		else
+			return false;
+	}
+	
+	public boolean containKnowledge() {
+		if (getSpecificObject(Knowledge.class) != null)
+			return true;
+		else
+			return false;
+	}
+	
+	/**
+	 * Finds specified object of class "o".
+	 * @param o - should be a class reference. Like Something.class
+	 * @return - instance of given class if present, null otherwise
+	 */
+	public GameObject getSpecificObject(Object o) {
 		for (GameObject object:gameObjects) {
-			if (object.getClass().equals(Base.class))
-				return true;
+			if (object.getClass().equals(o))
+				return (GameObject) object;
 		}
-		return false;
+		return null;
 	}
 	
 	/**
@@ -87,11 +128,10 @@ public class Node {
 	 * @return true if given type of object is present
 	 */
 	public boolean containSpecificObect(Object o) {
-		for (GameObject object:gameObjects) {
-			if (object.getClass().equals(o))
-				return true;
-		}
-		return false;
+		if (getSpecificObject(o) != null) 
+			return true;
+		else
+			return false;
 	}
 	
 	/**

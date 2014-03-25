@@ -61,7 +61,8 @@ public class Knowledge extends GameObject {
 
 
 	public void setBase(Base base) {
-		this.base.getKnowledgeList().remove(this);
+		if (this.base != null)
+			this.base.getKnowledgeList().remove(this);
 		this.base = base;
 		base.getKnowledgeList().add(this);
 	}

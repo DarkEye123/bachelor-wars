@@ -7,12 +7,14 @@ import jason.environment.Environment;
 import jason.environment.grid.Location;
 
 import java.util.LinkedList;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import mapping.GameSettings;
 import objects.Base;
 import objects.Knowledge;
 import objects.units.Unit;
+import ui.GameMap;
 import ui.GameView;
 import ui.menu.MainMenu;
 
@@ -88,19 +90,11 @@ public class GameEnv extends Environment {
         				waitForDraw();
         				view.getGameMap().drawPossibleMovement(unit);
         				waitForDraw();
-        				boolean repeat = true;
-        				while (repeat) {
-        					for (Location loc:view.getGameMap().getMovementLocations()) {
-        						double test = Math.random();
-        						if (test > 0.5) {
-        							unit.setLocation(loc);
-        							repeat = false;
-        							view.repaint();
-        							view.getGameMap().repaint();
-        							break;
-        						}
-        					}
-        				}
+        				int index = new Random().nextInt(view.getGameMap().getMovementLocations().size());
+        				unit.setLocation(view.getGameMap().getMovementLocations().get(index));
+        				view.repaint();
+        				view.getGameMap().repaint();
+        				view.getGameMap().getMovementLocations().clear();
         			}
         			clearPercepts(base.getAgent());
         		}
@@ -112,13 +106,13 @@ public class GameEnv extends Environment {
         	if (marker == view.getSettings().getNumPlayers() -1 ) { //-1 cos we have a living player too 
         		view.getGameMap().setEnabled(true);
         		marker = 0;
-        		int sum = view.getSettings().getIncomePerRound();
         		for (Base base:view.getGameMap().getBaseList()) {
+        			int sum = view.getSettings().getIncomePerRound();
         			for (Knowledge knowledge:base.getKnowledgeList())
         				sum += knowledge.getKnowledgePerRound();
         			base.addKnowledge(sum);
         		}
-        		
+        		GameMap.ROUND++;
         	}
         	return true;
         } else {

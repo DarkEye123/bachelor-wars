@@ -80,6 +80,7 @@ public class GameView extends JPanel {
 
 		constraints.gridy = 1;
 		gameMap = createGameMap(constraints);
+		controlMenu.init();
 		
 		constraints.gridy = 2;
 		constraints.gridheight = GridBagConstraints.REMAINDER;
