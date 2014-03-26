@@ -15,6 +15,7 @@ public class FirstYear extends Unit {
     private static final int COST = 20;
     private static final int ATK = 5;
     private static final int HP = 40;
+    private static final int SP = 0;
     private static final int MOV = 4;
     private static final String NAME = "First Year Student";
     private static final File IMAGE_PATH = new File("pics/first_class128.png");
@@ -39,6 +40,7 @@ public class FirstYear extends Unit {
 		cost = COST;
 		atk = ATK;
 		hp = HP;
+		sp = SP;
 		mov = MOV;
 		name = NAME;
 	}

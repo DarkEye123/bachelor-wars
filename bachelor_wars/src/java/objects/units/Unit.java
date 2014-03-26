@@ -28,6 +28,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	protected static int mov;
 	protected static int cost;
 	protected static int atk;
+	protected static int sp;
 	public Base base; //it's like owner from GameObject but due to some dependencies is better set a base on it's own too
 	
 	public Unit() {
@@ -122,5 +123,13 @@ public abstract class Unit extends GameObject implements Clickable {
 	
 	public static Unit getPrototype() {
 		return null;
+	}
+
+	public int getSp() {
+		return sp;
+	}
+
+	public void setSp(int sp) {
+		Unit.sp = sp;
 	}
 }
