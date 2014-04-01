@@ -14,7 +14,7 @@ import javax.imageio.ImageIO;
 public class Knowledge extends GameObject {
 	
 	private BufferedImage image;
-	private int kPerR = 5;
+	private static int kPerR = 5;
 	private Base base;
 	
 	
@@ -48,8 +48,8 @@ public class Knowledge extends GameObject {
 		return kPerR;
 	}
 
-	public void setKnowledgePerRound(int knowledge) {
-		this.kPerR = knowledge;
+	public static void setKnowledgePerRound(int knowledge) {
+		kPerR = knowledge;
 	}
 
 

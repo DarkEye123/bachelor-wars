@@ -4,8 +4,12 @@ package env;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Structure;
 import jason.environment.Environment;
+import jason.environment.TimeSteppedEnvironment;
 import jason.environment.grid.Location;
+import jason.mas2j.AgentParameters;
 
+import java.io.File;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -47,6 +51,8 @@ public class GameEnv extends Environment {
         	menu.init();
         }
         
+        getEnvironmentInfraTier().getRuntimeServices().killAgent("simple_ai", "simple_ai");
+//        addAgent("test", "simple_ai.asl");
     }
     
     public void waitForDraw() {
@@ -62,6 +68,7 @@ public class GameEnv extends Environment {
     @Override
     public boolean executeAction(String agName, Structure action) {
         logger.info("["+agName+"] executing: "+action);
+        addAgent("test", "simple_ai.asl");
         if (action.equals(UPDATE)) {
         	for (Base base:view.getGameMap().getBaseList()) {
         		if (base.getOwner() != GameSettings.PLAYER_ID) {
@@ -127,6 +134,18 @@ public class GameEnv extends Environment {
 
 	public void updatePercepts(LinkedList<Literal> list) {
 		
+	}
+	
+	public void addAgent(String name, String agent) {
+//		jason.mas2j.AgentParameters.this.
+		LinkedList<String> cs = new LinkedList<String>();
+		try {
+			getEnvironmentInfraTier().getRuntimeServices().createAgent(name, "src/asl/" + agent, null, cs, null, null);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		jason.mas2j.parser.mas2j.class.getSigners()getaddAgent(par);
 	}
 	
 	/** Called before the end of MAS execution */

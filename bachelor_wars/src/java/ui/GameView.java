@@ -22,9 +22,6 @@ public class GameView extends JPanel {
 
 	private static final long serialVersionUID = 4375482311151482280L;
 	
-	public static final int WINDOW_WIDTH = 1024;
-	public static final int WINDOW_HEIGHT = 768;
-	
 	protected Font defaultFont = new Font("Arial", Font.BOLD, 10);
 	
 	GameMap gameMap;
@@ -49,20 +46,19 @@ public class GameView extends JPanel {
 		frame = new JFrame(title);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
-		setComponentSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT), frame);
-		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH | JFrame.MAXIMIZED_VERT);
 		frame.setAlwaysOnTop(true);
 		frame.setLayout(new BorderLayout());
 		frame.setLocationRelativeTo(null);
 		frame.getContentPane().add(this, BorderLayout.CENTER);
-		this.setSize(frame.getSize());
-		this.setPreferredSize(frame.getSize());
-
 	}
 
 	public GameView(GameSettings settings) {
 		this(MainMenu.TITLE);
 		this.settings = settings;
+		setComponentSize(new Dimension(settings.getWidth(), settings.getHeight()), frame);
+		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH | JFrame.MAXIMIZED_VERT);
+		this.setSize(frame.getSize());
+		this.setPreferredSize(frame.getSize());
 	}
 	
 	public void init(GameEnv env) {

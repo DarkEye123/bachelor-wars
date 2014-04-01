@@ -13,6 +13,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import mapping.GameSettings;
+import ui.GameView;
 import env.GameEnv;
 
 public class MainMenu extends Menu {
@@ -27,6 +29,7 @@ public class MainMenu extends Menu {
 
 	public void init() {
 		super.init();
+		
 		pane = new JPanel();
 		
 		
@@ -63,11 +66,11 @@ public class MainMenu extends Menu {
 			}
 		});
         
+        buttonStart.setText("Create Game");
         buttonStart.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent e) {
 				frame.dispose();
-				new NewGameMenu(env).init();
+				new GameSettingsMenu(env);
 			}
 		});
 	}

@@ -150,10 +150,10 @@ public class Node {
 		}
 		for (int y = 0; y < rows; ++y) {
 			for (int x = 0; x < columns; ++x) {
-				nodeGrid[y][x].down = getNode(y -1, x);
-				nodeGrid[y][x].up = getNode(y +1, x);
-				nodeGrid[y][x].left = getNode(y, x - 1);
-				nodeGrid[y][x].right = getNode(y, x + 1);
+				nodeGrid[y][x].down = getNode(x, y - 1);
+				nodeGrid[y][x].up = getNode(x, y + 1);
+				nodeGrid[y][x].left = getNode(x - 1, y);
+				nodeGrid[y][x].right = getNode(x + 1, y);
 			}
 		}
 	}
@@ -161,15 +161,16 @@ public class Node {
 	public static Node getNode(int x, int y) {
 		if (! isValidPosition(x, y))
 			return null;
-		else
+		else {
 			return nodeGrid[y][x];
+		}
 	}
 	
 	private static boolean isValidPosition(int x, int y) {
 		if (nodeGrid == null) {
 			return false;
 		}
-		if (x < 0 || x >= rows || y < 0 || y >= columns) {
+		if (y < 0 || y >= rows || x < 0 || x >= columns) {
 			return false;
 		}
 		return true;
@@ -191,15 +192,26 @@ public class Node {
 	//For testing purpose only
 	public static void main(String[] args) {
 		Node.generateGrid(5, 5);
-		Node node = Node.getNode(0, 0);
-		node.gameObjects.add(new FirstYear());
-		System.out.println(node.containBase());
-		System.out.println(node.containUnit());
-		System.out.println(node.containSpecificObect(Unit.class));
-		System.out.println(node.containSpecificObect(FirstYear.class));
+		Node node = Node.getNode(1, 1);
 		
-		System.out.println(Base.class.isInstance(node.gameObjects.get(0)));
-		for (Object c:FirstYear.class.getClasses())
-			System.out.println(c.toString());
+		System.out.println(node.left);
+		System.out.println(node.right);
+		System.out.println(node.up);
+		System.out.println(node.down);
+		
+//		node.gameObjects.add(new FirstYear());
+//		System.out.println(node.containBase());
+//		System.out.println(node.containUnit());
+//		System.out.println(node.containSpecificObect(Unit.class));
+//		System.out.println(node.containSpecificObect(FirstYear.class));
+//		
+//		System.out.println(Base.class.isInstance(node.gameObjects.get(0)));
+//		for (Object c:FirstYear.class.getClasses())
+//			System.out.println(c.toString());
+	}
+
+	@Override
+	public String toString() {
+		return "x: " + x + " y " + y;
 	}
 }

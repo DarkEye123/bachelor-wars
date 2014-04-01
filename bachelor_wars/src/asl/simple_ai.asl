@@ -32,6 +32,7 @@ maximumSlots(unknown)[source(percept)].
 //TODO here it fails
 can_create_unit :- freeSlots(N)[source(percept)] & N > 0 & .print(N).
 
+
 /* Initial goals */
 
 //!start.
@@ -59,6 +60,8 @@ can_create_unit :- freeSlots(N)[source(percept)] & N > 0 & .print(N).
 //is possible buy even the cheapest unit
 +!check_action: can_create_unit & enough_knowledge <- create_unit; move_units; mark_done.
 -!check_action: true <- mark_done.
+
+
 		
 -can_act <- .print("can_act removed, waiting for next turn").
 

@@ -2,6 +2,7 @@ package ui;
 
 import jason.environment.grid.Location;
 
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -21,7 +22,7 @@ import objects.units.Unit;
 
 public class UnitInfoPanel extends JPanel {
 	private static final long serialVersionUID = -994376929960143428L;
-	private static final int INTERNAL_PADDING_Y = 5;
+	private static final int INTERNAL_PADDING_Y = -1;
 	private static final Insets DEFAULT_INSETS = new Insets(1, 20, 1, 20);
 	
 	private static final float PIC_WIDTH = 0.1f;
@@ -61,17 +62,19 @@ public class UnitInfoPanel extends JPanel {
 //		constraints.gridheight = GridBagConstraints.REMAINDER;
 		constraints.gridx = 0;
 		constraints.gridy = 6;
-		constraints.gridwidth = 2;
+		constraints.anchor = GridBagConstraints.CENTER;
+		constraints.gridwidth = 1;
 		this.add(addButton, constraints);
 	}
 	
 	private void init() {
+		Font font = new Font("VL Gothic", 0, 13);
 		this.setLayout(new GridBagLayout());
 		constraints = new GridBagConstraints();
 		constraints.fill = GridBagConstraints.NONE;
 		constraints.ipady = INTERNAL_PADDING_Y;
 		constraints.insets = DEFAULT_INSETS;
-		constraints.anchor = GridBagConstraints.CENTER;
+		constraints.anchor = GridBagConstraints.LINE_START;
 		
 		name = new JLabel(unit.getName());
 		hp = new JLabel("HP: " + unit.getHp());
@@ -79,6 +82,13 @@ public class UnitInfoPanel extends JPanel {
 		atk = new JLabel("ATK: " + unit.getAtk());
 		moveRange = new JLabel("MOV: " + unit.getMov());
 		cost = new JLabel("COST: " + unit.getCost());
+		
+		name.setFont(new Font("VL Gothic", 0, 14));
+		hp.setFont(font);
+		sp.setFont(font);
+		atk.setFont(font);
+		moveRange.setFont(font);
+		cost.setFont(font);
 		
 
 //		constraints.gridheight = GridBagConstraints.REMAINDER;

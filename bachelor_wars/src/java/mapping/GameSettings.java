@@ -12,9 +12,12 @@ import objects.units.Unit;
 
 
 public class GameSettings {
+	public static final int INFINITE = 0;
 	//TODO add new units, should be 6 units, but now it's only one
 	public static final List<Dictionary<Integer, Unit>> AVAILABLE_UNITS = new LinkedList<Dictionary<Integer, Unit>>();
 	public static final int GSize = 24;
+	public static final int WINDOW_WIDTH = 1024;
+	public static final int WINDOW_HEIGHT = 768;
 	
 	
 	public static final int DEFAULT_KNOWLEDGE_RESOURCES = 6;
@@ -26,7 +29,9 @@ public class GameSettings {
 	public static final int MEDIUM_AI = 2;
 	public static final int ADVANCED_AI = 3;
 	
-    // constants for the grid objects
+	public static final int DOMINATION = 0, ANIHLIATION = 1, MADNESS = 2;
+	
+	// constants for the grid objects
     public static final int BASE = 16; //common id for Bases
     public static final int UNIT = 32; //common id for UNITs
     
@@ -38,6 +43,7 @@ public class GameSettings {
 	public static final String [] AI_NAMES = {"Simple AI", "Medium AI", "Advanced AI"};
 	public static final String [] AI_AGENTS = {"simple_ai", "medium_ai", "advanced_ai"};
 	
+	private int maxRounds = INFINITE; //default
 	
 	private int numPlayers; // used to set ID's for players (agents and living player) up to this number from 0 - indicates owners of bases
 	private ArrayList<Integer> players; //players in game
@@ -47,8 +53,11 @@ public class GameSettings {
 	private int IncomePerRound = 10;
 	
 	private int mapColumns = GSize, mapRows = GSize; //grid size
-	private int width, height; // pixel size of screen
+	private int width = WINDOW_WIDTH, height = WINDOW_HEIGHT; // pixel size of screen
 	private int numKnowledgeResources = DEFAULT_KNOWLEDGE_RESOURCES;
+	private boolean boostEnabled;
+	private float boostProbability;
+	private int mode;
 	
 	public GameSettings() {
 		setPlayers(new ArrayList<Integer>());
@@ -60,18 +69,15 @@ public class GameSettings {
 	 * Default game settings to increase developing speed
 	 */
 	public void defaultInit() {
-		setNumPlayers(DEFAULT_PLAYERS);
-		getPlayers().add(PLAYER);
-		getPlayers().add(SIMPLE_AI);
-		getColors().add(Color.green);
-		getColors().add(Color.RED);
-		getBaseLocations().add(new Location(0,0));
-		getBaseLocations().add(new Location(GSize-2,GSize-2));
+		addPlayer(PLAYER, Color.green, new Location(0,0));
+		addPlayer(SIMPLE_AI, Color.RED, new Location(GSize-2,GSize-2));
 		playerName = PLAYER_NAME;
-		
 		mapRows = GSize;
 		mapColumns = GSize;
-		
+		initUnits();
+	}
+	
+	public void init() {
 		initUnits();
 	}
 	
@@ -84,12 +90,11 @@ public class GameSettings {
 		AVAILABLE_UNITS.add(new Dictionary<Integer, Unit>(FIRST_YEAR_STUDENT,FirstYear.getPrototype()));
 	}
 	
-	public int getMapWidth() {
-		return width;
-	}
-	
-	public int getMapHeight() {
-		return height;
+	public void addPlayer(int aiType, Color color , Location location) {
+		getPlayers().add(aiType);
+		getColors().add(color);
+		getBaseLocations().add(location);
+		numPlayers++;
 	}
 
 	public int getNumPlayers() {
@@ -154,5 +159,61 @@ public class GameSettings {
 
 	public void setIncomePerRound(int incomePerRound) {
 		IncomePerRound = incomePerRound;
+	}
+
+	public int getMaxRounds() {
+		return maxRounds;
+	}
+
+	public void setMaxRounds(int maxRounds) {
+		this.maxRounds = maxRounds;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public void setMapColumns(int mapColumns) {
+		this.mapColumns = mapColumns;
+	}
+
+	public void setMapRows(int mapRows) {
+		this.mapRows = mapRows;
+	}
+
+	public void setBoostEnabled(boolean enabled) {
+		boostEnabled = enabled;
+	}
+
+	public void setBoostProbability(int value) {
+		boostProbability = (float) value / 100;
+	}
+
+	public boolean isBoostEnabled() {
+		return boostEnabled;
+	}
+
+	public float getBoostProbability() {
+		return boostProbability;
+	}
+
+	public int getMode() {
+		return mode;
+	}
+
+	public void setMode(int mode) {
+		this.mode = mode;
 	}
 }
