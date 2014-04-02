@@ -169,15 +169,17 @@ public class GameMap extends JPanel {
     }
     
     public void drawBasicAtkRange(Location loc, int max) {
-    	findPossibleLocations(loc, 1, max, atkLocations, null);
+    	findPossibleLocations(loc, 0, max, atkLocations, null);
+    	atkLocations.remove(loc);
     	
     	Graphics g = this.getGraphics();
         for (Location location:atkLocations) {
         	g.setColor(Color.red);
         	int x = Math.round(location.x * cellSizeW);
         	int y = Math.round(location.y * cellSizeH);
-        	g.drawRect(x, y, cellSizeW, cellSizeH);
+        	g.drawRect(x + 1, y + 1, cellSizeW - 1, cellSizeH - 1);
         }
+//        repaint();
     }
     
     public void drawMovementGrid(LinkedList<Location> locations) {
@@ -251,7 +253,7 @@ public class GameMap extends JPanel {
     	movementLocations.removeAll(getForbiddenLocations());	
     	movementLocations.remove(loc);
     	drawMovementGrid(movementLocations);
-    	repaint();
+//    	repaint();
     }
     
     private void findPossibleLocations(Location loc, int act, int max, LinkedList<Location> locations, LinkedList<Location> forbidden) {
@@ -373,17 +375,25 @@ public class GameMap extends JPanel {
 								break;
 							}
 						}
-						if (cunit != null)
+						if (cunit != null) {
 							drawPossibleMovement(cunit);
+							drawBasicAtkRange(cunit.getLocation(), cunit.getBasicAtkRange());
+						}
 					} else {
 						Location loc = new Location(e.getX() / cellSizeW, e.getY() / cellSizeH); //get a cell where mouse clicked
 						if (movementLocations.contains(loc)) {
 							cunit.setLocation(loc);
 							movementLocations.clear();
+							atkLocations.clear();
 							view.getGameMap().setEnabled(false);
 							allowActions();
-						} else
+						} else {
 							movementLocations.clear();
+							if (atkLocations.contains(loc)) {
+								Node.getNode(loc.x, loc.y).getUnit().addDamage(cunit.getAtk());
+							}
+						}
+						atkLocations.clear();
 						cunit = null;
 						e.getComponent().getParent().repaint(); //view
 	//					e.getComponent().repaint();
@@ -399,5 +409,6 @@ public class GameMap extends JPanel {
 	public void clearMovement() {
 		cunit = null;
 		movementLocations.clear();
+		atkLocations.clear();
 	}
 }

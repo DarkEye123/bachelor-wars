@@ -26,7 +26,7 @@ public class GameEnv extends Environment {
 	
 	public static final String VERSION = "0.0.1";
 	
-	private static final int TIME_TO_WAIT = 800;
+	private static final int TIME_TO_WAIT = 50; //800
 	
 	public static final Literal CA = Literal.parseLiteral("can_act");
 	public static final Literal CU = Literal.parseLiteral("create_unit");
@@ -51,7 +51,6 @@ public class GameEnv extends Environment {
         	menu.init();
         }
         
-        getEnvironmentInfraTier().getRuntimeServices().killAgent("simple_ai", "simple_ai");
 //        addAgent("test", "simple_ai.asl");
     }
     
@@ -68,7 +67,10 @@ public class GameEnv extends Environment {
     @Override
     public boolean executeAction(String agName, Structure action) {
         logger.info("["+agName+"] executing: "+action);
+        for (String name: getEnvironmentInfraTier().getRuntimeServices().getAgentsNames())
+        	System.out.println(name);
         addAgent("test", "simple_ai.asl");
+//        System.out.println(getEnvironmentInfraTier().getRuntimeServices().killAgent("simple_ai", null));
         if (action.equals(UPDATE)) {
         	for (Base base:view.getGameMap().getBaseList()) {
         		if (base.getOwner() != GameSettings.PLAYER_ID) {
