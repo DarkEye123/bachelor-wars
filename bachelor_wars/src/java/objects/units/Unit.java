@@ -24,6 +24,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	protected static BufferedImage image = null;
 	protected int id;
 	protected int hp;
+	protected int basicAtkRange = 1;
 	protected static int maxHp;
 	protected static int mov;
 	protected static int cost;
@@ -131,5 +132,13 @@ public abstract class Unit extends GameObject implements Clickable {
 
 	public void setSp(int sp) {
 		Unit.sp = sp;
+	}
+
+	public int getBasicAtkRange() {
+		return basicAtkRange;
+	}
+
+	public void setBasicAtkRange(int basicAtkRange) {
+		this.basicAtkRange = basicAtkRange;
 	}
 }

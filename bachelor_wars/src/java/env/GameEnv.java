@@ -101,7 +101,7 @@ public class GameEnv extends Environment {
         				unit.setLocation(view.getGameMap().getMovementLocations().get(index));
         				view.repaint();
         				view.getGameMap().repaint();
-        				view.getGameMap().getMovementLocations().clear();
+        				view.getGameMap().clearMovement();
         			}
         			clearPercepts(base.getAgent());
         		}

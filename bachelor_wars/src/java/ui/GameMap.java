@@ -41,6 +41,7 @@ public class GameMap extends JPanel {
 	private LinkedList<Base> baseList = new LinkedList<Base>();
 	private LinkedList<Knowledge> knowledgeList = new LinkedList<Knowledge>();
 	private LinkedList<Location> movementLocations = new LinkedList<Location>();
+	private LinkedList<Location> atkLocations = new LinkedList<Location>();
 	
 	MapMouseInputAdapter mouseListener;
 	
@@ -167,7 +168,18 @@ public class GameMap extends JPanel {
         g.drawRect(x * cellSizeW, y * cellSizeH, cellSizeW, cellSizeH);
     }
     
-    //TODO change it to the circles or something
+    public void drawBasicAtkRange(Location loc, int max) {
+    	findPossibleLocations(loc, 1, max, atkLocations, null);
+    	
+    	Graphics g = this.getGraphics();
+        for (Location location:atkLocations) {
+        	g.setColor(Color.red);
+        	int x = Math.round(location.x * cellSizeW);
+        	int y = Math.round(location.y * cellSizeH);
+        	g.drawRect(x, y, cellSizeW, cellSizeH);
+        }
+    }
+    
     public void drawMovementGrid(LinkedList<Location> locations) {
     	Graphics g = this.getGraphics();
         for (Location location:locations) {
@@ -176,7 +188,6 @@ public class GameMap extends JPanel {
         	int centerY = Math.round(location.y * cellSizeH);
         	g.fillOval(centerX, centerY, cellSizeW, cellSizeH);
         }
-        ///drawString(g, x, y, defaultFont, mov+"");
     }
 
     
@@ -244,7 +255,10 @@ public class GameMap extends JPanel {
     }
     
     private void findPossibleLocations(Location loc, int act, int max, LinkedList<Location> locations, LinkedList<Location> forbidden) {
-    	if (act <= max && !forbidden.contains(loc)) {
+    	boolean contain = false;
+    	if (forbidden != null && forbidden.contains(loc))
+    		contain = true;
+    	if (act <= max && !contain) {
     		if (! locations.contains(loc))
     			locations.add(loc);
     		if (loc.x + 1 < settings.getMapColumns())
@@ -380,5 +394,10 @@ public class GameMap extends JPanel {
 				}
 			}
 		}
+	}
+
+	public void clearMovement() {
+		cunit = null;
+		movementLocations.clear();
 	}
 }
