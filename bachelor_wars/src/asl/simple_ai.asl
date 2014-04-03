@@ -28,6 +28,8 @@
 actualKnowledge(unknown)[source(percept)].
 freeSlots(unknown)[source(percept)].
 maximumSlots(unknown)[source(percept)].
+availableUnits([])[source(percept)].
+ownedUnits([])[source(percept)].
 
 //TODO here it fails
 can_create_unit :- freeSlots(N)[source(percept)] & N > 0 & .print(N).
