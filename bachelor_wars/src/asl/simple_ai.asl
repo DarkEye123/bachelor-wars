@@ -28,20 +28,28 @@
 actualKnowledge(unknown)[source(percept)].
 freeSlots(unknown)[source(percept)].
 maximumSlots(unknown)[source(percept)].
-availableUnits([])[source(percept)].
-ownedUnits([])[source(percept)].
 
-//TODO here it fails
+availableUnits([])[source(percept)]. //stats: generalUnitID, type, id, cost, hp, atk, mov, atkRange, sp -> these are units that can be used for creation, but player doesn't own them
+ownedUnits([])[source(percept)]. // generalUnitID, type, id, cost, hp, atk, mov, atkRange, sp
+possibleUnits([])[source(percept)].
+
+
 can_create_unit :- freeSlots(N)[source(percept)] & N > 0 & .print(N).
 
+test([[1,2],[3,4]]).
+//test([1,2]).
 
 /* Initial goals */
 
-//!start.
+!start.
 
 /* Plans */
 
-//+!start : true <- !wait.
++!start : true <- ?test(N); .print(N); !decomp(N).
+
++!decomp([H|B]) : true <- .print(H); !decomp(B).
++!decomp([]).
+
 //
 //@can_act_True
 //+!wait: can_act <- .print("Can create").
@@ -54,13 +62,12 @@ can_create_unit :- freeSlots(N)[source(percept)] & N > 0 & .print(N).
 //+can_act <- .print("pridane"); create_unit.
 //-can_act <- .print("odobrane").
 
-//+!start : true <- !wait.
 //+!wait: not can_act <- !wait.
 
 +can_act <- .print("preparing action"); update_percepts; !check_action.
 
 //is possible buy even the cheapest unit
-+!check_action: can_create_unit & enough_knowledge <- create_unit; move_units; mark_done.
++!check_action: can_create_unit & possibleUnits <- create_unit; move_units; mark_done.
 -!check_action: true <- mark_done.
 
 
