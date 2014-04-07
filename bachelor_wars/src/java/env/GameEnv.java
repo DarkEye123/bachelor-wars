@@ -52,6 +52,7 @@ public class GameEnv extends Environment {
         }
         
 //        addAgent("test", "simple_ai.asl");
+        addPercept("simple_ai", Literal.parseLiteral("possibleUnits([[1,2],[3,4]])"));
     }
     
     public void waitForDraw() {

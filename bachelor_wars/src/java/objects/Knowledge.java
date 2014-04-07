@@ -16,6 +16,8 @@ public class Knowledge extends GameObject {
 	private BufferedImage image;
 	private static int kPerR = 5;
 	private Base base;
+	private static int _id_; //identifier of a unit
+	protected int id;
 	
 	
 
@@ -27,6 +29,8 @@ public class Knowledge extends GameObject {
 			e.printStackTrace();
 		}
 		name = "Source of knowledge";
+		_id_++;
+		id = _id_;
 	}
 
 
@@ -67,4 +71,9 @@ public class Knowledge extends GameObject {
 		base.getKnowledgeList().add(this);
 	}
 
+
+
+	public int getId() {
+		return id;
+	}
 }

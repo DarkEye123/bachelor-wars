@@ -25,11 +25,11 @@ public abstract class Unit extends GameObject implements Clickable {
 	protected int id;
 	protected int hp;
 	protected int basicAtkRange = 1;
-	protected static int maxHp;
-	protected static int mov;
-	protected static int cost;
-	protected static int atk;
-	protected static int sp;
+	protected int maxHp;
+	protected int mov;
+	protected int cost;
+	protected int atk;
+	protected int sp;
 	public Base base; //it's like owner from GameObject but due to some dependencies is better set a base on it's own too
 	
 	public Unit() {
@@ -131,7 +131,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	}
 
 	public void setSp(int sp) {
-		Unit.sp = sp;
+		this.sp = sp;
 	}
 
 	public int getBasicAtkRange() {
@@ -140,5 +140,9 @@ public abstract class Unit extends GameObject implements Clickable {
 
 	public void setBasicAtkRange(int basicAtkRange) {
 		this.basicAtkRange = basicAtkRange;
+	}
+
+	public int getId() {
+		return id;
 	}
 }
