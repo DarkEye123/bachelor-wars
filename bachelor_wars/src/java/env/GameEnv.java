@@ -1,14 +1,19 @@
 package env;
 
 
+import jason.NoValueException;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Structure;
+import jason.asSyntax.Term;
 import jason.environment.Environment;
 import jason.environment.TimeSteppedEnvironment;
 import jason.environment.grid.Location;
 import jason.mas2j.AgentParameters;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
@@ -34,6 +39,7 @@ public class GameEnv extends Environment {
 	public static final Literal MOV = Literal.parseLiteral("move_units");
 	public static final Literal EKNOW = Literal.parseLiteral("enough_knowledge");
 	public static final Literal MD = Literal.parseLiteral("mark_done");
+	public static final Literal move = Literal.parseLiteral("move");
 
     private Logger logger = Logger.getLogger("bachelor_wars."+GameEnv.class.getName());
     private int marker;
@@ -70,7 +76,6 @@ public class GameEnv extends Environment {
         logger.info("["+agName+"] executing: "+action);
         for (String name: getEnvironmentInfraTier().getRuntimeServices().getAgentsNames())
         	System.out.println(name);
-        addAgent("test", "simple_ai.asl");
 //        System.out.println(getEnvironmentInfraTier().getRuntimeServices().killAgent("simple_ai", null));
         if (action.equals(UPDATE)) {
         	for (Base base:view.getGameMap().getBaseList()) {
@@ -124,6 +129,17 @@ public class GameEnv extends Environment {
         		}
         		GameMap.ROUND++;
         	}
+        	return true;
+        } else if (action.getFunctor().equals("move")) {
+        	try {
+				int unitID = (int)(((NumberTerm)action.getTerm(0)).solve());
+				ArrayList<Integer>loc = new ArrayList<Integer>();
+				for (Term t:((ListTermImpl)action.getTerm(1))) {
+					loc.add((int)(( (NumberTerm) t).solve()));
+				}
+			} catch (NoValueException e) {
+				e.printStackTrace();
+			}
         	return true;
         } else {
         	for (Base base:view.getGameMap().getBaseList()) {

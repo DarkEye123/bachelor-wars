@@ -18,6 +18,7 @@ public class Base extends GameObject implements Clickable{
 	
 	public final static int DEFAULT_SLOT_SIZE = 6;
 	public final static Dimension DEFAULT_BASE_SIZE = new Dimension(2,2); //size on grid (x,y)
+	private static final int ARC_W = 12, ARC_H = 12;
 	
 	
 	private LinkedList<Unit> unitList = new LinkedList<Unit>();
@@ -165,9 +166,9 @@ public class Base extends GameObject implements Clickable{
 		if (posY + cellSizeH * 2 > height)
 			posY = height - cellSizeH * 2;
 		
-		g.fillRect(posX + 1, posY + 1, cellSizeW*2-1, cellSizeH*2-1);
+		g.fillRoundRect(posX, posY, cellSizeW*2, cellSizeH*2, ARC_W, ARC_H);
 		g.setColor(Color.lightGray);
-		g.drawRect(posX, posY, cellSizeW*2, cellSizeH*2);
+		g.drawRoundRect(posX, posY, cellSizeW*2, cellSizeH*2, ARC_W, ARC_H);
 		g.setColor(Color.black);
 		GameMap.drawString(g, Math.round(posX+(0.3f*cellSizeW)), Math.round(posY+(0.5f*cellSizeH)), GameMap.defaultFont, getName());
 	}

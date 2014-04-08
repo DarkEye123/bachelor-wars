@@ -3,6 +3,7 @@ import jason.environment.grid.Location;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.DisplayMode;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.MenuItem;
@@ -302,7 +303,7 @@ public class GameMap extends JPanel {
         }
         for (Unit unit:unitList) {
         	unit.draw(g, cellSizeW, cellSizeH);
-        }
+        };
     }
     
     public void repaint() {
@@ -372,6 +373,8 @@ public class GameMap extends JPanel {
 							if ( unit.wasSelected( e.getX(),  e.getY()) ) {
 								cunit = unit;
 								view.controlPanel.infoPanel.showUnitContext(cunit);
+								if (cunit.getOwner() != GameSettings.PLAYER)
+									cunit = null;
 								break;
 							}
 						}

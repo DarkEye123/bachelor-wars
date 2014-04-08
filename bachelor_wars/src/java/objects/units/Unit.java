@@ -18,6 +18,7 @@ import objects.GameObject;
 public abstract class Unit extends GameObject implements Clickable {
 
 	public static final Dimension DEFAULT_UNIT_SIZE = new Dimension(1,1); //size on grid (x,y)
+	private static final int ARC_W = 12, ARC_H = 12;
 	
 	private static int _id_; //identifier of a unit
 	
@@ -73,9 +74,11 @@ public abstract class Unit extends GameObject implements Clickable {
 		int ny = y * cellSizeH;
 		cellSizeW = width;
 		cellSizeH = height;
+		g.setColor(base.getColor());
+		g.fillRoundRect(nx, ny, cellSizeW, cellSizeH, ARC_W, ARC_H);
 		g.drawImage(image, nx + 1, ny + 1, cellSizeW - 1, cellSizeH - 1, null);
 		g.setColor(Color.lightGray);
-        g.drawRect(nx, ny, cellSizeW, cellSizeH);
+        g.drawRoundRect(nx, ny, cellSizeW, cellSizeH, ARC_W, ARC_H);
     }
 
 	public int getMov() {
