@@ -204,7 +204,8 @@ public class Node {
 		return ret;
 	}
 	
-	public static void searchPath(Node from, Node to) {
+	public static LinkedList<Node> searchPath(Node from, Node to) {
+		LinkedList<Node> ret = new LinkedList<Node>();
 		LinkedList<Node> closedSet = new LinkedList<Node>();
 		LinkedList<Node> openSet = new LinkedList<Node>();
 		from.gScore = 0; // Cost from start along best known path
@@ -237,12 +238,14 @@ public class Node {
 				}
 			}
 		}
-//		Node act = to;
-//		while (act != null) {
-//			if (act.getPredecessor() == null && !act.equals(from)) //if last node of path != node from where we are trying to go, there is no path
-//				to.predecessor = null;
-//			act = act.getPredecessor();
-//		}
+		Node act = to;
+		while (act != null) {
+			if (act.getPredecessor() == null && !act.equals(from)) //if last node of path != node from where we are trying to go, there is no path
+				return ret;
+			ret.addFirst(act);
+			act = act.getPredecessor();
+		}
+		return ret;
 	}
 	
 	//For testing purpose only
@@ -263,7 +266,7 @@ public class Node {
 
 	@Override
 	public String toString() {
-		return "x: " + getX() + " y " + getY();
+		return "[" + getX() + ", " + getY() + "]";
 	}
 
 	public int getX() {
