@@ -1,5 +1,8 @@
 package mapping;
 
+import jason.environment.grid.Location;
+
+import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,34 +14,19 @@ import objects.units.Unit;
 
 public class Node {
 	
-//	class EmptyGrid extends Exception {
-//		private static final long serialVersionUID = 2941646389703077018L;
-//		private static final String message = "Grid is not created, it can't be filled with nodes then.";
-//		public EmptyGrid() {
-//			super(message);
-//		}
-//	}
-//	
-//	class IllegalPosition extends Exception {
-//		private static final long serialVersionUID = 2941646389703077019L;
-//		private static final String message = "You are trying initialize node";
-//		public IllegalPosition() {
-//			super(message);
-//		}
-//	}
-	
 	private static Node[][] nodeGrid;
 	private static int rows, columns;
 	
-	Node up;
-	Node down;
-	Node left;
-	Node right;
-	int x,y;
+	LinkedList<Node> neighbours = new LinkedList<>();
+	private Node predecessor = null;
+	int gScore;
+	int fScore;
+	private int x;
+	private int y;
 	List<GameObject> gameObjects = new LinkedList<GameObject>(); //list of objects that are in actual node
 	
 	public boolean equals(Node node) {
-		if (x == node.x && y == node.y)
+		if (getX() == node.getX() && getY() == node.getY())
 			return true;
 		else
 			return false;
@@ -150,10 +138,10 @@ public class Node {
 		}
 		for (int y = 0; y < rows; ++y) {
 			for (int x = 0; x < columns; ++x) {
-				nodeGrid[y][x].down = getNode(x, y - 1);
-				nodeGrid[y][x].up = getNode(x, y + 1);
-				nodeGrid[y][x].left = getNode(x - 1, y);
-				nodeGrid[y][x].right = getNode(x + 1, y);
+				nodeGrid[y][x].neighbours.add(getNode(x, y - 1));
+				nodeGrid[y][x].neighbours.add(getNode(x, y + 1));
+				nodeGrid[y][x].neighbours.add(getNode(x - 1, y));
+				nodeGrid[y][x].neighbours.add(getNode(x + 1, y));
 			}
 		}
 	}
@@ -177,8 +165,8 @@ public class Node {
 	}
 	
 	private Node(int x, int y) {
-		this.x = x;
-		this.y = y;
+		this.setX(x);
+		this.setY(y);
 	}
 	
 	public List<GameObject> getGameObjects() {
@@ -189,15 +177,78 @@ public class Node {
 		this.gameObjects = gameObjects;
 	}
 	
+	/** calculates the Manhattan distance between two nodes */
+	private int distance(Node n) {
+        return Math.abs(getX() - n.getX()) + Math.abs(getY() - n.getY());
+    }
+	
+	public static void removePredecessors() {
+		for (int y = 0; y < rows; ++y) {
+			for (int x = 0; x < columns; ++x) {
+				nodeGrid[y][x].setPredecessor(null);
+				nodeGrid[y][x].fScore = 0;
+				nodeGrid[y][x].gScore = 0;
+			}
+		}
+	}
+	
+	private static Node findLowestF(LinkedList<Node> list) {
+		int minF = Integer.MAX_VALUE;
+		Node ret = null;
+		for (Node node:list) {
+			if (node.fScore < minF) {
+				minF = node.fScore;
+				ret = node;
+			}
+		}
+		return ret;
+	}
+	
+	public static void searchPath(Node from, Node to) {
+		LinkedList<Node> closedSet = new LinkedList<Node>();
+		LinkedList<Node> openSet = new LinkedList<Node>();
+		from.gScore = 0; // Cost from start along best known path
+		from.fScore = from.gScore + from.distance(to);
+		openSet.add(from);
+		
+		while (!openSet.isEmpty()) {
+			Node current = findLowestF(openSet);
+			if (current.equals(to))
+				break;
+			openSet.remove(current);
+			if (!closedSet.contains(current))
+				closedSet.add(current);
+			
+			for (Node neighbour:current.neighbours) {
+				if (neighbour != null && !closedSet.contains(neighbour)) {
+					if (! neighbour.containUnit()) {
+						int tentativeGScore = current.gScore + current.distance(to);
+						
+						if (!openSet.contains(neighbour) || tentativeGScore < neighbour.gScore) {
+							neighbour.setPredecessor(current);
+							neighbour.gScore = tentativeGScore;
+							neighbour.fScore = neighbour.gScore + neighbour.distance(to);
+							if (!openSet.contains(neighbour))
+								openSet.add(neighbour);
+						}
+					} else {
+						closedSet.add(neighbour);
+					}
+				}
+			}
+		}
+//		Node act = to;
+//		while (act != null) {
+//			if (act.getPredecessor() == null && !act.equals(from)) //if last node of path != node from where we are trying to go, there is no path
+//				to.predecessor = null;
+//			act = act.getPredecessor();
+//		}
+	}
+	
 	//For testing purpose only
 	public static void main(String[] args) {
 		Node.generateGrid(5, 5);
 		Node node = Node.getNode(1, 1);
-		
-		System.out.println(node.left);
-		System.out.println(node.right);
-		System.out.println(node.up);
-		System.out.println(node.down);
 		
 //		node.gameObjects.add(new FirstYear());
 //		System.out.println(node.containBase());
@@ -212,6 +263,30 @@ public class Node {
 
 	@Override
 	public String toString() {
-		return "x: " + x + " y " + y;
+		return "x: " + getX() + " y " + getY();
+	}
+
+	public int getX() {
+		return x;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	public Node getPredecessor() {
+		return predecessor;
+	}
+
+	public void setPredecessor(Node predecessor) {
+		this.predecessor = predecessor;
 	}
 }

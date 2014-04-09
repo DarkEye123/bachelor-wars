@@ -356,10 +356,23 @@ public class GameMap extends JPanel {
 
 	class MapMouseInputAdapter extends MouseInputAdapter {
 		Base cbase = null;
+		Node test1 = null;
+		Node test2 = null;
+		int testCounter = 0;
 		
 		public void mouseClicked(MouseEvent e) {
 			if (isEnabled()) {
 				if (e.getButton() == MouseEvent.BUTTON1) { 
+					if (testCounter++ % 2 == 0) {
+						test1 = Node.getNode(e.getX() / cellSizeW, e.getY() / cellSizeH);
+						System.out.println("test1");
+					}
+					else {
+						test2 = Node.getNode(e.getX() / cellSizeW, e.getY() / cellSizeH);
+						System.out.println("test2");
+						debugPath(test1, test2);
+					}
+					
 					if (movementLocations.isEmpty()) {
 						for (Base base:baseList) {
 	//						System.out.println(base.getName() + " " + base.wasSelected( e.getX(),  e.getY()));
@@ -413,5 +426,22 @@ public class GameMap extends JPanel {
 		cunit = null;
 		movementLocations.clear();
 		atkLocations.clear();
+	}
+	
+	private void debugPath(Node from, Node to) {
+		Graphics g = this.getGraphics();
+		Node.searchPath(from, to);
+		Node act = to;
+		if (!from.equals(to) && to.getPredecessor() == null) //no path was found
+			return;
+		
+		while (act != null) {
+			g.setColor(Color.blue);
+			g.fillRect(act.getX() * cellSizeW, act.getY() * cellSizeH, cellSizeW, cellSizeH);
+			g.setColor(Color.black);
+			g.drawRect(act.getX() * cellSizeW, act.getY() * cellSizeH, cellSizeW, cellSizeH);
+			act = act.getPredecessor();
+		}
+		Node.removePredecessors();
 	}
 }

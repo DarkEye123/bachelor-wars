@@ -79,10 +79,13 @@ public class GameSettingsMenu extends Menu {
 	}
 
 	private void initComponents() {
+		int x = 800, y = 600;
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 		} catch (Exception e) {
 			e.printStackTrace();
+			x = 820;
+			y = 630;
 		}
 		frame = new JFrame();
 		modeButtonGroup = new javax.swing.ButtonGroup();
@@ -141,12 +144,12 @@ public class GameSettingsMenu extends Menu {
 		playerName = new javax.swing.JTextField();
 
 		frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-		frame.setMaximumSize(new java.awt.Dimension(800, 600));
-		frame.setPreferredSize(new java.awt.Dimension(800, 600));
+		frame.setMaximumSize(new java.awt.Dimension(x, y));
+		frame.setPreferredSize(new java.awt.Dimension(x, y));
 		frame.setResizable(false);
 
-		gameSettingsContainer.setMaximumSize(new java.awt.Dimension(800, 600));
-		gameSettingsContainer.setMinimumSize(new java.awt.Dimension(800, 600));
+		gameSettingsContainer.setMaximumSize(new java.awt.Dimension(x, y));
+		gameSettingsContainer.setMinimumSize(new java.awt.Dimension(x, y));
 		gameSettingsContainer.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
 		buttonStart.setText("Start Game");
