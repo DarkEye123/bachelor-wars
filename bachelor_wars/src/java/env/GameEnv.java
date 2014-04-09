@@ -142,7 +142,8 @@ public class GameEnv extends Environment {
 			}
         	return true;
         } else {
-        	for (Base base:view.getGameMap().getBaseList()) {
+        	view.getGameMap();
+			for (Base base:GameMap.getBaseList()) {
         		if (base.getOwner() != GameSettings.PLAYER_ID) {
         			clearPercepts(base.getAgent());
         		}

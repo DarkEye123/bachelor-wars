@@ -98,6 +98,11 @@ public abstract class GameObject implements Clickable{
 		this.cellSizeW = cellSizeW;
 	}
 
+	@Override
+	public String toString() {
+		return name;
+	}
+
 	public void setCellSizeH(int cellSizeH) {
 		this.cellSizeH = cellSizeH;
 	}
@@ -122,6 +127,10 @@ public abstract class GameObject implements Clickable{
 		return location;
 	}
 	
+	public Node getNode() {
+		return Node.getNode(x, y);
+	}
+	
 	public void setLocation(Location loc) {
 		this.location = loc;
 		Node.getNode(loc.x, loc.y).add(this); //add this unit to the new node, but before its grid coordinates are changed (old coordinates are for knowing in which node to delete unit)
@@ -136,4 +145,6 @@ public abstract class GameObject implements Clickable{
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public abstract int getId();
 }

@@ -1,4 +1,5 @@
 package ui;
+import jason.asSyntax.Literal;
 import jason.environment.grid.Location;
 
 import java.awt.Color;
@@ -38,9 +39,9 @@ public class GameMap extends JPanel {
 	protected int cellSizeW = 0;
 	protected int cellSizeH = 0;
 	
-	private LinkedList<Unit> unitList = new LinkedList<Unit>();
-	private LinkedList<Base> baseList = new LinkedList<Base>();
-	private LinkedList<Knowledge> knowledgeList = new LinkedList<Knowledge>();
+	private static LinkedList<Unit> unitList = new LinkedList<Unit>();
+	private static LinkedList<Base> baseList = new LinkedList<Base>();
+	private static LinkedList<Knowledge> knowledgeList = new LinkedList<Knowledge>();
 	private LinkedList<Location> movementLocations = new LinkedList<Location>();
 	private LinkedList<Location> atkLocations = new LinkedList<Location>();
 	
@@ -113,6 +114,9 @@ public class GameMap extends JPanel {
 			}
 			
 			baseList.add(base);
+			view.env.addAgent(base.getName(), base.getAgent()); //add agent to the game
+			base.setAgent(base.getName());
+			view.env.addPercept(base.getAgent(), Literal.parseLiteral("agentID("+base.getOwner()+")"));
 			base.setMapWidth(settings.getMapColumns()); //set number of cells in a row
 			base.setMapHeight(settings.getMapRows()); //set number of cells in a column
 			Node.getNode(base.getX(), base.getY()).add(base);
@@ -323,28 +327,20 @@ public class GameMap extends JPanel {
     }
 
 
-	public LinkedList<Unit> getUnitList() {
+	public static LinkedList<Unit> getUnitList() {
 		return unitList;
 	}
 
-	public void setUnitList(LinkedList<Unit> unitList) {
-		this.unitList = unitList;
-	}
-
-	public LinkedList<Base> getBaseList() {
+	public static LinkedList<Base> getBaseList() {
 		return baseList;
 	}
 
-	public void setBaseList(LinkedList<Base> baseList) {
-		this.baseList = baseList;
-	}
-	
-	public LinkedList<Location> getMovementLocations() {
-		return movementLocations;
+	public static LinkedList<Knowledge> getKnowledgeList() {
+		return knowledgeList;
 	}
 
-	public void setMovementLocations(LinkedList<Location> movementLocations) {
-		this.movementLocations = movementLocations;
+	public LinkedList<Location> getMovementLocations() {
+		return movementLocations;
 	}
 	
 	public void allowActions() {
@@ -363,19 +359,18 @@ public class GameMap extends JPanel {
 		public void mouseClicked(MouseEvent e) {
 			if (isEnabled()) {
 				if (e.getButton() == MouseEvent.BUTTON1) { 
-					if (testCounter++ % 2 == 0) {
-						test1 = Node.getNode(e.getX() / cellSizeW, e.getY() / cellSizeH);
-						System.out.println("test1");
-					}
-					else {
-						test2 = Node.getNode(e.getX() / cellSizeW, e.getY() / cellSizeH);
-						System.out.println("test2");
-						debugPath(test1, test2);
-					}
+//					if (testCounter++ % 2 == 0) {
+//						test1 = Node.getNode(e.getX() / cellSizeW, e.getY() / cellSizeH);
+//						System.out.println("test1");
+//					}
+//					else {
+//						test2 = Node.getNode(e.getX() / cellSizeW, e.getY() / cellSizeH);
+//						System.out.println("test2");
+//						debugPath(test1, test2);
+//					}
 					
 					if (movementLocations.isEmpty()) {
 						for (Base base:baseList) {
-	//						System.out.println(base.getName() + " " + base.wasSelected( e.getX(),  e.getY()));
 							if ( base.wasSelected( e.getX(),  e.getY()) ) {
 								cbase = base;
 								view.controlPanel.infoPanel.showBaseContext(base);
@@ -412,7 +407,6 @@ public class GameMap extends JPanel {
 						atkLocations.clear();
 						cunit = null;
 						e.getComponent().getParent().repaint(); //view
-	//					e.getComponent().repaint();
 					}
 				}
 				if (e.getButton() == MouseEvent.BUTTON3) {
@@ -428,15 +422,17 @@ public class GameMap extends JPanel {
 		atkLocations.clear();
 	}
 	
+	@SuppressWarnings("unused")
 	private void debugPath(Node from, Node to) {
 		Graphics g = this.getGraphics();
-		Node.searchPath(from, to);
-		Node act = to;
-		if (!from.equals(to) && to.getPredecessor() == null) //no path was found
-			return;
-		
-		while (act != null) {
-			g.setColor(Color.blue);
+		LinkedList<Node> path = Node.searchPath(from, to);
+		int x = 0;
+		for (Node act:path) {
+			if (x == 0)
+				g.setColor(Color.red);
+			else
+				g.setColor(Color.blue);
+			++x;
 			g.fillRect(act.getX() * cellSizeW, act.getY() * cellSizeH, cellSizeW, cellSizeH);
 			g.setColor(Color.black);
 			g.drawRect(act.getX() * cellSizeW, act.getY() * cellSizeH, cellSizeW, cellSizeH);

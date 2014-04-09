@@ -172,4 +172,9 @@ public class Base extends GameObject implements Clickable{
 		g.setColor(Color.black);
 		GameMap.drawString(g, Math.round(posX+(0.3f*cellSizeW)), Math.round(posY+(0.5f*cellSizeH)), GameMap.defaultFont, getName());
 	}
+
+	@Override
+	public int getId() {
+		return owner;
+	}
 }
