@@ -20,6 +20,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import mapping.GameSettings;
+import mapping.Node;
 import objects.Base;
 import objects.Knowledge;
 import objects.units.Unit;
@@ -36,10 +37,7 @@ public class GameEnv extends Environment {
 	public static final Literal CA = Literal.parseLiteral("can_act");
 	public static final Literal CU = Literal.parseLiteral("create_unit");
 	public static final Literal UPDATE = Literal.parseLiteral("update_percepts");
-	public static final Literal MOV = Literal.parseLiteral("move_units");
-	public static final Literal EKNOW = Literal.parseLiteral("enough_knowledge");
 	public static final Literal MD = Literal.parseLiteral("mark_done");
-	public static final Literal move = Literal.parseLiteral("move");
 
     private Logger logger = Logger.getLogger("bachelor_wars."+GameEnv.class.getName());
     private int marker;
@@ -58,7 +56,7 @@ public class GameEnv extends Environment {
         }
         
 //        addAgent("test", "simple_ai.asl");
-        addPercept("simple_ai", Literal.parseLiteral("possibleUnits([[1,2],[3,4]])"));
+//        addPercept("simple_ai", Literal.parseLiteral("possibleUnits([[1,2],[3,4]])"));
     }
     
     public void waitForDraw() {
@@ -74,23 +72,23 @@ public class GameEnv extends Environment {
     @Override
     public boolean executeAction(String agName, Structure action) {
         logger.info("["+agName+"] executing: "+action);
-        for (String name: getEnvironmentInfraTier().getRuntimeServices().getAgentsNames())
-        	System.out.println(name);
+//        for (String name: getEnvironmentInfraTier().getRuntimeServices().getAgentsNames())
+//        	System.out.println(name);
 //        System.out.println(getEnvironmentInfraTier().getRuntimeServices().killAgent("simple_ai", null));
         if (action.equals(UPDATE)) {
-        	for (Base base:view.getGameMap().getBaseList()) {
+			for (Base base:GameMap.getBaseList()) {
         		if (base.getOwner() != GameSettings.PLAYER_ID) {
         			clearPercepts(base.getAgent());
 			        addPercept(base.getAgent(), Literal.parseLiteral("actualKnowledge("+base.getKnowledge()+")"));
 			        addPercept(base.getAgent(), Literal.parseLiteral("freeSlots("+base.getFreeSlots()+")"));
 			        addPercept(base.getAgent(), Literal.parseLiteral("maximumSlots("+base.getMaxSlots()+")"));
-			        addPercept(base.getAgent(), EKNOW);
 			        System.out.println("updating percepts for: " + base.getAgent());
         		}
         	}
 	        return true;
         } else if (action.equals(CU)) {
-        	for (Base base:view.getGameMap().getBaseList()) {
+        	view.getGameMap();
+			for (Base base:GameMap.getBaseList()) {
         		if (base.getOwner() != GameSettings.PLAYER_ID) {
 		        	Location loc = base.getLocation();
 		            view.getGameMap().createUnit(loc, base.getOwner(), GameSettings.FIRST_YEAR_STUDENT);
@@ -98,30 +96,13 @@ public class GameEnv extends Environment {
         		}
         	}
             return true;
-        } else if (action.equals(MOV)) {
-        	for (Base base:view.getGameMap().getBaseList()) {
-        		if (base.getOwner() != GameSettings.PLAYER_ID) {
-        			for (Unit unit:base.getUnitList()) {
-        				waitForDraw();
-        				view.getGameMap().drawPossibleMovement(unit);
-        				waitForDraw();
-        				int index = new Random().nextInt(view.getGameMap().getMovementLocations().size());
-        				unit.setLocation(view.getGameMap().getMovementLocations().get(index));
-        				view.repaint();
-        				view.getGameMap().repaint();
-        				view.getGameMap().clearMovement();
-        			}
-        			clearPercepts(base.getAgent());
-        		}
-        	}
-        	return true;
         } else if (action.equals(MD)) {
         	marker++;
 //        	System.out.println(view.getSettings().getNumPlayers() -1 + " and marker is: " + marker);
         	if (marker == view.getSettings().getNumPlayers() -1 ) { //-1 cos we have a living player too 
         		view.getGameMap().setEnabled(true);
         		marker = 0;
-        		for (Base base:view.getGameMap().getBaseList()) {
+				for (Base base:GameMap.getBaseList()) {
         			int sum = view.getSettings().getIncomePerRound();
         			for (Knowledge knowledge:base.getKnowledgeList())
         				sum += knowledge.getKnowledgePerRound();
@@ -133,10 +114,14 @@ public class GameEnv extends Environment {
         } else if (action.getFunctor().equals("move")) {
         	try {
 				int unitID = (int)(((NumberTerm)action.getTerm(0)).solve());
-				ArrayList<Integer>loc = new ArrayList<Integer>();
-				for (Term t:((ListTermImpl)action.getTerm(1))) {
-					loc.add((int)(( (NumberTerm) t).solve()));
-				}
+				Unit unit = GameMap.searchUnit(unitID);
+				Node node = Node.getNode(action.getTermsArray());
+				waitForDraw();
+				view.getGameMap().drawPossibleMovement(unit);
+				waitForDraw();
+				reInit();
+				unit.setLocation(node, view);
+				clearPercepts(unit.base.getAgent());
 			} catch (NoValueException e) {
 				e.printStackTrace();
 			}
@@ -151,21 +136,24 @@ public class GameEnv extends Environment {
         	return true;
         }
     }
+    
+    private void reInit() {
+    	view.repaint();
+		view.getGameMap().repaint();
+		view.getGameMap().clearMovement();
+    }
 
 	public void updatePercepts(LinkedList<Literal> list) {
 		
 	}
 	
 	public void addAgent(String name, String agent) {
-//		jason.mas2j.AgentParameters.this.
 		LinkedList<String> cs = new LinkedList<String>();
 		try {
 			getEnvironmentInfraTier().getRuntimeServices().createAgent(name, "src/asl/" + agent, null, cs, null, null);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//		jason.mas2j.parser.mas2j.class.getSigners()getaddAgent(par);
 	}
 	
 	/** Called before the end of MAS execution */

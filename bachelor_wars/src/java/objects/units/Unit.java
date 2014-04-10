@@ -6,20 +6,24 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import mapping.GameSettings;
+import mapping.Node;
 import objects.Base;
 import objects.Clickable;
 import objects.GameObject;
 import objects.Knowledge;
 import ui.GameMap;
+import ui.GameView;
 
 /**
  * Abstract class that represents a unit in general view. It provide fields that all units should share.
  * @author Matej Leško <xlesko04@stud.fit.vutbr.cz>
  */
 public abstract class Unit extends GameObject implements Clickable {
+	private static final int TIME_TO_WAIT = 50;
 	
 	public static final int	KILL 	= 0; //damage with atk
 	public static final int	HEAL 	= 1; 
@@ -212,5 +216,44 @@ public abstract class Unit extends GameObject implements Clickable {
 			return true;
 		else
 			return false;
+	}
+	
+	public void waitForDraw() {
+    	synchronized(this) {
+			try {
+				this.wait(TIME_TO_WAIT);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+    }
+
+	/**
+	 * Finds a path and sets position on the grid to given node or to the nearest postion to that node.
+	 * If there is a unit in the node, and unit is able to get there in actual round, position is set to the nearest available position to that unit to be able to attack it.
+	 * @param node - node containing a goal object.
+	 */
+	public void setLocation(Node node, GameView view) {
+//		setLocation(new Location(node.getX(), node.getY()));
+		LinkedList<Node> path = Node.searchPath(getNode(), node);
+		if (!path.isEmpty()) {
+			Graphics g = view.getGameMap().getGraphics();
+			g.setColor(Color.red);
+			g.drawRoundRect(node.getX() * cellSizeW, node.getY() * cellSizeH, cellSizeW, cellSizeH, ARC_W, ARC_H);
+			if (!node.containUnit()) {
+				if (node.containKnowledge())
+					addIntention(node.getKnowledge().getId(), SEIZE);
+				else
+					addIntention(node.getBase().getId(), SEIZE);
+			}
+			for (int x = 0; x < path.size() && x < getMov(); ++x) {
+				waitForDraw();
+				Node t = path.get(x);
+				setLocation(new Location(t.getX(), t.getY()));
+				waitForDraw();
+				view.repaint();
+				view.getGameMap().repaint();
+			}
+		}
 	}
 }

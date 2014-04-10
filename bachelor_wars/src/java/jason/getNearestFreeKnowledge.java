@@ -2,16 +2,20 @@
 
 package jason;
 
+import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.TransitionSystem;
+import jason.asSemantics.Unifier;
+import jason.asSyntax.NumberTerm;
+import jason.asSyntax.NumberTermImpl;
+import jason.asSyntax.Term;
+
 import java.util.LinkedList;
 
 import mapping.Node;
 import mapping.Wrapper;
-import objects.units.Unit;
 import objects.Knowledge;
+import objects.units.Unit;
 import ui.GameMap;
-import jason.*;
-import jason.asSemantics.*;
-import jason.asSyntax.*;
 
 /**
  * Finds out nearest knowledge resource that is not owned by agent or no unit has intention of seizing it
@@ -24,17 +28,13 @@ public class getNearestFreeKnowledge extends DefaultInternalAction {
 	@Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {
     	int unitId = (int)((NumberTerm) terms[0]).solve();
-    	Unit unit = null;
-    	for (Unit u:GameMap.getUnitList()) {
-    		if (unitId == u.getId()) {
-    			unit = u;
-    		}
-    	}
+    	Unit unit = GameMap.searchUnit(unitId);
+
     	LinkedList<Knowledge> listOfInterest = (LinkedList<Knowledge>) GameMap.getKnowledgeList().clone();
     	listOfInterest.removeAll(unit.base.getKnowledgeList()); //remove already owned knowledge resources
     	LinkedList<Knowledge> toRemove = new LinkedList<>();
     	
-    	for (Knowledge knowledge:listOfInterest) {
+    	for (Knowledge knowledge:listOfInterest) { //search knowledge resources that are free, but have some unit with intention assigned
     		for (Unit u:GameMap.getUnitList()) {
         		if ( u.hasIntention(knowledge.getId()) ) {
         			toRemove.add(knowledge);

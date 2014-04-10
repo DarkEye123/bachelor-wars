@@ -114,9 +114,16 @@ public class GameMap extends JPanel {
 			}
 			
 			baseList.add(base);
-			view.env.addAgent(base.getName(), base.getAgent()); //add agent to the game
-			base.setAgent(base.getName());
-			view.env.addPercept(base.getAgent(), Literal.parseLiteral("agentID("+base.getOwner()+")"));
+			if (base.getType() != GameSettings.PLAYER) {
+				view.env.addAgent("test", base.getAgent()); //add agent to the game
+		        for (String name: view.env.getEnvironmentInfraTier().getRuntimeServices().getAgentsNames())
+		        	System.out.println(name);
+				base.setAgent(base.getName());
+				view.env.clearPercepts();
+				view.env.addPercept(Literal.parseLiteral("jebat"));
+				view.env.addPercept("test", Literal.parseLiteral("agentID("+base.getOwner()+")"));
+				view.env.addPercept("test", Literal.parseLiteral("kurva("+base.getOwner()+")"));
+			}
 			base.setMapWidth(settings.getMapColumns()); //set number of cells in a row
 			base.setMapHeight(settings.getMapRows()); //set number of cells in a column
 			Node.getNode(base.getX(), base.getY()).add(base);
@@ -420,6 +427,22 @@ public class GameMap extends JPanel {
 		cunit = null;
 		movementLocations.clear();
 		atkLocations.clear();
+	}
+	
+	public static Unit searchUnit(int id) {
+		for (Unit u:unitList) {
+			if (u.getId() == id)
+				return u;
+		}
+		return null;
+	}
+	
+	public static Knowledge searchKnowledge(int id) {
+		for (Knowledge u:knowledgeList) {
+			if (u.getId() == id)
+				return u;
+		}
+		return null;
 	}
 	
 	@SuppressWarnings("unused")

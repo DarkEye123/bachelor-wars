@@ -41,7 +41,7 @@ public class GameSettings {
 	public static final int PLAYER_ID = 0; //living player has always ID 1 as an owner of base
 	public static final String PLAYER_NAME = "DarkEye";
 	public static final String [] AI_NAMES = {"Simple AI", "Medium AI", "Advanced AI"};
-	public static final String [] AI_AGENTS = {"simple_ai", "medium_ai", "advanced_ai"};
+	public static final String [] AI_AGENTS = {"simple_ai.asl", "medium_ai.asl", "advanced_ai.asl"};
 	
 	private int maxRounds = INFINITE; //default
 	

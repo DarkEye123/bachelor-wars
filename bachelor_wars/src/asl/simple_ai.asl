@@ -43,11 +43,13 @@ possibleUnits([])[source(percept)].
 
 enoughSlots :- freeSlots(N)[source(percept)] & N > 0 & .print("free slots: ",N).
 dominationMode :- mode(N)[source(percept)] & N == 0. //0 for domination mode
-isKnowledgeInReach(Unit, Knowledge) :- .getUnitKnowledgePairs(Unit, Knowledge) & .print("Knowledge: ", Knowledge).
+//isKnowledgeInReach(Unit, Knowledge) :- .getUnitKnowledgePairs(Unit, Knowledge) & .print("Knowledge: ", Knowledge).
 
 //test1([]).
 //test2([]).
 
+//!start.
+//+!start: true <- jason.test([1,2]).
 //!start.
 //+!start : true <- ?test1(N); ?test2(M); !compare(N,M). 
 //+!compare(N,M) : N == M <- .print(N == M).
@@ -91,7 +93,7 @@ isKnowledgeInReach(Unit, Knowledge) :- .getUnitKnowledgePairs(Unit, Knowledge) &
 		createUnit(Unit);
 		update_percepts.
 			
-+!moveUnit(Unit): .getNearestFreeKnowledge(Unit,Knowledge)
++!moveUnit(Unit): jason.getNearestFreeKnowledge(Unit,Knowledge) & not jason.hasIntention(Unit)
 	<- move(Unit, Knowledge). //move unit in that direction
 		
 +!moveUnit(Unit, Place) : jason.isEmpty(Place)
@@ -110,7 +112,7 @@ isKnowledgeInReach(Unit, Knowledge) :- .getUnitKnowledgePairs(Unit, Knowledge) &
 +!check_action: enoughSlots & possibleUnits[source(percept)] 
 	<- 	!createRandomUnit(U);
 		update_percepts;
-		!getId(U,Id)
+		!getId(U,Id);
 		!moveUnit(Id);
 		update_percepts;
 		!check_action.
@@ -122,6 +124,3 @@ isKnowledgeInReach(Unit, Knowledge) :- .getUnitKnowledgePairs(Unit, Knowledge) &
 -can_act <- .print("can_act removed, waiting for next turn").
 
 
-//!start.
-//+!start: true <- jason.test(N); .print(N).
-//+can_act <- .print("preparing action"); update_percepts; move(1,[20,30]); mark_done.

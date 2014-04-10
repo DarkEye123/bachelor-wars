@@ -1,16 +1,18 @@
 package mapping;
 
-import jason.environment.grid.Location;
+import jason.NoValueException;
+import jason.asSyntax.ListTermImpl;
+import jason.asSyntax.NumberTerm;
+import jason.asSyntax.Term;
 
-import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 
 import objects.Base;
 import objects.GameObject;
 import objects.Knowledge;
-import objects.units.FirstYear;
 import objects.units.Unit;
+import ui.GameMap;
 
 public class Node {
 	
@@ -291,5 +293,32 @@ public class Node {
 
 	public void setPredecessor(Node predecessor) {
 		this.predecessor = predecessor;
+	}
+	
+	public static Node getNode(Term[] terms) throws NoValueException {
+		int x = 0,y = 0, placeId = -1;
+		
+		if (terms.length == 2) {
+			if (!terms[0].isList()) {
+				placeId = (int)((NumberTerm) terms[0]).solve();
+				LinkedList<GameObject> objects = (LinkedList<GameObject>) GameMap.getUnitList().clone();
+				objects.addAll(GameMap.getKnowledgeList());
+				for (GameObject o:objects) {
+					if (o.getId() == placeId) {
+						x = o.getX();
+						y = o.getY();
+						break;
+					}
+				}
+			} else {
+				x = (int)((NumberTerm)((ListTermImpl) terms[0]).getTerms().get(0)).solve();
+				y = (int)((NumberTerm)((ListTermImpl) terms[0]).getTerms().get(1)).solve();
+			}
+		}
+		else {
+			x = (int)((NumberTerm)(terms[0])).solve();
+			y = (int)((NumberTerm)(terms[1])).solve();
+		}
+		return Node.getNode(x, y);
 	}
 }

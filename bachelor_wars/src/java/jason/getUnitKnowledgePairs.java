@@ -2,18 +2,21 @@
 
 package jason;
 
+import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.TransitionSystem;
+import jason.asSemantics.Unifier;
+import jason.asSyntax.ListTermImpl;
+import jason.asSyntax.NumberTerm;
+import jason.asSyntax.Term;
+
 import java.util.LinkedList;
 
 import mapping.Node;
 import mapping.Wrapper;
 import objects.Base;
-import objects.GameObject;
 import objects.Knowledge;
 import objects.units.Unit;
 import ui.GameMap;
-import jason.*;
-import jason.asSemantics.*;
-import jason.asSyntax.*;
 
 public class getUnitKnowledgePairs extends DefaultInternalAction {
 	private static final long serialVersionUID = 4836533164553341855L;
