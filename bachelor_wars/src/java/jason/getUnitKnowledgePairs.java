@@ -24,22 +24,33 @@ public class getUnitKnowledgePairs extends DefaultInternalAction {
 		LinkedList<Wrapper> objects = new LinkedList<>();
 		Base base = null;
 		for (Base b:GameMap.getBaseList()) {
-			if (b.getOwner() == agentID)
+			if (b.getOwner() == agentID) {
 				base = b;
+				break;
+			}
 		}
 		
+		LinkedList<Knowledge> listOfInterest = (LinkedList<Knowledge>) GameMap.getKnowledgeList().clone(); //get all knowledge
+		listOfInterest.removeAll(base.getKnowledgeList()); //remove that sources, that are already own
 		for (Unit unit:base.getUnitList()) {
-			for (Knowledge knowledge:base.getKnowledgeList()) {
+			for (Knowledge knowledge:GameMap.getKnowledgeList()) {
 				objects.add(new Wrapper(unit, knowledge, Node.searchPath(unit.getNode(), knowledge.getNode())));
 			}
 		}
 		
 		Wrapper.sort(objects);
 		
-		String finalList = "[";
-		for (Wrapper w:objects) {
-			finalList = finalList + w;
+		String finalList = "";
+		for (int x = 0; x < objects.size(); ++x) {
+			if (x + 1 == objects.size()) //the last node
+				finalList = finalList + ", "+ objects.get(x) + "]";
+			else if (x == 0) 
+				finalList = "[" + objects.get(x);
+			else
+				finalList =  finalList + ", " + objects.get(x);
 		}
+		
+		un.unifies(terms[1], ListTermImpl.parseList(finalList));
 		
 		if (objects.isEmpty())
 			return false;

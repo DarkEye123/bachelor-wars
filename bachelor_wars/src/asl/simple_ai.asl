@@ -37,6 +37,7 @@ freeSlots(unknown)[source(percept)].
 maximumSlots(unknown)[source(percept)].
 
 ownedUnits([])[source(percept)]. // generalUnitID, type, id, cost, hp, atk, mov, atkRange, sp, x, y, owner
+ownedUnusedUnits([])[source(percept)]. // generalUnitID, type, id, cost, hp, atk, mov, atkRange, sp, x, y, owner
 possibleUnits([])[source(percept)].
 
 
@@ -90,9 +91,8 @@ isKnowledgeInReach(Unit, Knowledge) :- .getUnitKnowledgePairs(Unit, Knowledge) &
 		createUnit(Unit);
 		update_percepts.
 			
-+!moveUnit(Unit): isKnowledgeInReach(Unit,KnowledgeList)
-	<- 	!getId(Unit,Id); .getNearest(Unit,KnowledgeList,KnowledgeId,Path); //unit id to identify unit, path is list of nodes to move on 
-		!moveUnit(Unit, Path, KnowledgeId). //move unit using path to given knowledge
++!moveUnit(Unit): .getNearestFreeKnowledge(Unit,Knowledge)
+	<- move(Unit, Knowledge). //move unit in that direction
 		
 +!moveUnit(Unit, Place) : jason.isEmpty(Place)
 	<-	!getId(Unit,Id); 
@@ -104,13 +104,14 @@ isKnowledgeInReach(Unit, Knowledge) :- .getUnitKnowledgePairs(Unit, Knowledge) &
 
 +can_act <- .print("preparing action"); update_percepts; !check_action.
 
-+!check_action: ownedUnits[source(percept)]
++!check_action: ownedUnusedUnits[source(percept)]
 	<-	!move_units.
 
 +!check_action: enoughSlots & possibleUnits[source(percept)] 
 	<- 	!createRandomUnit(U);
 		update_percepts;
-		!moveUnit(U);
+		!getId(U,Id)
+		!moveUnit(Id);
 		update_percepts;
 		!check_action.
 		 

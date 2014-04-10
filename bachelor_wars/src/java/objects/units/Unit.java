@@ -5,17 +5,26 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 
 import mapping.GameSettings;
 import objects.Base;
 import objects.Clickable;
 import objects.GameObject;
+import objects.Knowledge;
+import ui.GameMap;
 
 /**
  * Abstract class that represents a unit in general view. It provide fields that all units should share.
  * @author Matej Leško <xlesko04@stud.fit.vutbr.cz>
  */
 public abstract class Unit extends GameObject implements Clickable {
+	
+	public static final int	KILL 	= 0; //damage with atk
+	public static final int	HEAL 	= 1; 
+	public static final int	BUFF 	= 2; //use a power with given intention TODO try to find out if necessary
+	public static final int	SEIZE 	= 3;
 
 	public static final Dimension DEFAULT_UNIT_SIZE = new Dimension(1,1); //size on grid (x,y)
 	private static final int ARC_W = 12, ARC_H = 12;
@@ -32,6 +41,8 @@ public abstract class Unit extends GameObject implements Clickable {
 	protected int atk;
 	protected int sp;
 	public Base base; //it's like owner from GameObject but due to some dependencies is better set a base on it's own too
+	
+	Map<Integer, Integer> intention; //id of object and id of intention
 	
 	public Unit() {
 		
@@ -60,6 +71,7 @@ public abstract class Unit extends GameObject implements Clickable {
 		this.type = type;
 		_id_++;
 		id = _id_;
+		intention = new HashMap<>();
 	}
 
 	/**
@@ -147,5 +159,58 @@ public abstract class Unit extends GameObject implements Clickable {
 
 	public int getId() {
 		return id;
+	}
+	
+	public void addIntention(Integer key, Integer value) {
+		intention.put(key, value);
+	}
+	
+	public Map<Integer, Integer> getIntentions() {
+		return intention;
+	}
+	
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public void doIntention(Integer key) {
+		if (intention.get(key) == KILL) {
+			for (Unit u:GameMap.getUnitList()) {
+				if (u.getId() == key) {
+					u.addDamage(this.getAtk());
+				}
+			}
+		}
+		if (intention.get(key) == HEAL) {
+			for (Unit u:this.base.getUnitList()) {
+				if (u.getId() == key) {
+					u.addHeal(this.getAtk());
+				}
+			}
+		}
+		intention.remove(key);
+	}
+	
+	/**
+	 * @return true if unit has any intention
+	 */
+	public boolean hasIntention() {
+		if (!getIntentions().isEmpty())
+			return true;
+		else
+			return false;
+	}
+	
+	/**
+	 * 
+	 * @param key - id of GameObject defining intention
+	 * @return true if unit has some intetion with given GameObject
+	 */
+	public boolean hasIntention(Integer key) {
+		if (intention.get(key) != null)
+			return true;
+		else
+			return false;
 	}
 }

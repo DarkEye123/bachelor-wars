@@ -6,9 +6,9 @@ import objects.GameObject;
 import objects.units.Unit;
 
 public class Wrapper {
-	Unit from;
-	GameObject to;
-	LinkedList<Node> path;
+	public Unit from;
+	public GameObject to;
+	public LinkedList<Node> path;
 	
 	public Wrapper(Unit from, GameObject to, LinkedList<Node> path) {
 		this.from = from;
@@ -18,12 +18,15 @@ public class Wrapper {
 	
 	@Override
 	public String toString() {
-		String nodes = "[";
-		//TODO add for cycle
-//		for (int x = 0)
-		for (Node node:path)
-			nodes = nodes + ", " + node ;
-		nodes = nodes + "]";
+		String nodes = "";
+		for (int x = 0; x < path.size(); ++x) {
+			if (x + 1 == path.size()) //the last node
+				nodes = nodes + ", "+ path.get(x) + "]";
+			else if (x ==0) 
+				nodes = "[" + path.get(x);
+			else
+				nodes =  nodes + ", " + path.get(x);
+		}
 		return "[" + from.getId() + ", " + to.getId() + ", " + nodes + "]";
 	}
 
