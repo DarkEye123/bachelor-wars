@@ -78,6 +78,9 @@ dominationMode :- mode(N)[source(percept)] & N == 0. //0 for domination mode
 +!getOwner(Unit,Stat) : true
 	<- .nth(10,Unit,Stat).
 	
++!getKnowledgePosition([H|B], P) : true
+	<- P=B.
+	
 
 //+!decomp([H|B]) : true <- .print(H); !decomp(H); !decomp(B).
 //+!decomp(X).
@@ -86,15 +89,17 @@ dominationMode :- mode(N)[source(percept)] & N == 0. //0 for domination mode
 	<-	X=math.floor(math.random(.length(Units)));
 		.nth(X, Units, Unit);.
 
-+!createRandomUnit(ID, Units, Unit) : true 
-	<- 	!getRandomUnit(Units,Unit);
-		.print("choosing unit: ", Unit);
-		!getType(Unit, Id);
-		create_unit(ID, Id);
-		update_percepts.
++!createRandomUnit(ID, Units, UnitID) : true 
+	<- 	!getRandomUnit(Units, U);
+		.print("choosing unit: ", U, "from ", Units);
+		!getType(U, Type);
+		create_unit(ID, Type);
+		?created_unit(UnitID); //here is unit id created
+		.print("created unit id: ", UnitID).
 			
-+!moveUnit(Unit): jason.getNearestFreeKnowledge(Unit,Knowledge) & not jason.hasIntention(Unit)
-	<- move(Unit, Knowledge). //move unit in that direction
++!moveUnit(Unit): .print("Moving unit: ", Unit)  & jason.getNearestFreeKnowledge(Unit,Knowledge) & not jason.hasIntention(Unit)
+	<-	!getKnowledgePosition(Knowledge,Pos); 
+		move(Unit, Pos). //move unit in that direction
 		
 +!moveUnit(Unit, Place) : jason.isEmpty(Place)
 	<-	!getId(Unit,Id); 
@@ -104,15 +109,14 @@ dominationMode :- mode(N)[source(percept)] & N == 0. //0 for domination mode
 //		<-	move_unit()
 
 
-+can_act <- .print("preparing action"); ?agentID(N); .print(N); update_percepts; !check_action(N).
++can_act <- .print("preparing action"); ?agentID(N); update_percepts; !check_action(N).
 
 +!check_action: ownedUnusedUnits[source(percept)]
 	<-	!move_units.
 
 +!check_action(ID): enoughSlots & jason.getAffordableUnits(ID, Units) //agentID(N) wtf?
-	<- 	!createRandomUnit(ID, Units, Unit);
-		!getId(Unit,Id);
-		!moveUnit(Id);
+	<- 	!createRandomUnit(ID, Units, UnitID); //here is unit created from a template and actual created unit is given
+		!moveUnit(UnitID);
 		update_percepts;
 		!check_action(ID).
 		 

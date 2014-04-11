@@ -5,6 +5,7 @@ package jason;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
@@ -28,9 +29,11 @@ public class getNearestFreeKnowledge extends DefaultInternalAction {
 	@Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {
     	int unitId = (int)((NumberTerm) terms[0]).solve();
+    	
     	Unit unit = GameMap.searchUnit(unitId);
 
     	LinkedList<Knowledge> listOfInterest = (LinkedList<Knowledge>) GameMap.getKnowledgeList().clone();
+    	System.out.println(unitId);
     	listOfInterest.removeAll(unit.base.getKnowledgeList()); //remove already owned knowledge resources
     	LinkedList<Knowledge> toRemove = new LinkedList<>();
     	
@@ -53,7 +56,7 @@ public class getNearestFreeKnowledge extends DefaultInternalAction {
     		return false;
     	else {
     		Wrapper.sort(interests);
-        	un.unifies(terms[1], new NumberTermImpl(interests.getFirst().to.getId()));
+        	un.unifies(terms[1], ListTermImpl.parseList(interests.getFirst().to.toString()));
         	return true;
     	}
     }

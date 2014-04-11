@@ -2,8 +2,10 @@ package env;
 
 
 import jason.NoValueException;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTerm;
+import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Structure;
 import jason.environment.Environment;
 import jason.environment.grid.Location;
@@ -85,7 +87,9 @@ public class GameEnv extends Environment {
 				int agentID = (int)(((NumberTerm)action.getTerm(0)).solve());
 				int type = (int)(((NumberTerm)action.getTerm(1)).solve());
 				Base base = GameMap.searchBase(agentID);
-				view.getGameMap().createUnit(base.getLocation(), agentID, type);
+				Unit u = view.getGameMap().createUnit(base.getLocation(), agentID, type);
+				clearPercepts(base.getAgent());
+				addPercept(base.getAgent(), Literal.parseLiteral("created_unit(" + u.getId() + ")"));
 			} catch (NoValueException e) {
 				e.printStackTrace();
 			}
@@ -114,6 +118,7 @@ public class GameEnv extends Environment {
 				view.getGameMap().drawPossibleMovement(unit);
 				waitForDraw();
 				reInit();
+//				System.out.println("Node: " + node.getX() + " " + node.getY());
 				unit.setLocation(node, view);
 				clearPercepts(unit.base.getAgent());
 			} catch (NoValueException e) {

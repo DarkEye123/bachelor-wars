@@ -157,9 +157,10 @@ public abstract class GameObject implements Clickable{
     		} else if (x == 0) {
     			l = "[" + objects.get(x) + ", ";
     		} else {
-    			l = objects.get(x) + "]";
+    			l = l + objects.get(x) + "]";
     		}
     	}
+//		System.out.println(l);
 		return l;
 	}
 }

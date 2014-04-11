@@ -299,8 +299,8 @@ public class Node {
 		int x = 0,y = 0, placeId = -1;
 		
 		if (terms.length == 2) {
-			if (!terms[0].isList()) {
-				placeId = (int)((NumberTerm) terms[0]).solve();
+			if (!terms[1].isList()) {
+				placeId = (int)((NumberTerm) terms[1]).solve();
 				LinkedList<GameObject> objects = (LinkedList<GameObject>) GameMap.getUnitList().clone();
 				objects.addAll(GameMap.getKnowledgeList());
 				for (GameObject o:objects) {
@@ -311,13 +311,15 @@ public class Node {
 					}
 				}
 			} else {
-				x = (int)((NumberTerm)((ListTermImpl) terms[0]).getTerms().get(0)).solve();
-				y = (int)((NumberTerm)((ListTermImpl) terms[0]).getTerms().get(1)).solve();
+				List<Term> l = ((ListTermImpl) terms[1]).getAsList();
+				x = (int)((NumberTerm)l.get(0)).solve();
+				y = (int)((NumberTerm)l.get(1)).solve();
+//				System.out.println(x + "  " + y);
 			}
 		}
 		else {
-			x = (int)((NumberTerm)(terms[0])).solve();
-			y = (int)((NumberTerm)(terms[1])).solve();
+			x = (int)((NumberTerm)(terms[1])).solve();
+			y = (int)((NumberTerm)(terms[2])).solve();
 		}
 		return Node.getNode(x, y);
 	}

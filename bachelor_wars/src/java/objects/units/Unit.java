@@ -85,10 +85,10 @@ public abstract class Unit extends GameObject implements Clickable {
 	 */
 	@Override
 	public void draw(Graphics g, int width, int height) {
-		int nx = x * cellSizeW;
-		int ny = y * cellSizeH;
 		cellSizeW = width;
 		cellSizeH = height;
+		int nx = x * cellSizeW;
+		int ny = y * cellSizeH;
 		g.setColor(base.getColor());
 		g.fillRoundRect(nx, ny, cellSizeW, cellSizeH, ARC_W, ARC_H);
 		g.drawImage(image, nx + 1, ny + 1, cellSizeW - 1, cellSizeH - 1, null);
@@ -244,7 +244,7 @@ public abstract class Unit extends GameObject implements Clickable {
 					addIntention(node.getKnowledge().getId(), SEIZE);
 				else
 					addIntention(node.getBase().getId(), SEIZE);
-			}
+			} //TODO kill intention
 			for (int x = 0; x < path.size() && x < getMov(); ++x) {
 				waitForDraw();
 				Node t = path.get(x);
@@ -253,6 +253,7 @@ public abstract class Unit extends GameObject implements Clickable {
 				view.repaint();
 				view.getGameMap().repaint();
 			}
+			Node.removePredecessors();
 		}
 	}
 

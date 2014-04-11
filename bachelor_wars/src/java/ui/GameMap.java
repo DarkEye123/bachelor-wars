@@ -364,15 +364,13 @@ public class GameMap extends JPanel {
 		public void mouseClicked(MouseEvent e) {
 			if (isEnabled()) {
 				if (e.getButton() == MouseEvent.BUTTON1) { 
-//					if (testCounter++ % 2 == 0) {
-//						test1 = Node.getNode(e.getX() / cellSizeW, e.getY() / cellSizeH);
-//						System.out.println("test1");
-//					}
-//					else {
-//						test2 = Node.getNode(e.getX() / cellSizeW, e.getY() / cellSizeH);
-//						System.out.println("test2");
-//						debugPath(test1, test2);
-//					}
+					if (testCounter++ % 2 == 0) {
+						test1 = Node.getNode(e.getX() / cellSizeW, e.getY() / cellSizeH);
+					}
+					else {
+						test2 = Node.getNode(e.getX() / cellSizeW, e.getY() / cellSizeH);
+						debugPath(test1, test2);
+					}
 					
 					if (movementLocations.isEmpty()) {
 						for (Base base:baseList) {
