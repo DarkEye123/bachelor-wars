@@ -4,7 +4,6 @@ import jason.environment.grid.Location;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import objects.Base;
 import objects.units.FirstYear;
@@ -14,7 +13,7 @@ import objects.units.Unit;
 public class GameSettings {
 	public static final int INFINITE = 0;
 	//TODO add new units, should be 6 units, but now it's only one
-	public static final List<Dictionary<Integer, Unit>> AVAILABLE_UNITS = new LinkedList<Dictionary<Integer, Unit>>();
+	public static final LinkedList<Unit> AVAILABLE_UNITS = new LinkedList<Unit>();
 	public static final int GSize = 24;
 	public static final int WINDOW_WIDTH = 1024;
 	public static final int WINDOW_HEIGHT = 768;
@@ -30,12 +29,6 @@ public class GameSettings {
 	public static final int ADVANCED_AI = 3;
 	
 	public static final int DOMINATION = 0, ANIHLIATION = 1, MADNESS = 2;
-	
-	// constants for the grid objects
-    public static final int BASE = 16; //common id for Bases
-    public static final int UNIT = 32; //common id for UNITs
-    
-    public static final int FIRST_YEAR_STUDENT = 64;
 	
 	public static final int DEFAULT_PLAYERS = 2;
 	public static final int PLAYER_ID = 0; //living player has always ID 1 as an owner of base
@@ -74,20 +67,20 @@ public class GameSettings {
 		playerName = PLAYER_NAME;
 		mapRows = GSize;
 		mapColumns = GSize;
-		initUnits();
+		initDefaultUnits();
 	}
 	
 	public void init() {
-		initUnits();
+		initDefaultUnits();
 	}
 	
-	private void initUnits() {
-		AVAILABLE_UNITS.add(new Dictionary<Integer, Unit>(FIRST_YEAR_STUDENT,FirstYear.getPrototype()));
-		AVAILABLE_UNITS.add(new Dictionary<Integer, Unit>(FIRST_YEAR_STUDENT,FirstYear.getPrototype()));
-		AVAILABLE_UNITS.add(new Dictionary<Integer, Unit>(FIRST_YEAR_STUDENT,FirstYear.getPrototype()));
-		AVAILABLE_UNITS.add(new Dictionary<Integer, Unit>(FIRST_YEAR_STUDENT,FirstYear.getPrototype()));
-		AVAILABLE_UNITS.add(new Dictionary<Integer, Unit>(FIRST_YEAR_STUDENT,FirstYear.getPrototype()));
-		AVAILABLE_UNITS.add(new Dictionary<Integer, Unit>(FIRST_YEAR_STUDENT,FirstYear.getPrototype()));
+	private void initDefaultUnits() {
+		AVAILABLE_UNITS.add(FirstYear.getPrototype());
+		AVAILABLE_UNITS.add(FirstYear.getPrototype());
+		AVAILABLE_UNITS.add(FirstYear.getPrototype());
+		AVAILABLE_UNITS.add(FirstYear.getPrototype());
+		AVAILABLE_UNITS.add(FirstYear.getPrototype());
+		AVAILABLE_UNITS.add(FirstYear.getPrototype());
 	}
 	
 	public void addPlayer(int aiType, Color color , Location location) {

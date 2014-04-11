@@ -15,7 +15,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 
-import mapping.Dictionary;
 import mapping.GameSettings;
 import objects.units.Unit;
 
@@ -45,9 +44,9 @@ public class UnitInfoPanel extends JPanel {
 	
 	public UnitInfoPanel(int type, ControlPanel controlPanel) {
 		this.controlPanel = controlPanel;
-		for (Dictionary<Integer, Unit> map:GameSettings.AVAILABLE_UNITS) {
-			if (map.getIndex() == type) {
-				unit = map.getValue();
+		for (Unit u:GameSettings.AVAILABLE_UNITS) {
+			if (u.getType() == type) {
+				unit = u;
 				image = new ImagePanel(unit.getImage(), controlPanel.getWidth() * PIC_WIDTH, controlPanel.getHeight() * PIC_HEIGHT);
 			}
 		}
@@ -123,7 +122,7 @@ public class UnitInfoPanel extends JPanel {
 		public void mouseClicked(MouseEvent e) {
 			if (e.getComponent().getName().equals("buy unit")) {
 				Location loc = controlPanel.view.settings.getBaseLocations().get(0); //player location must be EVERYTIME FIRST
-				unit = controlPanel.view.gameMap.createUnit(loc, GameSettings.PLAYER_ID, type);
+				unit = controlPanel.view.gameMap.createUnit(loc, GameSettings.PLAYER_ID, unit.getType());
 				controlPanel.statusArea.append(ft.format(dNow) + ": Player: created unit" + unit.getName());
 			}
 		}

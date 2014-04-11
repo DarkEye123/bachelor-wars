@@ -2,27 +2,21 @@ package env;
 
 
 import jason.NoValueException;
-import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Structure;
-import jason.asSyntax.Term;
 import jason.environment.Environment;
-import jason.environment.TimeSteppedEnvironment;
 import jason.environment.grid.Location;
-import jason.mas2j.AgentParameters;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Random;
 import java.util.logging.Logger;
 
 import mapping.GameSettings;
 import mapping.Node;
 import objects.Base;
+import objects.GameObject;
 import objects.Knowledge;
+import objects.units.FirstYear;
 import objects.units.Unit;
 import ui.GameMap;
 import ui.GameView;
@@ -86,15 +80,15 @@ public class GameEnv extends Environment {
         		}
         	}
 	        return true;
-        } else if (action.equals(CU)) {
-        	view.getGameMap();
-			for (Base base:GameMap.getBaseList()) {
-        		if (base.getOwner() != GameSettings.PLAYER_ID) {
-		        	Location loc = base.getLocation();
-		            view.getGameMap().createUnit(loc, base.getOwner(), GameSettings.FIRST_YEAR_STUDENT);
-		            clearPercepts(base.getAgent());
-        		}
-        	}
+        } else if (action.getFunctor().equals("create_unit")) {
+        	try {
+				int agentID = (int)(((NumberTerm)action.getTerm(0)).solve());
+				int type = (int)(((NumberTerm)action.getTerm(1)).solve());
+				Base base = GameMap.searchBase(agentID);
+				view.getGameMap().createUnit(base.getLocation(), agentID, type);
+			} catch (NoValueException e) {
+				e.printStackTrace();
+			}
             return true;
         } else if (action.equals(MD)) {
         	marker++;
@@ -151,6 +145,8 @@ public class GameEnv extends Environment {
 		LinkedList<String> cs = new LinkedList<String>();
 		try {
 			getEnvironmentInfraTier().getRuntimeServices().createAgent(name, "src/asl/" + agent, null, cs, null, null);
+			// Starts new agent
+			getEnvironmentInfraTier().getRuntimeServices().startAgent(name);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

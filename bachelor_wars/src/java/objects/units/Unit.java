@@ -14,7 +14,6 @@ import mapping.Node;
 import objects.Base;
 import objects.Clickable;
 import objects.GameObject;
-import objects.Knowledge;
 import ui.GameMap;
 import ui.GameView;
 
@@ -55,11 +54,11 @@ public abstract class Unit extends GameObject implements Clickable {
 	/**
 	 * Constructor of Unit
 	 * @param location - coordinates in grid where unit starts
-	 * @param baseSize - width and height of unit in cells in grid
+	 * @param unitSize - width and height of unit in cells in grid
 	 * @param cellSize - real cell size - width and height in pixels
 	 */
-	public Unit(Location location, Dimension baseSize, Dimension cellSize) {
-		super(location, baseSize, cellSize);
+	public Unit(Location location, Dimension unitSize, Dimension cellSize) {
+		super(location, unitSize, cellSize);
 	}
 
 	/**
@@ -255,5 +254,14 @@ public abstract class Unit extends GameObject implements Clickable {
 				view.getGameMap().repaint();
 			}
 		}
+	}
+
+	//TODO add class of unit (like heal, damage, etc)
+	@Override
+	//type, id, cost, hp, atk, mov, atkRange, sp, x, y, owner - later class
+	public String toString() {
+		return "[" + getType() + ", " + getId() + ", " + getCost() + ", " + getHp() + ", " +
+				getAtk() + ", " + getMov() + ", " + getBasicAtkRange() + ", " + getSp() + ", " + 
+				getX() + ", " + getY() + ", "  + getOwner() +  "]";
 	}
 }

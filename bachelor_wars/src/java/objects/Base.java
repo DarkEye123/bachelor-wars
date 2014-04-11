@@ -17,6 +17,7 @@ import jason.environment.grid.Location;
 public class Base extends GameObject implements Clickable{
 	
 	public final static int DEFAULT_SLOT_SIZE = 6;
+	public final static int DEFAULT_KNOWLEDGE = 100;
 	public final static Dimension DEFAULT_BASE_SIZE = new Dimension(2,2); //size on grid (x,y)
 	private static final int ARC_W = 12, ARC_H = 12;
 	
@@ -27,7 +28,7 @@ public class Base extends GameObject implements Clickable{
 	protected int freeSlots = DEFAULT_SLOT_SIZE; //number of free slots to create new units
 	protected int maxSlots = DEFAULT_SLOT_SIZE; //actual maximum possible slots.
 	protected Color color;
-	protected int knowledge = 0; //this represents how many resources on the map player owns. 
+	protected int knowledge = DEFAULT_KNOWLEDGE; //this represents how many "money" player has. 
 	protected int mapWidth, mapHeight; //set number of cells in a row and column
 	protected String agent;
 	
@@ -173,6 +174,9 @@ public class Base extends GameObject implements Clickable{
 		GameMap.drawString(g, Math.round(posX+(0.3f*cellSizeW)), Math.round(posY+(0.5f*cellSizeH)), GameMap.defaultFont, getName());
 	}
 
+	/**
+	 * In this case ID of base is same as owner, basically it's the same thing
+	 */
 	@Override
 	public int getId() {
 		return owner;

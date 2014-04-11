@@ -12,9 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 
-import objects.units.Unit;
-import mapping.Dictionary;
 import mapping.GameSettings;
+import objects.units.Unit;
 
 
 public class GamePanel extends JPanel{
@@ -54,16 +53,16 @@ public class GamePanel extends JPanel{
 		int iwidth = Math.round(width - (width * ICON_PADDING_X));
 		int iheight = Math.round(height - (height * ICON_PADDING_Y));
 		
-		for (Dictionary<Integer, Unit> map:GameSettings.AVAILABLE_UNITS) {
+		for (Unit u:GameSettings.AVAILABLE_UNITS) {
 			
-			ImagePanel picture = new ImagePanel(map.getValue().getImage(), iwidth, iheight);
-			picture.setName(map.getIndex()+"");
+			ImagePanel picture = new ImagePanel(u.getImage(), iwidth, iheight);
+			picture.setName(u.getType()+"");
 			//GameView.setComponentSize(new Dimension(iwidth, iheight), picture);
 			picture.setOpaque(true);
 			picture.addMouseListener(iconMouseInputAdapter);
 			
 			JLabel name = new JLabel();
-			name.setText(map.getValue().getName());
+			name.setText(u.getName());
 			
 			JPanel panel = new JPanel();
 			GameView.setComponentSize(new Dimension(width,height), panel);
@@ -91,9 +90,7 @@ public class GamePanel extends JPanel{
 		Color bak;
 		
 		public void mouseClicked(MouseEvent e) {
-			if (e.getComponent().getName().equals(GameSettings.FIRST_YEAR_STUDENT+"")) {
-				controlPanel.infoPanel.showUnitContext(GameSettings.FIRST_YEAR_STUDENT);
-			}
+			controlPanel.infoPanel.showUnitContext(Integer.parseInt(e.getComponent().getName()));
 		}
 
 		@Override

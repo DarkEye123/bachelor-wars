@@ -19,6 +19,7 @@ import javax.swing.event.MouseInputAdapter;
 import mapping.GameSettings;
 import mapping.Node;
 import objects.Base;
+import objects.GameObject;
 import objects.Knowledge;
 import objects.units.FirstYear;
 import objects.units.Unit;
@@ -115,14 +116,9 @@ public class GameMap extends JPanel {
 			
 			baseList.add(base);
 			if (base.getType() != GameSettings.PLAYER) {
-				view.env.addAgent("test", base.getAgent()); //add agent to the game
-		        for (String name: view.env.getEnvironmentInfraTier().getRuntimeServices().getAgentsNames())
-		        	System.out.println(name);
+				view.env.addAgent(base.getName(), base.getAgent()); //add agent to the game
 				base.setAgent(base.getName());
-				view.env.clearPercepts();
-				view.env.addPercept(Literal.parseLiteral("jebat"));
-				view.env.addPercept("test", Literal.parseLiteral("agentID("+base.getOwner()+")"));
-				view.env.addPercept("test", Literal.parseLiteral("kurva("+base.getOwner()+")"));
+				view.env.addPercept(base.getAgent(), Literal.parseLiteral("agentID("+base.getOwner()+")"));
 			}
 			base.setMapWidth(settings.getMapColumns()); //set number of cells in a row
 			base.setMapHeight(settings.getMapRows()); //set number of cells in a column
@@ -229,7 +225,9 @@ public class GameMap extends JPanel {
     	assert !Node.getNode(gridLocation.x, gridLocation.y).containUnit() : "Can't create unit for owner: " + owner;
     	if (! Node.getNode(gridLocation.x, gridLocation.y).containUnit()) {
 	    	Dimension cellSize = new Dimension(cellSizeW, cellSizeH);
-	    	Unit unit = new FirstYear(gridLocation, Unit.DEFAULT_UNIT_SIZE, cellSize);
+	    	Unit unit = null; //TODO here should be some parametrized function that can make instances from types by generic way
+	    	if (type == FirstYear.TYPE)
+	    		unit = new FirstYear(gridLocation, Unit.DEFAULT_UNIT_SIZE, cellSize);
 	    	unit.setOwner(owner);
 	    	Base base = Base.getOwnerBase(owner,baseList); //seek for base
 	    	base.addUnit(unit); //list of units of actual player
@@ -351,9 +349,9 @@ public class GameMap extends JPanel {
 	}
 	
 	public void allowActions() {
-		for (Integer player:settings.getPlayers()) {
-			if (player != GameSettings.PLAYER)
-				view.env.addPercept(GameSettings.AI_AGENTS[player - 1], GameEnv.CA); //add percept to every agent in a game in a proper order
+		for (Base base:baseList) {
+			if (base.getOwner() != GameSettings.PLAYER)
+				view.env.addPercept(base.getAgent(), GameEnv.CA); //add percept to every agent in a game in a proper order
 		}
 	}
 
@@ -429,20 +427,24 @@ public class GameMap extends JPanel {
 		atkLocations.clear();
 	}
 	
-	public static Unit searchUnit(int id) {
-		for (Unit u:unitList) {
+	private static GameObject searchObject(int id, LinkedList<? extends GameObject > objects) {
+		for (GameObject u:objects) {
 			if (u.getId() == id)
 				return u;
 		}
 		return null;
 	}
 	
+	public static Unit searchUnit(int id) {
+		return (Unit) searchObject(id, unitList);
+	}
+	
 	public static Knowledge searchKnowledge(int id) {
-		for (Knowledge u:knowledgeList) {
-			if (u.getId() == id)
-				return u;
-		}
-		return null;
+		return (Knowledge) searchObject(id, knowledgeList);
+	}
+	
+	public static Base searchBase(int id) {
+		return (Base) searchObject(id, baseList);
 	}
 	
 	@SuppressWarnings("unused")

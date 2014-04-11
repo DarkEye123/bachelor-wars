@@ -28,16 +28,16 @@
 //General knowledge of map
 mode(unknown)[source(percept)].
 agentID(unknown)[source(percept)].
-availableUnits([])[source(percept)]. //stats: generalUnitID, type, id, cost, hp, atk, mov, atkRange, sp -> these are units that can be used for creation, but player doesn't own them
-playingUnits([])[source(percept)]. //stats: generalUnitID, type, id, cost, hp, atk, mov, atkRange, sp -> enemies units
+availableUnits([])[source(percept)]. //stats: type, id, cost, hp, atk, mov, atkRange, sp -> these are units that can be used for creation, but player doesn't own them
+playingUnits([])[source(percept)]. //stats: type, id, cost, hp, atk, mov, atkRange, sp -> enemies units
 knowledgeSources([])[source(percept)]. //list of knowledge positions in this format [[x,y],[x,y],..]
 
 actualKnowledge(unknown)[source(percept)].
 freeSlots(unknown)[source(percept)].
 maximumSlots(unknown)[source(percept)].
 
-ownedUnits([])[source(percept)]. // generalUnitID, type, id, cost, hp, atk, mov, atkRange, sp, x, y, owner
-ownedUnusedUnits([])[source(percept)]. // generalUnitID, type, id, cost, hp, atk, mov, atkRange, sp, x, y, owner
+ownedUnits([])[source(percept)]. // type, id, cost, hp, atk, mov, atkRange, sp, x, y, owner TODO class
+ownedUnusedUnits([])[source(percept)]. // type, id, cost, hp, atk, mov, atkRange, sp, x, y, owner
 possibleUnits([])[source(percept)].
 
 
@@ -86,11 +86,11 @@ dominationMode :- mode(N)[source(percept)] & N == 0. //0 for domination mode
 	<-	X=math.floor(math.random(.length(Units)));
 		.nth(X, Units, Unit);.
 
-+!createRandomUnit(Unit) : true 
-	<- 	?possibleUnits(Units)[source(percept)]; 
-		!getRandomUnit(Units,Unit);
++!createRandomUnit(ID, Units, Unit) : true 
+	<- 	!getRandomUnit(Units,Unit);
 		.print("choosing unit: ", Unit);
-		createUnit(Unit);
+		!getType(Unit, Id);
+		create_unit(ID, Id);
 		update_percepts.
 			
 +!moveUnit(Unit): jason.getNearestFreeKnowledge(Unit,Knowledge) & not jason.hasIntention(Unit)
@@ -104,20 +104,19 @@ dominationMode :- mode(N)[source(percept)] & N == 0. //0 for domination mode
 //		<-	move_unit()
 
 
-+can_act <- .print("preparing action"); update_percepts; !check_action.
++can_act <- .print("preparing action"); ?agentID(N); .print(N); update_percepts; !check_action(N).
 
 +!check_action: ownedUnusedUnits[source(percept)]
 	<-	!move_units.
 
-+!check_action: enoughSlots & possibleUnits[source(percept)] 
-	<- 	!createRandomUnit(U);
-		update_percepts;
-		!getId(U,Id);
++!check_action(ID): enoughSlots & jason.getAffordableUnits(ID, Units) //agentID(N) wtf?
+	<- 	!createRandomUnit(ID, Units, Unit);
+		!getId(Unit,Id);
 		!moveUnit(Id);
 		update_percepts;
-		!check_action.
+		!check_action(ID).
 		 
--!check_action: true <- mark_done.
+-!check_action(ID): true <- mark_done.
 
 
 		

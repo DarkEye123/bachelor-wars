@@ -76,4 +76,9 @@ public class Knowledge extends GameObject {
 	public int getId() {
 		return id;
 	}
+	
+	@Override
+	public String toString() {
+		return "[" + getId() + ", " + getX() + ", " + getY() + "]";
+	}
 }

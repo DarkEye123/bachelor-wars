@@ -8,9 +8,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import mapping.GameSettings;
-
 public class FirstYear extends Unit {
+	public static final int TYPE = 64;
 	
 	private static final int COST = 20;
     public static final int ATK = 5;
@@ -26,7 +25,7 @@ public class FirstYear extends Unit {
 	}
     
     public FirstYear(Location location, Dimension baseSize, Dimension cellSize) {
-		super(location, baseSize, cellSize, GameSettings.FIRST_YEAR_STUDENT);
+		super(location, baseSize, cellSize, TYPE);
 		init();
 		name = name + " " + id;
 	}
@@ -43,6 +42,7 @@ public class FirstYear extends Unit {
 		sp = SP;
 		mov = MOV;
 		name = NAME;
+		type = TYPE;
 	}
 	
 	public static FirstYear getPrototype() {

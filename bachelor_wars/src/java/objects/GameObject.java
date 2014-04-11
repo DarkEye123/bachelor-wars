@@ -3,6 +3,7 @@ import jason.environment.grid.Location;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.util.LinkedList;
 
 import mapping.Node;
 
@@ -147,4 +148,18 @@ public abstract class GameObject implements Clickable{
 	}
 	
 	public abstract int getId();
+	
+	public static String createListFromObjects(LinkedList<? extends GameObject> objects) {
+		String l = "";
+		for (int x = 0; x < objects.size(); ++x) {
+    		if (x > 0 && x <objects.size() -1) {
+    			l = l + objects.get(x) + ", ";
+    		} else if (x == 0) {
+    			l = "[" + objects.get(x) + ", ";
+    		} else {
+    			l = objects.get(x) + "]";
+    		}
+    	}
+		return l;
+	}
 }
