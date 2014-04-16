@@ -24,16 +24,32 @@ import ui.GameView;
 public abstract class Unit extends GameObject implements Clickable {
 	private static final int TIME_TO_WAIT = 50;
 	
+	/*
+	 * --------------------------------------------------------Classes-----------------------------------------------------------------------------------
+	 * These value can be combined, f.e. unit can be tank with one healing ability with certain restrictions, like only self heal and only limited amount of hp etc.
+	 * TODO add these into graphical representation
+	 */
+	public static final int TANK = 0;
+	public static final int HEALER = 0;
+	public static final int DAMAGE = 0;
+	
+	/*
+	 * --------------------------------------------------------Intentions-------------------------------------------------------------------------------
+	 */
 	public static final int	KILL 	= 0; //damage with atk
 	public static final int	HEAL 	= 1; 
-	public static final int	BUFF 	= 2; //use a power with given intention TODO try to find out if necessary
-	public static final int	SEIZE 	= 3;
+	public static final int	SEIZE 	= 2;
+	public static final int	BUFF 	= 3; //use a power with given intention TODO try to find out if necessary
+	public static final int	SUPPORT = 4; //Support copy intentions of friendly target unit. Do not forget to remove this intention after that
 
 	public static final Dimension DEFAULT_UNIT_SIZE = new Dimension(1,1); //size on grid (x,y)
 	private static final int ARC_W = 12, ARC_H = 12;
 	
 	private static int _id_; //identifier of a unit
-	
+
+	/*
+	 * --------------------------------------------------------Stats------------------------------------------------------------------------------------
+	 */
 	protected static BufferedImage image = null;
 	protected int id;
 	protected int hp;
@@ -43,9 +59,10 @@ public abstract class Unit extends GameObject implements Clickable {
 	protected int cost;
 	protected int atk;
 	protected int sp;
+	protected int uClass; //Healer, Damage, Support, Defense
 	public Base base; //it's like owner from GameObject but due to some dependencies is better set a base on it's own too
 	
-	Map<Integer, Integer> intention; //id of object and id of intention
+	HashMap<GameObject, Integer> intention; //id of object and id of intention
 	
 	public Unit() {
 		
@@ -112,8 +129,21 @@ public abstract class Unit extends GameObject implements Clickable {
 		this.hp = hp;
 	}
 	
+	/**
+	 * Adds damage to this unit, if unit is dead (hp ==0) is deleted from map and from its base. Free slot is added too.
+	 * @param damage - value that represents damage this unit
+	 */
 	public void addDamage(int damage) {
 		hp = hp - damage >= 0 ? hp - damage : 0;
+		if (isDead()) { //unit is dead
+			base.getUnitList().remove(this);
+			base.getUsableUnits().remove(this);
+			base.addFreeSlot();
+			for (Unit u: GameMap.getUnitList()) {
+				u.getIntentions().remove(this);
+			}
+			GameMap.removeUnit(this);;
+		}
 	}
 	
 	public void addHeal(int heal) {
@@ -164,35 +194,27 @@ public abstract class Unit extends GameObject implements Clickable {
 		return id;
 	}
 	
-	public void addIntention(Integer key, Integer value) {
+	public void addIntention(GameObject key, Integer value) {
 		intention.put(key, value);
 	}
 	
-	public Map<Integer, Integer> getIntentions() {
+	public HashMap<GameObject, Integer> getIntentions() {
 		return intention;
 	}
 	
 	/**
 	 * 
-	 * @param key
+	 * @param obj
 	 * @return
 	 */
-	public void doIntention(Integer key) {
-		if (intention.get(key) == KILL) {
-			for (Unit u:GameMap.getUnitList()) {
-				if (u.getId() == key) {
-					u.addDamage(this.getAtk());
-				}
-			}
+	public void doIntention(GameObject obj) {
+		if (intention.get(obj) == KILL) {
+			((Unit)obj).addDamage(this.getAtk());
 		}
-		if (intention.get(key) == HEAL) {
-			for (Unit u:this.base.getUnitList()) {
-				if (u.getId() == key) {
-					u.addHeal(this.getAtk());
-				}
-			}
+		if (intention.get(obj) == HEAL) {
+			((Unit)obj).addHeal(this.getAtk());
 		}
-		intention.remove(key);
+		intention.remove(obj);
 	}
 	
 	/**
@@ -207,10 +229,10 @@ public abstract class Unit extends GameObject implements Clickable {
 	
 	/**
 	 * 
-	 * @param key - id of GameObject defining intention
+	 * @param key - GameObject which is target of intention
 	 * @return true if unit has some intetion with given GameObject
 	 */
-	public boolean hasIntention(Integer key) {
+	public boolean hasIntention(GameObject key) {
 		if (intention.get(key) != null)
 			return true;
 		else
@@ -234,29 +256,55 @@ public abstract class Unit extends GameObject implements Clickable {
 	 */
 	public void setLocation(Node node, GameView view) {
 //		setLocation(new Location(node.getX(), node.getY()));
-		LinkedList<Node> path = Node.searchPath(getNode(), node);
-		if (!path.isEmpty()) {
-			Graphics g = view.getGameMap().getGraphics();
+		LinkedList<Node> path = Node.searchPath(getNode(), node, false);
+		
+		if (path.isEmpty()) { //there is no route to given object (but there could be path, but is temporarily blocked, so find this path till blocking unit is reached)
+			path = Node.searchPath(getNode(), node, true); //here ignore units (in practice find path till blocking unit)
+		}
+		
+		Graphics g = view.getGameMap().getGraphics();
+		if (!node.containUnit()) {
+			if (node.containKnowledge())
+				addIntention(node.getKnowledge(), SEIZE);
+			else
+				addIntention(node.getBase(), SEIZE);
+		} else { //TODO kill intention
+			Unit unit = node.getUnit();
+			if (unit.getOwner() == owner)  {// it is friendly unit TODO add friendly unit of another agent too
+				
+			} else { //enemy
+				addIntention(node.getUnit(), KILL);
+			}
+		}
+		for (int x = 0; x < path.size() && x < getMov(); ++x) {
 			g.setColor(Color.red);
 			g.drawRoundRect(node.getX() * cellSizeW, node.getY() * cellSizeH, cellSizeW, cellSizeH, ARC_W, ARC_H);
-			if (!node.containUnit()) {
-				if (node.containKnowledge())
-					addIntention(node.getKnowledge().getId(), SEIZE);
-				else
-					addIntention(node.getBase().getId(), SEIZE);
-			} //TODO kill intention
-			for (int x = 0; x < path.size() && x < getMov(); ++x) {
-				waitForDraw();
-				Node t = path.get(x);
-				setLocation(new Location(t.getX(), t.getY()));
-				waitForDraw();
-				view.repaint();
-				view.getGameMap().repaint();
-			}
-			Node.removePredecessors();
+			waitForDraw();
+			Node t = path.get(x);
+			setLocation(new Location(t.getX(), t.getY()));
+			waitForDraw();
+			view.repaint();
+			view.getGameMap().repaint();
 		}
+		Node.removePredecessors();
 	}
 
+	public int getUnitClass() {
+		return uClass;
+	}
+
+	public void setUnitClass(int uClass) {
+		this.uClass = uClass;
+	}
+	
+	public GameObject searchIntentionTargetById(int id) {
+		for (GameObject o:getIntentions().keySet()) {
+			if (o.getId() == id)
+				return o;
+		}
+		return null;
+	}
+	
 	//TODO add class of unit (like heal, damage, etc)
 	@Override
 	//type, id, cost, hp, atk, mov, atkRange, sp, x, y, owner - later class

@@ -10,7 +10,9 @@ import jason.asSyntax.Structure;
 import jason.environment.Environment;
 import jason.environment.grid.Location;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import mapping.GameSettings;
@@ -29,12 +31,10 @@ public class GameEnv extends Environment {
 	public static final String VERSION = "0.0.1";
 	
 	private static final int TIME_TO_WAIT = 50; //800
+	private static final Object countLock = new Object();
 	
 	public static final Literal CA = Literal.parseLiteral("can_act");
-	public static final Literal CU = Literal.parseLiteral("create_unit");
-	public static final Literal UPDATE = Literal.parseLiteral("update_percepts");
-	public static final Literal MD = Literal.parseLiteral("mark_done");
-
+	
     private Logger logger = Logger.getLogger("bachelor_wars."+GameEnv.class.getName());
     private int marker;
     
@@ -44,15 +44,12 @@ public class GameEnv extends Environment {
     @Override
     public void init(String[] args) {
     	
-        //super.init(args);
-        
+//    	System.out.println(test);
+    	
         if (args.length == 1 && args[0].equals("gui")) { 
         	MainMenu menu = new MainMenu(this);
         	menu.init();
         }
-        
-//        addAgent("test", "simple_ai.asl");
-//        addPercept("simple_ai", Literal.parseLiteral("possibleUnits([[1,2],[3,4]])"));
     }
     
     public void waitForDraw() {
@@ -68,62 +65,20 @@ public class GameEnv extends Environment {
     @Override
     public boolean executeAction(String agName, Structure action) {
         logger.info("["+agName+"] executing: "+action);
-//        for (String name: getEnvironmentInfraTier().getRuntimeServices().getAgentsNames())
-//        	System.out.println(name);
-//        System.out.println(getEnvironmentInfraTier().getRuntimeServices().killAgent("simple_ai", null));
-        if (action.equals(UPDATE)) {
-			for (Base base:GameMap.getBaseList()) {
-        		if (base.getOwner() != GameSettings.PLAYER_ID) {
-        			clearPercepts(base.getAgent());
-			        addPercept(base.getAgent(), Literal.parseLiteral("actualKnowledge("+base.getKnowledge()+")"));
-			        addPercept(base.getAgent(), Literal.parseLiteral("freeSlots("+base.getFreeSlots()+")"));
-			        addPercept(base.getAgent(), Literal.parseLiteral("maximumSlots("+base.getMaxSlots()+")"));
-			        System.out.println("updating percepts for: " + base.getAgent());
-        		}
-        	}
+        if (action.getFunctor().equals("update_percepts")) {
+        	updatePercepts(action);
 	        return true;
         } else if (action.getFunctor().equals("create_unit")) {
-        	try {
-				int agentID = (int)(((NumberTerm)action.getTerm(0)).solve());
-				int type = (int)(((NumberTerm)action.getTerm(1)).solve());
-				Base base = GameMap.searchBase(agentID);
-				Unit u = view.getGameMap().createUnit(base.getLocation(), agentID, type);
-				clearPercepts(base.getAgent());
-				addPercept(base.getAgent(), Literal.parseLiteral("created_unit(" + u.getId() + ")"));
-			} catch (NoValueException e) {
-				e.printStackTrace();
-			}
+        	createUnit(action);
             return true;
-        } else if (action.equals(MD)) {
-        	marker++;
-//        	System.out.println(view.getSettings().getNumPlayers() -1 + " and marker is: " + marker);
-        	if (marker == view.getSettings().getNumPlayers() -1 ) { //-1 cos we have a living player too 
-        		view.getGameMap().setEnabled(true);
-        		marker = 0;
-				for (Base base:GameMap.getBaseList()) {
-        			int sum = view.getSettings().getIncomePerRound();
-        			for (Knowledge knowledge:base.getKnowledgeList())
-        				sum += knowledge.getKnowledgePerRound();
-        			base.addKnowledge(sum);
-        		}
-        		GameMap.ROUND++;
-        	}
+        } else if (action.getFunctor().equals("mark_done")) {
+        	markDone(action);
         	return true;
         } else if (action.getFunctor().equals("move")) {
-        	try {
-				int unitID = (int)(((NumberTerm)action.getTerm(0)).solve());
-				Unit unit = GameMap.searchUnit(unitID);
-				Node node = Node.getNode(action.getTermsArray());
-				waitForDraw();
-				view.getGameMap().drawPossibleMovement(unit);
-				waitForDraw();
-				reInit();
-//				System.out.println("Node: " + node.getX() + " " + node.getY());
-				unit.setLocation(node, view);
-				clearPercepts(unit.base.getAgent());
-			} catch (NoValueException e) {
-				e.printStackTrace();
-			}
+        	move(action);
+        	return true;
+        } else if (action.getFunctor().equals("do_intention_if_possible")) {
+        	doInteractionIfPossible(action);
         	return true;
         } else {
         	view.getGameMap();
@@ -136,14 +91,100 @@ public class GameEnv extends Environment {
         }
     }
     
-    private void reInit() {
+    private void reInit(boolean clear) {
     	view.repaint();
 		view.getGameMap().repaint();
-		view.getGameMap().clearMovement();
+		if (clear)
+			view.getGameMap().clearMovement();
+    }
+    
+    private void doInteractionIfPossible(Structure action) {
+//    	System.out.println("here");
+    	synchronized (countLock) {
+	    	try {
+		    	int unitId = (int)(((NumberTerm)action.getTerm(0)).solve());
+				int gameObjectId = (int)(((NumberTerm)action.getTerm(1)).solve());
+				
+				Unit unit = GameMap.searchUnit(unitId);
+				GameObject target = unit.searchIntentionTargetById(gameObjectId);
+				
+				if (unit.getIntentions().get(target) == Unit.KILL) {
+					if (unit.getNode().distance(target.getNode()) <= unit.getBasicAtkRange()) { // unit is able to do damage TODO special attacks
+						((Unit)target).addDamage(unit.getAtk());
+					}
+				}
+				else if (unit.getIntentions().get(target) == Unit.SEIZE) {
+					if (unit.getNode().distance(target.getNode()) == 0 ) //we are at position
+						unit.getIntentions().remove(target);
+				}
+				
+	    	} catch (NoValueException e) {
+				e.printStackTrace();
+			}
+    	}
+    }
+    private void markDone(Structure action) {
+    	marker++;
+//    	System.out.println(view.getSettings().getNumPlayers() -1 + " and marker is: " + marker);
+    	if (marker == view.getSettings().getNumPlayers() -1 ) { //-1 cos we have a living player too 
+    		view.getGameMap().setEnabled(true);
+    		marker = 0;
+			for (Base base:GameMap.getBaseList()) {
+    			int sum = view.getSettings().getIncomePerRound();
+    			for (Knowledge knowledge:base.getKnowledgeList())
+    				sum += knowledge.getKnowledgePerRound();
+    			base.addKnowledge(sum);
+    			base.reInit();
+    		}
+    		GameMap.ROUND++;
+    	}
+    }
+    
+    private void createUnit(Structure action) {
+    	try {
+			int agentID = (int)(((NumberTerm)action.getTerm(0)).solve());
+			int type = (int)(((NumberTerm)action.getTerm(1)).solve());
+			Base base = GameMap.searchBase(agentID);
+			Unit u = view.getGameMap().createUnit(base.getLocation(), agentID, type);
+			clearPercepts(base.getAgent());
+			base.getUsableUnits().add(u);
+			addPercept(base.getAgent(), Literal.parseLiteral("created_unit(" + u.getId() + ")"));
+		} catch (NoValueException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    private void move(Structure action) {
+    	try {
+			int unitID = (int)(((NumberTerm)action.getTerm(0)).solve());
+			Unit unit = GameMap.searchUnit(unitID);
+			Node node = Node.getNode(action.getTermsArray());
+			waitForDraw();
+			view.getGameMap().drawPossibleMovement(unit);
+			waitForDraw();
+			reInit(false);
+//			System.out.println("Node: " + node.getX() + " " + node.getY());
+			unit.setLocation(node, view);
+			reInit(true);
+			unit.base.getUsableUnits().remove(unit);
+			clearPercepts(unit.base.getAgent());
+		} catch (NoValueException e) {
+			e.printStackTrace();
+		}
     }
 
-	public void updatePercepts(LinkedList<Literal> list) {
-		
+	private void updatePercepts(Structure action) {
+		for (Base base:GameMap.getBaseList()) {
+    		if (base.getOwner() != GameSettings.PLAYER_ID) {
+    			clearPercepts(base.getAgent());
+		        addPercept(base.getAgent(), Literal.parseLiteral("actualKnowledge("+base.getKnowledge()+")"));
+		        addPercept(base.getAgent(), Literal.parseLiteral("freeSlots("+base.getFreeSlots()+")"));
+		        addPercept(base.getAgent(), Literal.parseLiteral("maximumSlots("+base.getMaxSlots()+")"));
+		        addPercept(base.getAgent(), Literal.parseLiteral("agentID("+base.getOwner()+")"));
+		        addPercept(base.getAgent(), Literal.parseLiteral("mode("+view.getSettings().getMode()+")"));
+		        System.out.println("updating percepts for: " + base.getAgent());
+    		}
+    	}
 	}
 	
 	public void addAgent(String name, String agent) {

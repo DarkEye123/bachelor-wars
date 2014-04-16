@@ -37,23 +37,13 @@ public class getUnitKnowledgePairs extends DefaultInternalAction {
 		listOfInterest.removeAll(base.getKnowledgeList()); //remove that sources, that are already own
 		for (Unit unit:base.getUnitList()) {
 			for (Knowledge knowledge:GameMap.getKnowledgeList()) {
-				objects.add(new Wrapper(unit, knowledge, Node.searchPath(unit.getNode(), knowledge.getNode())));
+				objects.add(new Wrapper(unit, knowledge, Node.searchPath(unit.getNode(), knowledge.getNode(), false)));
 			}
 		}
 		
 		Wrapper.sort(objects);
 		
-		String finalList = "";
-		for (int x = 0; x < objects.size(); ++x) {
-			if (x + 1 == objects.size()) //the last node
-				finalList = finalList + ", "+ objects.get(x) + "]";
-			else if (x == 0) 
-				finalList = "[" + objects.get(x);
-			else
-				finalList =  finalList + ", " + objects.get(x);
-		}
-		
-		un.unifies(terms[1], ListTermImpl.parseList(finalList));
+		un.unifies(terms[1], ListTermImpl.parseList(objects.toString()));
 		
 		if (objects.isEmpty())
 			return false;

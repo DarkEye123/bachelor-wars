@@ -28,9 +28,9 @@ public class getAffordableUnits extends DefaultInternalAction {
     	LinkedList<Unit> available = new LinkedList<>();
     	
     	for (Unit u:GameSettings.AVAILABLE_UNITS) {
+//    		System.out.println("base knowledge: " + base.getKnowledge() + " unit knowledge: " + u.getCost());
     		if (base.getKnowledge() >= u.getCost()) {
     			available.add(u);
-//    			System.out.println("addung unit: "+ u);
     		}
     	}
     	
@@ -39,7 +39,7 @@ public class getAffordableUnits extends DefaultInternalAction {
     	
     	
     	
-    	ListTerm list = ListTermImpl.parseList(GameObject.createListFromObjects(available));
+    	ListTerm list = ListTermImpl.parseList(available.toString());
     	un.unifies(terms[1], list);
     	
     	return true;

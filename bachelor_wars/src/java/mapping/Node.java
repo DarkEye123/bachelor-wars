@@ -180,7 +180,7 @@ public class Node {
 	}
 	
 	/** calculates the Manhattan distance between two nodes */
-	private int distance(Node n) {
+	public int distance(Node n) {
         return Math.abs(getX() - n.getX()) + Math.abs(getY() - n.getY());
     }
 	
@@ -206,13 +206,23 @@ public class Node {
 		return ret;
 	}
 	
-	public static LinkedList<Node> searchPath(Node from, Node to) {
+	public static LinkedList<Node> searchPath(Node from, Node to, boolean ignoreUnits) {
 		LinkedList<Node> ret = new LinkedList<Node>();
 		LinkedList<Node> closedSet = new LinkedList<Node>();
 		LinkedList<Node> openSet = new LinkedList<Node>();
 		from.gScore = 0; // Cost from start along best known path
 		from.fScore = from.gScore + from.distance(to);
 		openSet.add(from);
+		
+		boolean dontCloseLastNode = false;
+		
+		if (from.getUnit() != null && to.getUnit() != null) {
+			dontCloseLastNode = from.getUnit().hasIntention(to.getUnit());
+			System.out.println("setting DONT_CLOSE");
+		}
+		
+		if (ignoreUnits)
+			System.out.println("IGNORIIIIIIIIIIIIIIING for: " + from.getUnit().getId());
 		
 		while (!openSet.isEmpty()) {
 			Node current = findLowestF(openSet);
@@ -224,7 +234,7 @@ public class Node {
 			
 			for (Node neighbour:current.neighbours) {
 				if (neighbour != null && !closedSet.contains(neighbour)) {
-					if (! neighbour.containUnit()) {
+					if ( (!neighbour.containUnit() || (neighbour.equals(to) && dontCloseLastNode)) || ignoreUnits) {
 						int tentativeGScore = current.gScore + current.distance(to);
 						
 						if (!openSet.contains(neighbour) || tentativeGScore < neighbour.gScore) {
@@ -242,29 +252,30 @@ public class Node {
 		}
 		Node act = to;
 		while (act != null) {
-			if (act.getPredecessor() == null && !act.equals(from)) //if last node of path != node from where we are trying to go, there is no path
-				return ret;
+			if (!ignoreUnits) {
+				if (act.getPredecessor() == null && !act.equals(from)) //if last node of path != node from where we are trying to go, there is no path
+					return ret;
+			}
 			ret.addFirst(act);
 			act = act.getPredecessor();
+		}
+		if (ignoreUnits) {
+			LinkedList<Node> temp = new LinkedList<Node>();
+			for (Node node:ret) {
+				if (!node.containUnit() || node.equals(from)) {
+//					System.out.println("adding node: " + node);
+					temp.add(node);
+				} else {
+					return temp;
+				}
+			}
+		}
+		if (ret.getLast().containUnit()) {
+			ret.removeLast();
 		}
 		return ret;
 	}
 	
-	//For testing purpose only
-	public static void main(String[] args) {
-		Node.generateGrid(5, 5);
-		Node node = Node.getNode(1, 1);
-		
-//		node.gameObjects.add(new FirstYear());
-//		System.out.println(node.containBase());
-//		System.out.println(node.containUnit());
-//		System.out.println(node.containSpecificObect(Unit.class));
-//		System.out.println(node.containSpecificObect(FirstYear.class));
-//		
-//		System.out.println(Base.class.isInstance(node.gameObjects.get(0)));
-//		for (Object c:FirstYear.class.getClasses())
-//			System.out.println(c.toString());
-	}
 
 	@Override
 	public String toString() {
@@ -322,5 +333,21 @@ public class Node {
 			y = (int)((NumberTerm)(terms[2])).solve();
 		}
 		return Node.getNode(x, y);
+	}
+	
+	//For testing purpose only
+	public static void main(String[] args) {
+		Node.generateGrid(5, 5);
+		Node node = Node.getNode(1, 1);
+		
+//		node.gameObjects.add(new FirstYear());
+//		System.out.println(node.containBase());
+//		System.out.println(node.containUnit());
+//		System.out.println(node.containSpecificObect(Unit.class));
+//		System.out.println(node.containSpecificObect(FirstYear.class));
+//		
+//		System.out.println(Base.class.isInstance(node.gameObjects.get(0)));
+//		for (Object c:FirstYear.class.getClasses())
+//			System.out.println(c.toString());
 	}
 }

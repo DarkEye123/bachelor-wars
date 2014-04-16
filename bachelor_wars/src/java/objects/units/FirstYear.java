@@ -43,6 +43,7 @@ public class FirstYear extends Unit {
 		mov = MOV;
 		name = NAME;
 		type = TYPE;
+		uClass = Unit.SUPPORT;
 	}
 	
 	public static FirstYear getPrototype() {

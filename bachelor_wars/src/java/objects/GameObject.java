@@ -149,18 +149,4 @@ public abstract class GameObject implements Clickable{
 	
 	public abstract int getId();
 	
-	public static String createListFromObjects(LinkedList<? extends GameObject> objects) {
-		String l = "";
-		for (int x = 0; x < objects.size(); ++x) {
-    		if (x > 0 && x <objects.size() -1) {
-    			l = l + objects.get(x) + ", ";
-    		} else if (x == 0) {
-    			l = "[" + objects.get(x) + ", ";
-    		} else {
-    			l = l + objects.get(x) + "]";
-    		}
-    	}
-//		System.out.println(l);
-		return l;
-	}
 }

@@ -17,6 +17,7 @@ public class hasIntention extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {
     	int unitId = (int)((NumberTerm) terms[0]).solve();
     	Unit unit = GameMap.searchUnit(unitId);
+//    	System.out.println(unit.getIntentions() + " " + unit.getId() + " " + unit.hasIntention());
         return unit.hasIntention();
     }
 }

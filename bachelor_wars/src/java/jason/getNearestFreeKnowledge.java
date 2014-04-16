@@ -7,7 +7,6 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.NumberTerm;
-import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
 
 import java.util.LinkedList;
@@ -33,13 +32,12 @@ public class getNearestFreeKnowledge extends DefaultInternalAction {
     	Unit unit = GameMap.searchUnit(unitId);
 
     	LinkedList<Knowledge> listOfInterest = (LinkedList<Knowledge>) GameMap.getKnowledgeList().clone();
-    	System.out.println(unitId);
     	listOfInterest.removeAll(unit.base.getKnowledgeList()); //remove already owned knowledge resources
     	LinkedList<Knowledge> toRemove = new LinkedList<>();
     	
     	for (Knowledge knowledge:listOfInterest) { //search knowledge resources that are free, but have some unit with intention assigned
-    		for (Unit u:GameMap.getUnitList()) {
-        		if ( u.hasIntention(knowledge.getId()) ) {
+    		for (Unit u:unit.base.getUnitList()) { //search for units from agent base that already have this 
+        		if ( u.hasIntention(knowledge) ) {
         			toRemove.add(knowledge);
         			break;
         		}
@@ -49,7 +47,7 @@ public class getNearestFreeKnowledge extends DefaultInternalAction {
     	
     	LinkedList<Wrapper> interests = new LinkedList<>();
     	for (Knowledge knowledge:listOfInterest) {
-    		interests.add(new Wrapper(unit, knowledge, Node.searchPath(unit.getNode(), knowledge.getNode())));
+    		interests.add(new Wrapper(unit, knowledge, Node.searchPath(unit.getNode(), knowledge.getNode(), false)));
     	}
     	
     	if (interests.isEmpty()) //there is no free Knowledge resource (not much possible because others are fighting for them constantly)

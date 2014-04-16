@@ -23,6 +23,7 @@ public class Base extends GameObject implements Clickable{
 	
 	
 	private LinkedList<Unit> unitList = new LinkedList<Unit>();
+	private LinkedList<Unit> usableUnits = new LinkedList<Unit>();
 	private LinkedList<Knowledge> knowledgeList = new LinkedList<Knowledge>();
 	
 	protected int freeSlots = DEFAULT_SLOT_SIZE; //number of free slots to create new units
@@ -83,6 +84,16 @@ public class Base extends GameObject implements Clickable{
 	public void addKnowledge(int knowledge) {
 		this.knowledge += knowledge;
 	}
+	
+	/**
+	 * When we need apply a price for something (Unit)
+	 * @param knowledge
+	 */
+	public void applyKnowledgeValue(int knowledge) {
+		this.knowledge -= knowledge;
+		if (this.knowledge < 0)
+			this.knowledge = 0;
+	}
 
 	public int getMaxSlots() {
 		return maxSlots;
@@ -102,6 +113,7 @@ public class Base extends GameObject implements Clickable{
 	
 	public void addUnit(Unit unit) {
 		unitList.add(unit);
+		applyKnowledgeValue(unit.getCost());
 		deleteFreeSlot();
 	}
 	
@@ -181,4 +193,13 @@ public class Base extends GameObject implements Clickable{
 	public int getId() {
 		return owner;
 	}
+
+	public LinkedList<Unit> getUsableUnits() {
+		return usableUnits;
+	}
+
+	public void reInit() {
+		usableUnits = (LinkedList<Unit>) unitList.clone();
+	}
+	
 }

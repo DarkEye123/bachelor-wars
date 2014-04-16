@@ -45,6 +45,7 @@ public class GameMap extends JPanel {
 	private static LinkedList<Knowledge> knowledgeList = new LinkedList<Knowledge>();
 	private LinkedList<Location> movementLocations = new LinkedList<Location>();
 	private LinkedList<Location> atkLocations = new LinkedList<Location>();
+	private static final Object countLock = new Object();
 	
 	MapMouseInputAdapter mouseListener;
 	
@@ -232,7 +233,9 @@ public class GameMap extends JPanel {
 	    	Base base = Base.getOwnerBase(owner,baseList); //seek for base
 	    	base.addUnit(unit); //list of units of actual player
 	    	unit.base = base; //set a base for unit (it's like owner from GameObject but due to some dependencies is better set a base on it's own too)
-	    	unitList.add(unit); //list of all units
+	    	synchronized (countLock) {
+	    		unitList.add(unit); //list of all units
+	    	}
 	    	Node.getNode(unit.getX(),unit.getY()).add(unit);
 	    	repaint();
 	    	return unit;
@@ -310,9 +313,11 @@ public class GameMap extends JPanel {
         for (Knowledge knowledge:knowledgeList) {
         	knowledge.draw(g, cellSizeW, cellSizeH);
         }
-        for (Unit unit:unitList) {
-        	unit.draw(g, cellSizeW, cellSizeH);
-        };
+        synchronized (countLock) {
+	        for (Unit unit:unitList) {
+	        	unit.draw(g, cellSizeW, cellSizeH);
+	        };
+        }
     }
     
     public void repaint() {
@@ -333,7 +338,15 @@ public class GameMap extends JPanel {
 
 
 	public static LinkedList<Unit> getUnitList() {
-		return unitList;
+		synchronized (countLock) {
+			return unitList;
+		}
+	}
+	
+	public static void removeUnit(Unit unit) {
+		synchronized (countLock) {
+			unitList.remove(unit);
+		}
 	}
 
 	public static LinkedList<Base> getBaseList() {
@@ -434,21 +447,21 @@ public class GameMap extends JPanel {
 	}
 	
 	public static Unit searchUnit(int id) {
-		return (Unit) searchObject(id, unitList);
+		return (Unit) searchObject(id, getUnitList());
 	}
 	
 	public static Knowledge searchKnowledge(int id) {
-		return (Knowledge) searchObject(id, knowledgeList);
+		return (Knowledge) searchObject(id, getKnowledgeList());
 	}
 	
 	public static Base searchBase(int id) {
-		return (Base) searchObject(id, baseList);
+		return (Base) searchObject(id, getBaseList());
 	}
 	
 	@SuppressWarnings("unused")
 	private void debugPath(Node from, Node to) {
 		Graphics g = this.getGraphics();
-		LinkedList<Node> path = Node.searchPath(from, to);
+		LinkedList<Node> path = Node.searchPath(from, to, false);
 		int x = 0;
 		for (Node act:path) {
 			if (x == 0)
