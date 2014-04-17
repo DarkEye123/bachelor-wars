@@ -125,8 +125,10 @@ public class GameEnv extends Environment {
     }
     private void markDone(Structure action) {
     	marker++;
-//    	System.out.println(view.getSettings().getNumPlayers() -1 + " and marker is: " + marker);
-    	if (marker == view.getSettings().getNumPlayers() -1 ) { //-1 cos we have a living player too 
+    	GameMap.removeActiveBase();
+    	GameMap.allowActions(GameMap.getActiveBases(), this);
+//    	if (marker == view.getSettings().getNumPlayers() -1 ) { //-1 cos we have a living player too 
+    	if (GameMap.getActiveBases().isEmpty()) {
     		view.getGameMap().setEnabled(true);
     		marker = 0;
 			for (Base base:GameMap.getBaseList()) {
@@ -137,6 +139,7 @@ public class GameEnv extends Environment {
     			base.reInit();
     		}
     		GameMap.ROUND++;
+    		GameMap.reinitActiveBases();
     	}
     }
     

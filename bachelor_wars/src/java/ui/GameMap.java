@@ -42,6 +42,7 @@ public class GameMap extends JPanel {
 	
 	private static LinkedList<Unit> unitList = new LinkedList<Unit>();
 	private static LinkedList<Base> baseList = new LinkedList<Base>();
+	private static LinkedList<Base> activeBasesInRound = new LinkedList<Base>();
 	private static LinkedList<Knowledge> knowledgeList = new LinkedList<Knowledge>();
 	private LinkedList<Location> movementLocations = new LinkedList<Location>();
 	private LinkedList<Location> atkLocations = new LinkedList<Location>();
@@ -126,6 +127,26 @@ public class GameMap extends JPanel {
 			Node.getNode(base.getX(), base.getY()).add(base);
 		}
 		repaint();
+		reinitActiveBases();
+	}
+	
+	public static void reinitActiveBases() {
+		synchronized (countLock) {
+			activeBasesInRound = (LinkedList<Base>) getBaseList().clone();
+			activeBasesInRound.removeFirst(); //this is player, there is need only for AI bases
+		}
+	}
+	
+	public static void removeActiveBase() {
+		synchronized (countLock) {
+			activeBasesInRound.removeFirst();
+		}
+	}
+	
+	public static LinkedList<Base> getActiveBases() {
+		synchronized (countLock) {
+			return activeBasesInRound;
+		}
 	}
 
 	public int getCellSizeW() {
@@ -350,21 +371,29 @@ public class GameMap extends JPanel {
 	}
 
 	public static LinkedList<Base> getBaseList() {
-		return baseList;
+		synchronized (countLock) {
+			return baseList;
+		}
 	}
 
 	public static LinkedList<Knowledge> getKnowledgeList() {
-		return knowledgeList;
+		synchronized (countLock) {
+			return knowledgeList;
+		}
 	}
 
 	public LinkedList<Location> getMovementLocations() {
-		return movementLocations;
+		synchronized (countLock) {
+			return movementLocations;
+		}
 	}
 	
-	public void allowActions() {
-		for (Base base:baseList) {
-			if (base.getOwner() != GameSettings.PLAYER)
-				view.env.addPercept(base.getAgent(), GameEnv.CA); //add percept to every agent in a game in a proper order
+	public static void allowActions(LinkedList<Base> bases, GameEnv env) {
+		for (Base base:bases) {
+			if (base.getOwner() != GameSettings.PLAYER) {
+				env.addPercept(base.getAgent(), GameEnv.CA); //add percept to every agent in a game in a proper order
+				return;
+			}
 		}
 	}
 
@@ -413,7 +442,7 @@ public class GameMap extends JPanel {
 							movementLocations.clear();
 							atkLocations.clear();
 							view.getGameMap().setEnabled(false);
-							allowActions();
+							allowActions(getActiveBases(), view.env);
 						} else {
 							movementLocations.clear();
 							if (atkLocations.contains(loc)) {

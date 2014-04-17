@@ -46,6 +46,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	private static final int ARC_W = 12, ARC_H = 12;
 	
 	private static int _id_; //identifier of a unit
+	private static final Object countLock = new Object();
 
 	/*
 	 * --------------------------------------------------------Stats------------------------------------------------------------------------------------
@@ -195,11 +196,15 @@ public abstract class Unit extends GameObject implements Clickable {
 	}
 	
 	public void addIntention(GameObject key, Integer value) {
-		intention.put(key, value);
+		synchronized (countLock) {
+			intention.put(key, value);
+		}
 	}
 	
 	public HashMap<GameObject, Integer> getIntentions() {
-		return intention;
+		synchronized (countLock) {
+			return intention;
+		}
 	}
 	
 	/**
@@ -233,10 +238,12 @@ public abstract class Unit extends GameObject implements Clickable {
 	 * @return true if unit has some intetion with given GameObject
 	 */
 	public boolean hasIntention(GameObject key) {
-		if (intention.get(key) != null)
-			return true;
-		else
-			return false;
+		synchronized (countLock) {
+			if (intention.get(key) != null)
+				return true;
+			else
+				return false;
+		}
 	}
 	
 	public void waitForDraw() {
