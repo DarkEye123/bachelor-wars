@@ -218,11 +218,11 @@ public class Node {
 		
 		if (from.getUnit() != null && to.getUnit() != null) {
 			dontCloseLastNode = from.getUnit().hasIntention(to.getUnit());
-			System.out.println("setting DONT_CLOSE");
+//			System.out.println("setting DONT_CLOSE");
 		}
 		
-		if (ignoreUnits)
-			System.out.println("IGNORIIIIIIIIIIIIIIING for: " + from.getUnit().getId());
+//		if (ignoreUnits)
+//			System.out.println("IGNORIIIIIIIIIIIIIIING for: " + from.getUnit().getId());
 		
 		while (!openSet.isEmpty()) {
 			Node current = findLowestF(openSet);

@@ -239,6 +239,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	 */
 	public boolean hasIntention(GameObject key) {
 		synchronized (countLock) {
+			System.out.println("Looking for: " + key + " in: " + intention );
 			if (intention.get(key) != null)
 				return true;
 			else
@@ -268,19 +269,18 @@ public abstract class Unit extends GameObject implements Clickable {
 		if (path.isEmpty()) { //there is no route to given object (but there could be path, but is temporarily blocked, so find this path till blocking unit is reached)
 			path = Node.searchPath(getNode(), node, true); //here ignore units (in practice find path till blocking unit)
 		}
-		
+		//TODO tu je chyba, ked predosla AI umiestni napr jednotku na knowledge co je v intentions tak ju nezamerne nasledujuci tah priradi do intentions novej AI
 		Graphics g = view.getGameMap().getGraphics();
-		if (!node.containUnit()) {
-			if (node.containKnowledge())
-				addIntention(node.getKnowledge(), SEIZE);
-			else
-				addIntention(node.getBase(), SEIZE);
-		} else { //TODO kill intention
+		if (node.containKnowledge())
+			addIntention(node.getKnowledge(), SEIZE);
+		if (node.containBase())
+			addIntention(node.getBase(), SEIZE);
+		if (node.containUnit()) { //TODO kill intention
 			Unit unit = node.getUnit();
 			if (unit.getOwner() == owner)  {// it is friendly unit TODO add friendly unit of another agent too
 				
 			} else { //enemy
-				addIntention(node.getUnit(), KILL);
+				addIntention(unit, KILL);
 			}
 		}
 		for (int x = 0; x < path.size() && x < getMov(); ++x) {

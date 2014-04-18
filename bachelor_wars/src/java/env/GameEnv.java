@@ -108,6 +108,17 @@ public class GameEnv extends Environment {
 				Unit unit = GameMap.searchUnit(unitId);
 				GameObject target = unit.searchIntentionTargetById(gameObjectId);
 				
+				System.out.println("ID : " + gameObjectId + " " + unit.getIntentions());
+				if (target == null) { //THIS SHOULD NEVER HAPPEN!!!
+					System.out.println("WAITING");
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
 				if (unit.getIntentions().get(target) == Unit.KILL) {
 					if (unit.getNode().distance(target.getNode()) <= unit.getBasicAtkRange()) { // unit is able to do damage TODO special attacks
 						((Unit)target).addDamage(unit.getAtk());

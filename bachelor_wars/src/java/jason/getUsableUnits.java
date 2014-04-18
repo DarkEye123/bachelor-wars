@@ -20,7 +20,7 @@ public class getUsableUnits extends DefaultInternalAction {
     	Base base = GameMap.searchBase(agentId);
     	un.unifies(terms[1], ListTermImpl.parseList(base.getUsableUnits().toString()));
     	
-    	System.out.println(base.getUsableUnits());
+//    	System.out.println(base.getUsableUnits());
     	if (base.getUsableUnits().isEmpty()) {
     		return false;
     	}

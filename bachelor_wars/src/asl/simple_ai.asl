@@ -118,13 +118,13 @@ isSeizeIntention(Type) :- seizeIntention(N) & N == Type.
 		!getKnowledgeId(Knowledge, TargetObject);
 		do_intention_if_possible(Unit, TargetObject).
 		
-+!moveUnit(Unit): not jason.hasIntention(Unit) & jason.getNearestFreeEnemy(Unit,Enemy) & .print("Moving unit: ", Unit, " to free enemy: ", Knowledge, " adding intention")
++!moveUnit(Unit): not jason.hasIntention(Unit) & jason.getNearestFreeEnemy(Unit,Enemy) & .print("Moving unit: ", Unit, " to free enemy: ", Enemy, " adding intention")
 	<-	!getPostion(Enemy,Place);
 		move(Unit, Place); //move unit in that direction
 		!getId(Enemy,TargetObject);
 		do_intention_if_possible(Unit, TargetObject).
 		
-+!moveUnit(Unit): not jason.hasIntention(Unit) & jason.getNearestEnemy(Unit,Enemy) & .print("Moving unit: ", Unit, " to enemy: ", Knowledge, " adding intention")
++!moveUnit(Unit): not jason.hasIntention(Unit) & jason.getNearestEnemy(Unit,Enemy) & .print("Moving unit: ", Unit, " to enemy: ", Enemy, " adding intention")
 	<-	!getPostion(Enemy,Place);
 		move(Unit, Place); //move unit in that direction
 		!getId(Enemy,TargetObject);
@@ -134,7 +134,7 @@ isSeizeIntention(Type) :- seizeIntention(N) & N == Type.
 	<-	?mode(Mode);
 		jason.getSortedIntentionsByDistance(Unit, Mode, Intentions); //if mode is domination then most priority in actual round have seize intentions, next attack and then support
 		.nth(0, Intentions, Intention);
-		.print("Unit : ", Unit, " chooses intention: ", Intention);
+		.print("Unit : ", Unit, " chooses intention: ", Intention, " from: ", Intentions);
 		!getTypeOfIntention(Intention, Type);
 		!moveUnit(Unit, Intention, Type).
 
