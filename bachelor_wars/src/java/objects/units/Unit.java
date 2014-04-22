@@ -4,12 +4,14 @@ import jason.environment.grid.Location;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 import mapping.GameSettings;
+import mapping.Intention;
 import mapping.Node;
 import objects.Base;
 import objects.Clickable;
@@ -29,9 +31,10 @@ public abstract class Unit extends GameObject implements Clickable {
 	 * These value can be combined, f.e. unit can be tank with one healing ability with certain restrictions, like only self heal and only limited amount of hp etc.
 	 * TODO add these into graphical representation
 	 */
-	public static final int TANK = 0;
-	public static final int HEALER = 0;
-	public static final int DAMAGE = 0;
+	public static final int TANK = 1;
+	public static final int HEALER = 2;
+	public static final int DAMAGE_DEALER = 4;
+	public static final int SUPPORTER = 8;
 	
 	/*
 	 * --------------------------------------------------------Intentions-------------------------------------------------------------------------------
@@ -51,7 +54,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	/*
 	 * --------------------------------------------------------Stats------------------------------------------------------------------------------------
 	 */
-	protected static BufferedImage image = null;
+	protected static Image image = null;
 	protected int id;
 	protected int hp;
 	protected int basicAtkRange = 1;
@@ -63,7 +66,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	protected int uClass; //Healer, Damage, Support, Defense
 	public Base base; //it's like owner from GameObject but due to some dependencies is better set a base on it's own too
 	
-	HashMap<GameObject, Integer> intention; //id of object and id of intention
+	HashMap<GameObject, Intention> intentions; //id of object and id of intention
 	
 	public Unit() {
 		
@@ -92,7 +95,7 @@ public abstract class Unit extends GameObject implements Clickable {
 		this.type = type;
 		_id_++;
 		id = _id_;
-		intention = new HashMap<>();
+		intentions = new HashMap<>();
 	}
 
 	/**
@@ -163,7 +166,7 @@ public abstract class Unit extends GameObject implements Clickable {
 		return atk;
 	}
 
-	public BufferedImage getImage() {
+	public Image getImage() {
 		return image;
 	}
 
@@ -195,32 +198,18 @@ public abstract class Unit extends GameObject implements Clickable {
 		return id;
 	}
 	
-	public void addIntention(GameObject key, Integer value) {
+	public void addIntention(GameObject key, Intention value) {
 		synchronized (countLock) {
-			intention.put(key, value);
+			intentions.put(key, value);
 		}
 	}
 	
-	public HashMap<GameObject, Integer> getIntentions() {
+	public HashMap<GameObject, Intention> getIntentions() {
 		synchronized (countLock) {
-			return intention;
+			return intentions;
 		}
 	}
 	
-	/**
-	 * 
-	 * @param obj
-	 * @return
-	 */
-	public void doIntention(GameObject obj) {
-		if (intention.get(obj) == KILL) {
-			((Unit)obj).addDamage(this.getAtk());
-		}
-		if (intention.get(obj) == HEAL) {
-			((Unit)obj).addHeal(this.getAtk());
-		}
-		intention.remove(obj);
-	}
 	
 	/**
 	 * @return true if unit has any intention
@@ -239,8 +228,8 @@ public abstract class Unit extends GameObject implements Clickable {
 	 */
 	public boolean hasIntention(GameObject key) {
 		synchronized (countLock) {
-			System.out.println("Looking for: " + key + " in: " + intention );
-			if (intention.get(key) != null)
+			System.out.println("Looking for: " + key + " in: " + intentions );
+			if (intentions.get(key) != null)
 				return true;
 			else
 				return false;
@@ -272,15 +261,15 @@ public abstract class Unit extends GameObject implements Clickable {
 		//TODO tu je chyba, ked predosla AI umiestni napr jednotku na knowledge co je v intentions tak ju nezamerne nasledujuci tah priradi do intentions novej AI
 		Graphics g = view.getGameMap().getGraphics();
 		if (node.containKnowledge())
-			addIntention(node.getKnowledge(), SEIZE);
+			addIntention(node.getKnowledge(), new Intention(SEIZE, Intention.Type.PERSISTENT));
 		if (node.containBase())
-			addIntention(node.getBase(), SEIZE);
+			addIntention(node.getBase(), new Intention(SEIZE, Intention.Type.PERSISTENT));
 		if (node.containUnit()) { //TODO kill intention
 			Unit unit = node.getUnit();
 			if (unit.getOwner() == owner)  {// it is friendly unit TODO add friendly unit of another agent too
 				
 			} else { //enemy
-				addIntention(unit, KILL);
+				addIntention(unit, new Intention(KILL, Intention.Type.PERSISTENT));
 			}
 		}
 		for (int x = 0; x < path.size() && x < getMov(); ++x) {
@@ -318,6 +307,6 @@ public abstract class Unit extends GameObject implements Clickable {
 	public String toString() {
 		return "[" + getType() + ", " + getId() + ", " + getCost() + ", " + getHp() + ", " +
 				getAtk() + ", " + getMov() + ", " + getBasicAtkRange() + ", " + getSp() + ", " + 
-				getX() + ", " + getY() + ", "  + getOwner() +  "]";
+				getX() + ", " + getY() + ", "  + getOwner() + ", "  + getUnitClass() +  "]";
 	}
 }

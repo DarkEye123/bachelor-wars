@@ -3,10 +3,12 @@ package objects.units;
 import jason.environment.grid.Location;
 
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 public class FirstYear extends Unit {
 	public static final int TYPE = 64;
@@ -17,7 +19,8 @@ public class FirstYear extends Unit {
     public static final int SP = 0;
     public static final int MOV = 4;
     private static final String NAME = "First Year Student";
-    private static final File IMAGE_PATH = new File("pics/first_class128.png");
+//    private static final File IMAGE_PATH = new File("pics/first_class128.png");
+    private static final File IMAGE_PATH = new File("pics/FirstYearStudent.gif");
     private static final FirstYear prototype = new FirstYear();
 
 	public FirstYear() {
@@ -31,11 +34,7 @@ public class FirstYear extends Unit {
 	}
 	
 	private void init() {
-		try {
-			image = ImageIO.read(IMAGE_PATH);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		image = Toolkit.getDefaultToolkit().getImage("pics/FirstYearStudent.gif");
 		cost = COST;
 		atk = ATK;
 		hp = HP;
@@ -43,7 +42,7 @@ public class FirstYear extends Unit {
 		mov = MOV;
 		name = NAME;
 		type = TYPE;
-		uClass = Unit.SUPPORT;
+		uClass = Unit.SUPPORTER;
 	}
 	
 	public static FirstYear getPrototype() {

@@ -40,20 +40,42 @@ seizeIntention(2).
 buffIntention(3). //use a power with given intention TODO try to find out if necessary
 supportIntention(4). //Support copy intentions of friendly target unit. Do not forget to remove this intention after that
 
+//----------------------------------------------------------------------Available-Modes-------------------------------------------------------
+domination(0).
+anihilation(1).
+madness(2).
+
+//----------------------------------------------------------------------Available-Classes-----------------------------------------------------
+tank(1).
+healer(2).
+damageDealer(4).
+supporter(8).
+
 //-----------------------------------------------------------------------Rules----------------------------------------------------------------
 enoughSlots :- freeSlots(N)[source(percept)] & N > 0 & .print("free slots: ",N).
-dominationMode :- mode(N)[source(percept)] & N == 0. //0 for domination mode
 isKillingIntention(Type) :- killIntention(N) & N == Type.
 isHealingIntention(Type) :- healIntention(N) & N == Type.
 isSeizeIntention(Type) :- seizeIntention(N) & N == Type.
+
+isDominationMode :- mode(N) & domination(M) & N == M.
+isAnihilationMode :- mode(N) & anihilation(M) & N == M.
+isMadnessMode :- mode(N) & madness(M) & N == M.
+
+isTankClass(Type) :- tank(M) & Type == M.
+isHealerClass(Type) :- healer(M) & Type == M.
+isDamageDealerClass(Type) :- damageDealer(M) & Type == M.
+isSupporterClass(Type) :- supporter(M) & Type == M.
 
 //isKnowledgeInReach(Unit, Knowledge) :- .getUnitKnowledgePairs(Unit, Knowledge) & .print("Knowledge: ", Knowledge).
 
 //test1([]).
 //test2([]).
 
+//test(Type) :- .print(Type) & Type == 2.
 
 //!start.
+//+!start : madness(N) & test(N) <- .print("ok").
+//+!start :true <- if (1 <= 10) {.print("yes");} else {.print("no");}.
 //+!test(List, Place) : true <- .nth(1,List,X); .nth(2,List,Y); Place=[X,Y].
 //+!start: true <- !test([1,2,3],Place); .print(Place).
 //+!start: jason.test(K) <- .print("preslo ", K).
@@ -85,7 +107,8 @@ isSeizeIntention(Type) :- seizeIntention(N) & N == Type.
 	<- .nth(8,Unit,X); .nth(9,Unit,Y); Place=[X,Y].
 +!getOwner(Unit,Stat) : true
 	<- .nth(10,Unit,Stat).
-
++!getClass(Unit,Stat) : true
+	<- .nth(11,Unit,Stat).
 
 //------------------------------------------------------------------------knowledge-stats------------------------------------------------------------	
 +!getKnowledgePosition([H|B], P) : true
@@ -95,10 +118,8 @@ isSeizeIntention(Type) :- seizeIntention(N) & N == Type.
 	
 //------------------------------------------------------------------------intentions-stats------------------------------------------------------------
 +!getTypeOfIntention(Intention, Type): true 
-	<-	.nth(1,Intention, Type).
-
-//+!decomp([H|B]) : true <- .print(H); !decomp(H); !decomp(B).
-//+!decomp(X).
+	<-	.nth(1,Intention, Pom);
+		.nth(0,Pom, Type).
 
 +!getRandomUnit(Units,Unit) : true
 	<-	X=math.floor(math.random(.length(Units)));
@@ -111,25 +132,44 @@ isSeizeIntention(Type) :- seizeIntention(N) & N == Type.
 		create_unit(ID, Type);
 		?created_unit(UnitID); //here is unit id created
 		.print("created unit id: ", UnitID).
-			
-+!moveUnit(Unit): not jason.hasIntention(Unit) & jason.getNearestFreeKnowledge(Unit,Knowledge) & .print("Moving unit: ", Unit, " to knowledge: ", Knowledge, " adding intention")
-	<-	!getKnowledgePosition(Knowledge,Pos); 
+
+//--------------------------------------------------------------------Without-Intentions---------------------------------------------------------------------------			
+//####################################################################--MODE-DOMINATION--##########################################################################
++!moveUnit(Unit): not jason.hasIntention(Unit) & isDominationMode & jason.getNearestFreeKnowledge(Unit,Knowledge) 
+	& .print("Moving unit: ", Unit, " to knowledge: ", Knowledge, " adding intention")
+	<-	!getKnowledgePosition(Knowledge,Pos);
+		!getClass(Unit,Class);
+		if (isHealerClass(Class)) {
+			if (jason.getFriendlyUnitInReach(Unit, FriendlyUnit) & jason.shouldHeal(FriendlyUnit)) {
+				jason.addIntention(Unit, FriendlyUnit, 0);
+			}
+		}
+		if (isDamageDealerClass(Class)) {
+			if (jason.getEnemyUnitInReach(Unit, EnemyUnit)) {
+				ason.addIntention(Unit, EnemyUnit, 0); //temporary intention
+			}
+		}
 		move(Unit, Pos); //move unit in that direction
 		!getKnowledgeId(Knowledge, TargetObject);
-		do_intention_if_possible(Unit, TargetObject).
+		do_intention_if_possible(Unit, TargetObject). //in this case try seize knowledge if possible
 		
-+!moveUnit(Unit): not jason.hasIntention(Unit) & jason.getNearestFreeEnemy(Unit,Enemy) & .print("Moving unit: ", Unit, " to free enemy: ", Enemy, " adding intention")
++!moveUnit(Unit): not jason.hasIntention(Unit) & isDominationMode & jason.getNearestFreeEnemy(Unit,Enemy) 
+	& .print("Moving unit: ", Unit, " to free enemy: ", Enemy, " adding intention")
 	<-	!getPostion(Enemy,Place);
 		move(Unit, Place); //move unit in that direction
 		!getId(Enemy,TargetObject);
 		do_intention_if_possible(Unit, TargetObject).
 		
-+!moveUnit(Unit): not jason.hasIntention(Unit) & jason.getNearestEnemy(Unit,Enemy) & .print("Moving unit: ", Unit, " to enemy: ", Enemy, " adding intention")
++!moveUnit(Unit): not jason.hasIntention(Unit) & isDominationMode & jason.getNearestEnemy(Unit,Enemy) 
+	& .print("Moving unit: ", Unit, " to enemy: ", Enemy, " adding intention")
 	<-	!getPostion(Enemy,Place);
 		move(Unit, Place); //move unit in that direction
 		!getId(Enemy,TargetObject);
 		do_intention_if_possible(Unit, TargetObject).
+//##################################################################################################################################################################
+//===================================================================================================================================================================
 
+//--------------------------------------------------------------------With-Intentions--------------------------------------------------------------------------------
 +!moveUnit(Unit): jason.hasIntention(Unit)
 	<-	?mode(Mode);
 		jason.getSortedIntentionsByDistance(Unit, Mode, Intentions); //if mode is domination then most priority in actual round have seize intentions, next attack and then support
@@ -158,6 +198,7 @@ isSeizeIntention(Type) :- seizeIntention(N) & N == Type.
 		move(Unit, Place); //move unit in that direction
 		!getKnowledgeId(Object, TargetObject);
 		do_intention_if_possible(Unit, TargetObject).
+//===================================================================================================================================================================
 
 +!listUnits([Unit|Units]): true
 	<- 	!getId(Unit, UnitId); 
@@ -174,6 +215,7 @@ isSeizeIntention(Type) :- seizeIntention(N) & N == Type.
 
 +!check_action(ID): enoughSlots & jason.getAffordableUnits(ID, Units) //agentID(N) wtf?
 	<- 	!createRandomUnit(ID, Units, UnitID); //here is unit created from a template and actual created unit is given
+		update_percepts;
 		!moveUnit(UnitID);
 		update_percepts;
 		!check_action(ID).

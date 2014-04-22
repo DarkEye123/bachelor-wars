@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import mapping.GameSettings;
+import mapping.Intention;
 import mapping.Node;
 import mapping.Wrapper;
 import objects.GameObject;
@@ -24,10 +25,10 @@ public class getSortedIntentions extends DefaultInternalAction {
 	protected static final int DISTANCE = 1;
 	protected static final int MODE = 2;
 
-	class Intention {
+	class SemanticIntention {
 		GameObject object;
-		Integer intention;
-		Intention(GameObject o, Integer i) {
+		Intention intention;
+		SemanticIntention(GameObject o, Intention i) {
 			object = o;
 			intention = i;
 		}
@@ -47,7 +48,7 @@ public class getSortedIntentions extends DefaultInternalAction {
     	
     	Unit unit = GameMap.searchUnit(unitID);
     	
-    	HashMap<GameObject, Integer> intentions = (HashMap<GameObject, Integer>) (unit.getIntentions()).clone();
+    	HashMap<GameObject, Intention> intentions = (HashMap<GameObject, Intention>) (unit.getIntentions()).clone();
     	LinkedList<Wrapper> wrapper = new LinkedList<>();
     	
     	boolean allEmpty = true;
@@ -76,9 +77,9 @@ public class getSortedIntentions extends DefaultInternalAction {
     	Wrapper.sort(wrapper);
     	
     	if (getBy() == DISTANCE) {
-    		LinkedList<Intention> ret = new LinkedList<>();
+    		LinkedList<SemanticIntention> ret = new LinkedList<>();
     		for (Wrapper o:wrapper) {
-    			ret.add(new Intention(o.to, intentions.get(o.to)));
+    			ret.add(new SemanticIntention(o.to, intentions.get(o.to)));
     		}
     		un.unifies(terms[2], ListTermImpl.parseList(ret.toString()));
     	}
@@ -100,11 +101,11 @@ public class getSortedIntentions extends DefaultInternalAction {
     	
         return true;
     }
-    private int getNextIntention(LinkedList<Wrapper> sortedList, int position, HashMap<GameObject, Integer> intentions, int intention, LinkedList<Intention> sortedIntentions) {
+    private int getNextIntention(LinkedList<Wrapper> sortedList, int position, HashMap<GameObject, Intention> intentions, int intention, LinkedList<SemanticIntention> sortedIntentions) {
     	for (int pos = position; pos < sortedList.size(); pos++) {
     		GameObject o = sortedList.get(pos).to;
-    		if (intentions.get(o) == intention) {
-    			sortedIntentions.add(new Intention(o, intention));
+    		if (intentions.get(o).intention == intention) { //TODO sorting by temporary and persistent intentions
+    			sortedIntentions.add(new SemanticIntention(o, intentions.get(o)));
     			return pos + 1;
     		}
     	}
@@ -112,13 +113,13 @@ public class getSortedIntentions extends DefaultInternalAction {
     	return Integer.MAX_VALUE;
     }
     
-    private LinkedList<Intention> getSortedInt(Unit unit, LinkedList<Wrapper> wrapper, HashMap<GameObject, Integer> intentions, int[] list) {
+    private LinkedList<SemanticIntention> getSortedInt(Unit unit, LinkedList<Wrapper> wrapper, HashMap<GameObject, Intention> intentions, int[] list) {
     	//TODO if buff will be used too, ad it here
     	int counterSeize = 0;
     	int counterKill = 0;
     	int counterHeal = 0;
     	int counterSupport = 0;
-    	LinkedList<Intention> sortedIntentions = new LinkedList<>();
+    	LinkedList<SemanticIntention> sortedIntentions = new LinkedList<>();
     	
     	if (unit.getUnitClass() != Unit.HEALER)
     		counterHeal = Integer.MAX_VALUE;

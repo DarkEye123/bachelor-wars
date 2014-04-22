@@ -12,7 +12,10 @@ public abstract class Power {
 		HEALING, DAMAGE, DEFENSE
 	}
 
-	int cost; //how much SP points
+	int cost; //how much SP points (from this is damage evaluated)
+	int multiplier; //multiplier for damage/heal/buff (for exaple multiplier is x2 so damage for given value of 3 SP = 6 damage
+	int maxSP; //maximum cost for power
+	int minSP; //minimum cost for power
 	String info; //text information about given power
 	ImagePanel image; //panel with picture of this skill
 	PowerType type;

@@ -119,12 +119,12 @@ public class GameEnv extends Environment {
 					}
 				}
 				
-				if (unit.getIntentions().get(target) == Unit.KILL) {
+				if (unit.getIntentions().get(target).intention == Unit.KILL) {
 					if (unit.getNode().distance(target.getNode()) <= unit.getBasicAtkRange()) { // unit is able to do damage TODO special attacks
 						((Unit)target).addDamage(unit.getAtk());
 					}
 				}
-				else if (unit.getIntentions().get(target) == Unit.SEIZE) {
+				else if (unit.getIntentions().get(target).intention == Unit.SEIZE) {
 					if (unit.getNode().distance(target.getNode()) == 0 ) //we are at position
 						unit.getIntentions().remove(target);
 				}
