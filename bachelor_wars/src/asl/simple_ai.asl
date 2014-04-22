@@ -66,26 +66,6 @@ isHealerClass(Type) :- healer(M) & Type == M.
 isDamageDealerClass(Type) :- damageDealer(M) & Type == M.
 isSupporterClass(Type) :- supporter(M) & Type == M.
 
-//isKnowledgeInReach(Unit, Knowledge) :- .getUnitKnowledgePairs(Unit, Knowledge) & .print("Knowledge: ", Knowledge).
-
-//test1([]).
-//test2([]).
-
-//test(Type) :- .print(Type) & Type == 2.
-
-//!start.
-//+!start : madness(N) & test(N) <- .print("ok").
-//+!start :true <- if (1 <= 10) {.print("yes");} else {.print("no");}.
-//+!test(List, Place) : true <- .nth(1,List,X); .nth(2,List,Y); Place=[X,Y].
-//+!start: true <- !test([1,2,3],Place); .print(Place).
-//+!start: jason.test(K) <- .print("preslo ", K).
-//-!start: true <- .print("nepreslo").
-//!start.
-//+!start : true <- ?test1(N); ?test2(M); !compare(N,M). 
-//+!compare(N,M) : N == M <- .print(N == M).
-//+!compare(N,M) : N \== M <- .print(N \== M).
-//-!start : true <- !start.
-
 //------------------------------------------------------------------------unit-stats------------------------------------------------------------
 +!getType(Unit,Stat) : true
 	<- .nth(0,Unit,Stat).
@@ -133,38 +113,49 @@ isSupporterClass(Type) :- supporter(M) & Type == M.
 		?created_unit(UnitID); //here is unit id created
 		.print("created unit id: ", UnitID).
 
+//-----------------------------------------------------------------Class-Based-Intentions--------------------------------------------------------------------------		
+//TODO - add power use decisions -> it's part of intention
++!addClassBasedIntention(Unit, Class, _) : isHealerClass(Class) & 
+										jason.getFriendlyUnitInReach(Unit, FriendlyUnit) & 
+										jason.shouldHeal(FriendlyUnit)
+	<-	!getId(FriendlyUnit, TargetObject);
+		jason.addIntention(Unit, TargetObject, 0, "friendly").
+	
++!addClassBasedIntention(Unit, _, _) : jason.getEnemyUnitInReach(Unit, EnemyUnit) //default action for every unit if none of previous is possible
+	<-	!getId(EnemyUnit, TargetObject);
+		jason.addIntention(Unit, TargetObject, 0, "enemy").
+
++!addClassBasedIntention(Unit, _, Source) : Source \== "knowledge" & jason.getFreeKnowledgeInReach(Unit, Knowledge) //default action for every unit if none of previous is possible
+	<-	!getKnowledgeId(Knowledge, TargetObject);
+		jason.addIntention(Unit, TargetObject, 0, "knowledge").
+
++!addClassBasedIntention(_, _, _). //end point if there is nothing in reach
+
 //--------------------------------------------------------------------Without-Intentions---------------------------------------------------------------------------			
 //####################################################################--MODE-DOMINATION--##########################################################################
 +!moveUnit(Unit): not jason.hasIntention(Unit) & isDominationMode & jason.getNearestFreeKnowledge(Unit,Knowledge) 
 	& .print("Moving unit: ", Unit, " to knowledge: ", Knowledge, " adding intention")
-	<-	!getKnowledgePosition(Knowledge,Pos);
+	<-	!getKnowledgeId(Knowledge, TargetObject);
+		jason.addIntention(Unit, TargetObject, 1, "knowledge");
 		!getClass(Unit,Class);
-		if (isHealerClass(Class)) {
-			if (jason.getFriendlyUnitInReach(Unit, FriendlyUnit) & jason.shouldHeal(FriendlyUnit)) {
-				jason.addIntention(Unit, FriendlyUnit, 0);
-			}
-		}
-		if (isDamageDealerClass(Class)) {
-			if (jason.getEnemyUnitInReach(Unit, EnemyUnit)) {
-				ason.addIntention(Unit, EnemyUnit, 0); //temporary intention
-			}
-		}
-		move(Unit, Pos); //move unit in that direction
-		!getKnowledgeId(Knowledge, TargetObject);
-		do_intention_if_possible(Unit, TargetObject). //in this case try seize knowledge if possible
+		!addClassBasedIntention(Unit, Class, "knowledge");
+		!moveUnit(Unit).
 		
 +!moveUnit(Unit): not jason.hasIntention(Unit) & isDominationMode & jason.getNearestFreeEnemy(Unit,Enemy) 
 	& .print("Moving unit: ", Unit, " to free enemy: ", Enemy, " adding intention")
-	<-	!getPostion(Enemy,Place);
-		move(Unit, Place); //move unit in that direction
-		!getId(Enemy,TargetObject);
-		do_intention_if_possible(Unit, TargetObject).
+	<-	!getId(Enemy,TargetObject);
+		jason.addIntention(Unit, TargetObject, 1, "enemy");
+		!getClass(Unit,Class);
+		!addClassBasedIntention(Unit, Class, "enemy");
+		!moveUnit(Unit).
+		
 		
 +!moveUnit(Unit): not jason.hasIntention(Unit) & isDominationMode & jason.getNearestEnemy(Unit,Enemy) 
 	& .print("Moving unit: ", Unit, " to enemy: ", Enemy, " adding intention")
 	<-	!getPostion(Enemy,Place);
-		move(Unit, Place); //move unit in that direction
 		!getId(Enemy,TargetObject);
+		jason.addIntention(Unit, TargetObject, 1, "enemy");
+		move(Unit, Place); //move unit in that direction
 		do_intention_if_possible(Unit, TargetObject).
 //##################################################################################################################################################################
 //===================================================================================================================================================================

@@ -14,7 +14,6 @@ import java.util.LinkedList;
 
 import mapping.GameSettings;
 import objects.Base;
-import objects.GameObject;
 import objects.units.Unit;
 import ui.GameMap;
 
