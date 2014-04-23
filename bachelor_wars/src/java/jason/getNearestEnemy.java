@@ -38,8 +38,8 @@ public class getNearestEnemy extends DefaultInternalAction {
     		if (isEmpty && !path.isEmpty())
     			isEmpty = false;
     	}
-    	
     	if (isEmpty) {
+    		interests.clear();
     		for (Unit enemyUnit:listOfInterest) {
         		path = Node.searchPath(unit.getNode(), enemyUnit.getNode(), true);
         		interests.add(new Wrapper(unit, enemyUnit, path));

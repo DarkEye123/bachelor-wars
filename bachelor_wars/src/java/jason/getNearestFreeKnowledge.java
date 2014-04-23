@@ -57,8 +57,8 @@ public class getNearestFreeKnowledge extends DefaultInternalAction {
     		if (isEmpty && !path.isEmpty())
     			isEmpty = false;
     	}
-    	
     	if (isEmpty) {
+    		interests.clear();
     		for (Knowledge knowledge:listOfInterest) {
         		path = Node.searchPath(unit.getNode(), knowledge.getNode(), true);
         		interests.add(new Wrapper(unit, knowledge, path));

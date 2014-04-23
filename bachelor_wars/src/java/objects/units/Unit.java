@@ -261,18 +261,18 @@ public abstract class Unit extends GameObject implements Clickable {
 		}
 		//TODO tu je chyba, ked predosla AI umiestni napr jednotku na knowledge co je v intentions tak ju nezamerne nasledujuci tah priradi do intentions novej AI
 		Graphics g = view.getGameMap().getGraphics();
-		if (node.containKnowledge())
-			addIntention(node.getKnowledge(), new Intention(SEIZE, Intention.Type.PERSISTENT));
-		if (node.containBase())
-			addIntention(node.getBase(), new Intention(SEIZE, Intention.Type.PERSISTENT));
-		if (node.containUnit()) { //TODO kill intention
-			Unit unit = node.getUnit();
-			if (unit.getOwner() == owner)  {// it is friendly unit TODO add friendly unit of another agent too
-				
-			} else { //enemy
-				addIntention(unit, new Intention(KILL, Intention.Type.PERSISTENT));
-			}
-		}
+//		if (node.containKnowledge())
+//			addIntention(node.getKnowledge(), new Intention(SEIZE, Intention.Type.PERSISTENT));
+//		if (node.containBase())
+//			addIntention(node.getBase(), new Intention(SEIZE, Intention.Type.PERSISTENT));
+//		if (node.containUnit()) { //TODO kill intention
+//			Unit unit = node.getUnit();
+//			if (unit.getOwner() == owner)  {// it is friendly unit TODO add friendly unit of another agent too
+//				
+//			} else { //enemy
+//				addIntention(unit, new Intention(KILL, Intention.Type.PERSISTENT));
+//			}
+//		}
 		for (int x = 0; x < path.size() && x < getMov(); ++x) {
 			g.setColor(Color.red);
 			g.drawRoundRect(node.getX() * cellSizeW, node.getY() * cellSizeH, cellSizeW, cellSizeH, ARC_W, ARC_H);

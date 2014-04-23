@@ -38,8 +38,8 @@ public class getNearestFriendlyUnit extends DefaultInternalAction {
     		if (isEmpty && !path.isEmpty())
     			isEmpty = false;
     	}
-    	
     	if (isEmpty) {
+    		interests.clear();
     		for (Unit friendlyUnit:listOfInterest) {
         		path = Node.searchPath(unit.getNode(), friendlyUnit.getNode(), true);
         		interests.add(new Wrapper(unit, friendlyUnit, path));

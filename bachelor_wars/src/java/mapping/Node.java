@@ -218,8 +218,8 @@ public class Node {
 		boolean dontCloseLastNode = false;
 		
 		if (from.getUnit() != null && to.getUnit() != null) {
-			dontCloseLastNode = from.getUnit().hasIntention(to.getUnit());
-//			System.out.println("setting DONT_CLOSE");
+			dontCloseLastNode = true;
+//			System.out.println("setting DONT_CLOSE: " + dontCloseLastNode);
 		}
 		
 //		if (ignoreUnits)
