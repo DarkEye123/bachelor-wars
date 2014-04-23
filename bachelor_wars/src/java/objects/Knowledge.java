@@ -44,6 +44,10 @@ public class Knowledge extends GameObject {
 		g.drawImage(image, nx + 1, ny + 1, cellSizeW - 1, cellSizeH - 1, null);
 		g.setColor(Color.lightGray);
         g.drawRect(nx, ny, cellSizeW, cellSizeH);
+        if (base != null) {
+        	g.setColor(base.getColor());
+        	g.fillOval(nx, ny, cellSizeW / 5, cellSizeH / 5);
+        }
 	}
 
 

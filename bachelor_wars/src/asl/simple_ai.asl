@@ -233,7 +233,7 @@ getTypeOfIntention(Intention, Type) :-
 		jason.getSortedIntentionsByDistance(UnitID, Mode, Intentions); //if mode is domination then most priority in actual round have seize intentions, next attack and then support
 		.nth(0, Intentions, Intention);
 		!checkSurrounding(Unit, Intention);
-		jason.getSortedIntentionsByDistance(UnitID, Mode, NewIntentions); //if mode is domination then most priority in actual round have seize intentions, next attack and then support
+		jason.getSortedIntentionsByDistance(UnitID, Mode, NewIntentions);
 		.nth(0, NewIntentions, FinalIntention);
 		!getTypeOfIntention(FinalIntention, FinalType);
 		.print("Unit : ", UnitID, " chooses intention: ", FinalIntention, " from: ", NewIntentions);
