@@ -20,7 +20,7 @@ public class addIntention extends DefaultInternalAction{
 		int unitID = (int)( (NumberTerm) terms[0]).solve();
 		int targetID = (int)( (NumberTerm) terms[1]).solve();
 		int type = (int)( (NumberTerm) terms[2]).solve();
-		String sorter = ((StringTerm)terms[3]).toString();
+		String sorter = ((StringTerm)terms[3]).getString();
 		
 		Unit unit = GameMap.searchUnit(unitID);
 		GameObject target = null;
@@ -43,7 +43,6 @@ public class addIntention extends DefaultInternalAction{
 			target = unit.base.searchUnit(targetID);
 			unit.addIntention(target, new Intention(Unit.HEAL, iType));
 		}
-		
 		
 		return true;
 	}

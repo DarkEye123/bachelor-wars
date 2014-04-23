@@ -37,8 +37,20 @@ public class getNearestFreeEnemy extends DefaultInternalAction {
     	listOfInterest.removeAll(toRemove); //remove already assigned knowledge resources
     	
     	LinkedList<Wrapper> interests = new LinkedList<>();
+    	boolean isEmpty = true;
+    	LinkedList<Node> path;
     	for (Unit enemyUnit:listOfInterest) {
-    		interests.add(new Wrapper(unit, enemyUnit, Node.searchPath(unit.getNode(), enemyUnit.getNode(), false)));
+    		path = Node.searchPath(unit.getNode(), enemyUnit.getNode(), false);
+    		interests.add(new Wrapper(unit, enemyUnit, path));
+    		if (isEmpty && !path.isEmpty())
+    			isEmpty = false;
+    	}
+    	
+    	if (isEmpty) {
+    		for (Unit enemyUnit:listOfInterest) {
+        		path = Node.searchPath(unit.getNode(), enemyUnit.getNode(), true);
+        		interests.add(new Wrapper(unit, enemyUnit, path));
+        	}
     	}
     	
     	if (interests.isEmpty()) //there is no free Knowledge resource (not much possible because others are fighting for them constantly)

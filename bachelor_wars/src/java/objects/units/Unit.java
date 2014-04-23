@@ -25,6 +25,7 @@ import ui.GameView;
  */
 public abstract class Unit extends GameObject implements Clickable {
 	private static final int TIME_TO_WAIT = 50;
+	private static final int HEALTH_QUOTE = 50;
 	
 	/*
 	 * --------------------------------------------------------Classes-----------------------------------------------------------------------------------
@@ -282,7 +283,6 @@ public abstract class Unit extends GameObject implements Clickable {
 			view.repaint();
 			view.getGameMap().repaint();
 		}
-		Node.removePredecessors();
 	}
 
 	public int getUnitClass() {
@@ -299,6 +299,13 @@ public abstract class Unit extends GameObject implements Clickable {
 				return o;
 		}
 		return null;
+	}
+	
+	public boolean needHeal() {
+		if (getHp()/(getMaxHp()/100.0f) < HEALTH_QUOTE)
+			return true;
+		else
+			return false;
 	}
 	
 	//TODO add class of unit (like heal, damage, etc)

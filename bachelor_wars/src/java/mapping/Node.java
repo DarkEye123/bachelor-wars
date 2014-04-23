@@ -207,6 +207,7 @@ public class Node {
 	}
 	
 	public static LinkedList<Node> searchPath(Node from, Node to, boolean ignoreUnits) {
+		Node.removePredecessors();
 		LinkedList<Node> ret = new LinkedList<Node>();
 		LinkedList<Node> closedSet = new LinkedList<Node>();
 		LinkedList<Node> openSet = new LinkedList<Node>();

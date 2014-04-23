@@ -24,12 +24,15 @@ import ui.GameMap;
  */
 public class getNearestFreeKnowledge extends DefaultInternalAction {
 	private static final long serialVersionUID = 3624829097798698211L;
+	
+	protected Wrapper closest;
+	protected Unit unit;
 
 	@Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {
     	int unitId = (int)((NumberTerm) terms[0]).solve();
     	
-    	Unit unit = GameMap.searchUnit(unitId);
+    	unit = GameMap.searchUnit(unitId);
 
     	LinkedList<Knowledge> listOfInterest = (LinkedList<Knowledge>) GameMap.getKnowledgeList().clone();
     	listOfInterest.removeAll(unit.base.getKnowledgeList()); //remove already owned knowledge resources
@@ -46,14 +49,27 @@ public class getNearestFreeKnowledge extends DefaultInternalAction {
     	listOfInterest.removeAll(toRemove); //remove already assigned knowledge resources
     	
     	LinkedList<Wrapper> interests = new LinkedList<>();
+    	boolean isEmpty = true;
+    	LinkedList<Node> path;
     	for (Knowledge knowledge:listOfInterest) {
-    		interests.add(new Wrapper(unit, knowledge, Node.searchPath(unit.getNode(), knowledge.getNode(), false)));
+    		path = Node.searchPath(unit.getNode(), knowledge.getNode(), false);
+    		interests.add(new Wrapper(unit, knowledge, path));
+    		if (isEmpty && !path.isEmpty())
+    			isEmpty = false;
+    	}
+    	
+    	if (isEmpty) {
+    		for (Knowledge knowledge:listOfInterest) {
+        		path = Node.searchPath(unit.getNode(), knowledge.getNode(), true);
+        		interests.add(new Wrapper(unit, knowledge, path));
+        	}
     	}
     	
     	if (interests.isEmpty()) //there is no free Knowledge resource (not much possible because others are fighting for them constantly)
     		return false;
     	else {
     		Wrapper.sort(interests);
+    		closest = interests.getFirst();
         	un.unifies(terms[1], ListTermImpl.parseList(interests.getFirst().to.toString()));
         	return true;
     	}

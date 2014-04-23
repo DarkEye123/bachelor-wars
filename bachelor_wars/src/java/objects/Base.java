@@ -2,6 +2,7 @@ package objects;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.util.Collection;
 import java.util.LinkedList;
 
 import objects.units.Unit;
@@ -21,10 +22,12 @@ public class Base extends GameObject implements Clickable{
 	public final static Dimension DEFAULT_BASE_SIZE = new Dimension(2,2); //size on grid (x,y)
 	private static final int ARC_W = 12, ARC_H = 12;
 	
-	
+	//TODO add friendly units
 	private LinkedList<Unit> unitList = new LinkedList<Unit>();
 	private LinkedList<Unit> usableUnits = new LinkedList<Unit>();
 	private LinkedList<Knowledge> knowledgeList = new LinkedList<Knowledge>();
+	private LinkedList<Base> allies = new LinkedList<>();
+	
 	
 	protected int freeSlots = DEFAULT_SLOT_SIZE; //number of free slots to create new units
 	protected int maxSlots = DEFAULT_SLOT_SIZE; //actual maximum possible slots.
@@ -210,4 +213,24 @@ public class Base extends GameObject implements Clickable{
 		return null;
 	}
 	
+	/**
+	 * This composes a list of all friendly units - so units from actual base are there too.
+	 * @return list of friendly units (EVERY unit which is NOT enemy)
+	 */
+	public LinkedList<Unit> getFriendlyUnits() {
+		LinkedList<Unit> ret = new LinkedList<>();
+		for (Base b:getAllies()) {
+			ret.addAll(b.getUnitList());
+		}
+		ret.addAll(getUnitList());
+		return ret;
+	}
+	
+	public void addAlly(Base base) {
+		this.allies.add(base);
+	}
+	
+	public LinkedList<Base> getAllies() {
+		return allies;
+	}
 }

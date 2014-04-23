@@ -162,7 +162,7 @@ public class GameEnv extends Environment {
 			Unit u = view.getGameMap().createUnit(base.getLocation(), agentID, type);
 			clearPercepts(base.getAgent());
 			base.getUsableUnits().add(u);
-			addPercept(base.getAgent(), Literal.parseLiteral("created_unit(" + u.getId() + ")"));
+			addPercept(base.getAgent(), Literal.parseLiteral("created_unit(" + u + ")"));
 		} catch (NoValueException e) {
 			e.printStackTrace();
 		}
