@@ -40,6 +40,8 @@ public class GameEnv extends Environment {
     
     GameView view;
 
+	private EnvAnalyzer analyzer;
+
     /** Called before the MAS execution with the args informed in .mas2j */
     @Override
     public void init(String[] args) {
@@ -151,6 +153,7 @@ public class GameEnv extends Environment {
     		}
     		GameMap.ROUND++;
     		GameMap.reinitActiveBases();
+    		analyzer.analyzeEnvironment();
     	}
     }
     
@@ -161,7 +164,6 @@ public class GameEnv extends Environment {
 			Base base = GameMap.searchBase(agentID);
 			Unit u = view.getGameMap().createUnit(base.getLocation(), agentID, type);
 			clearPercepts(base.getAgent());
-			base.getUsableUnits().add(u);
 			addPercept(base.getAgent(), Literal.parseLiteral("created_unit(" + u + ")"));
 		} catch (NoValueException e) {
 			e.printStackTrace();
@@ -221,5 +223,9 @@ public class GameEnv extends Environment {
 	public void setView(GameView view) {
 		this.view = view;
 		view.init(this);
+	}
+
+	public void setAnalyzer(EnvAnalyzer envAnalyzer) {
+		this.analyzer = envAnalyzer;
 	}
 }

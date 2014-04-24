@@ -27,8 +27,12 @@ public class GameSettings {
 	public static final int SIMPLE_AI = 1;
 	public static final int MEDIUM_AI = 2;
 	public static final int ADVANCED_AI = 3;
-	
+
+	//-----------------------------------------------------------------------MODES----------------------------------------------------------------------
 	public static final int DOMINATION = 0, ANIHLIATION = 1, MADNESS = 2;
+	public static final int DOMINATION_WIN_ROUNDS = 3;//, ANIHLIATION = 1, MADNESS = 2;
+	public static final float DOMINATION_WIN_PERCENTAGE = 80.0f;
+	
 	
 	public static final int DEFAULT_PLAYERS = 2;
 	public static final int PLAYER_ID = 0; //living player has always ID 1 as an owner of base
@@ -51,6 +55,7 @@ public class GameSettings {
 	private boolean boostEnabled;
 	private float boostProbability;
 	private int mode;
+	private int treshold = INFINITE;
 	
 	public GameSettings() {
 		setPlayers(new ArrayList<Integer>());
@@ -208,5 +213,11 @@ public class GameSettings {
 
 	public void setMode(int mode) {
 		this.mode = mode;
+	}
+	
+	public int getTreshold() {
+		if (treshold == INFINITE)
+			treshold = (int) (((float)getNumKnowledgeResources()/100.0f) * DOMINATION_WIN_PERCENTAGE);
+		return treshold;
 	}
 }

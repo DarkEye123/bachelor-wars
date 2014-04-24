@@ -116,6 +116,7 @@ public class Base extends GameObject implements Clickable{
 	
 	public void addUnit(Unit unit) {
 		unitList.add(unit);
+		usableUnits.add(unit);
 		applyKnowledgeValue(unit.getCost());
 		deleteFreeSlot();
 	}

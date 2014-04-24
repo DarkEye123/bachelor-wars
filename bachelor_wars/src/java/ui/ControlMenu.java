@@ -4,9 +4,12 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -17,7 +20,6 @@ import mapping.GameSettings;
 
 
 public class ControlMenu extends JPanel implements ActionListener{
-
 	private static final long serialVersionUID = -2262922170788475187L;
 	
 	public static final float HEIGHT_MULTIPLIER = 0.05f;
@@ -29,6 +31,7 @@ public class ControlMenu extends JPanel implements ActionListener{
 	JLabel round;
 	GridBagConstraints constraints;
 	Timer timer;
+	JButton buttonEndRound;
 	boolean canRepaint = false;
 	
 	public ControlMenu(GameView gameView) {
@@ -48,11 +51,15 @@ public class ControlMenu extends JPanel implements ActionListener{
 		income = new JLabel("Income per round: " + computeIncome( view.getGameMap().getBaseList().get(GameSettings.PLAYER_ID) ) );
 		round = new JLabel("Round: " + GameMap.ROUND );
 		time = new JLabel("time: " + ft.format(dNow));
+		buttonEndRound = new JButton("end round");
+		buttonEndRound.addMouseListener(new EndRoundListener());
 		this.add(income, constraints);
 		constraints.gridx = 1;
 		this.add(round, constraints);
 		constraints.gridx = 2;
 		this.add(time, constraints);
+		constraints.gridx = 3;
+		this.add(buttonEndRound, constraints);
 		canRepaint = true;
 		repaint();
 		timer = new Timer(1000, this);
@@ -87,5 +94,27 @@ public class ControlMenu extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		repaint();
+	}
+	
+	protected class EndRoundListener implements MouseListener {
+		
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			view.getGameMap().setEnabled(false);
+			GameMap.allowActions(GameMap.getActiveBases(), view.env);
+		}
+		
+		@Override
+		public void mousePressed(MouseEvent e) {}
+		
+		@Override
+		public void mouseReleased(MouseEvent e) {}
+		
+		@Override
+		public void mouseEntered(MouseEvent e) {}
+		
+		@Override
+		public void mouseExited(MouseEvent e) {	}
+		
 	}
 }

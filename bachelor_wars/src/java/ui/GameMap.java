@@ -4,7 +4,6 @@ import jason.environment.grid.Location;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.DisplayMode;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.MenuItem;
@@ -30,10 +29,13 @@ public class GameMap extends JPanel {
 
 	private static final long serialVersionUID = 6282676586123792528L;
 	public static final int BASE_DEFAULT_SIZE = 2;
+	public static final float WIDTH_MULTIPLIER = 1f ;
+	public static final float HEIGHT_MULTIPLIER = 0.7f ;
 	
 	GameView view;
 	private PopupMenu menu;
 	private Unit cunit = null;
+	private Base playerBase;
 
 	//protected GridCanvas drawArea;
 	
@@ -51,8 +53,6 @@ public class GameMap extends JPanel {
 	MapMouseInputAdapter mouseListener;
 	
 	
-	public static final float WIDTH_MULTIPLIER = 1f ;
-	public static final float HEIGHT_MULTIPLIER = 0.7f ;
 	
 	public static Font defaultFont = new Font("Arial", Font.BOLD, 10);
 	protected GameSettings settings;
@@ -102,6 +102,7 @@ public class GameMap extends JPanel {
 			//set names for players (AI, real player ..) 
 			if (base.getType() == GameSettings.PLAYER) {
 				base.setName(settings.getPlayerName());
+				playerBase = base;
 			} else if (base.getType() == GameSettings.SIMPLE_AI) {
 				indexes[GameSettings.SIMPLE_AI - 1]++;
 				base.setName(GameSettings.AI_NAMES[GameSettings.SIMPLE_AI - 1] + " " + indexes[GameSettings.SIMPLE_AI - 1]);
@@ -437,9 +438,11 @@ public class GameMap extends JPanel {
 								break;
 							}
 						}
-						if (cunit != null) {
+						if (cunit != null && playerBase.getUsableUnits().contains(cunit)) {
 							drawPossibleMovement(cunit);
 							drawBasicAtkRange(cunit.getLocation(), cunit.getBasicAtkRange());
+						} else {
+							cunit = null;
 						}
 					} else {
 						Location loc = new Location(e.getX() / cellSizeW, e.getY() / cellSizeH); //get a cell where mouse clicked
@@ -447,8 +450,7 @@ public class GameMap extends JPanel {
 							cunit.setLocation(loc);
 							movementLocations.clear();
 							atkLocations.clear();
-							view.getGameMap().setEnabled(false);
-							allowActions(getActiveBases(), view.env);
+							playerBase.getUsableUnits().remove(cunit);
 						} else {
 							movementLocations.clear();
 							if (atkLocations.contains(loc)) {
@@ -510,5 +512,18 @@ public class GameMap extends JPanel {
 			act = act.getPredecessor();
 		}
 		Node.removePredecessors();
+	}
+
+	public void printWinner(String winner) {
+		Graphics g = this.getGraphics();
+		Font defaultFont = new Font("Arial", Font.BOLD, 32);
+		g.setColor(Color.MAGENTA);
+		g.setFont(defaultFont);
+		String pom = "Winner: " + winner;
+		g.drawString(pom, this.getWidth()/2 - ((defaultFont.getSize()*pom.length())/3), this.getHeight()/2);
+	}
+
+	public Base getPlayerBase() {
+		return playerBase;
 	}
 }

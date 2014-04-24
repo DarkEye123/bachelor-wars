@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 
 import mapping.GameSettings;
+import objects.Base;
 import objects.units.Unit;
 
 
@@ -112,6 +113,18 @@ public class UnitInfoPanel extends JPanel {
 //		GameView.setComponentSize(controlPanel.getSize(), this);
 	}
 	
+	@Override
+	public void repaint() {
+		super.repaint();
+		if (addButton != null) {
+			Base player = controlPanel.view.getGameMap().getPlayerBase();
+			boolean canBuy = unit.getCost() <= player.getKnowledge();
+			boolean hasFreeSlot = player.getFreeSlots() > 0;
+			boolean isMapEnabled = controlPanel.view.getGameMap().isEnabled();
+			addButton.setEnabled(isMapEnabled & hasFreeSlot & canBuy);
+		}
+	}
+
 	class ButtonMouseInputAdapter extends MouseInputAdapter {
 		Date dNow = new Date( );
 	    SimpleDateFormat ft = new SimpleDateFormat ("hh:mm:ss");
@@ -120,20 +133,14 @@ public class UnitInfoPanel extends JPanel {
 	    
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			if (e.getComponent().getName().equals("buy unit")) {
-				Location loc = controlPanel.view.settings.getBaseLocations().get(0); //player location must be EVERYTIME FIRST
-				unit = controlPanel.view.gameMap.createUnit(loc, GameSettings.PLAYER_ID, unit.getType());
-				controlPanel.statusArea.append(ft.format(dNow) + ": Player: created unit" + unit.getName());
+			if (controlPanel.view.getGameMap().isEnabled()) {
+				Base playerBase = controlPanel.view.getGameMap().getPlayerBase();
+				if (playerBase.getFreeSlots() > 0 && unit.getCost() <= playerBase.getKnowledge()) {
+					Location loc = playerBase.getLocation(); //player location must be EVERYTIME FIRST
+					unit = controlPanel.view.gameMap.createUnit(loc, GameSettings.PLAYER_ID, unit.getType());
+					controlPanel.statusArea.append(ft.format(dNow) + ": Player: created unit" + unit.getName());
+				}
 			}
 		}
-
-		@Override
-		public void mouseEntered(MouseEvent e) {
-		}
-
-		@Override
-		public void mouseExited(MouseEvent e) {
-		}
-		
 	}
 }

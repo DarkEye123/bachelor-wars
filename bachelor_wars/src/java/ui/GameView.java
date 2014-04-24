@@ -11,6 +11,7 @@ import java.awt.GridBagLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import env.EnvAnalyzer;
 import env.GameEnv;
 import ui.ControlMenu;
 import ui.ControlPanel;
@@ -82,6 +83,7 @@ public class GameView extends JPanel {
 		constraints.gridheight = GridBagConstraints.REMAINDER;
 		controlPanel = createControlPanel(constraints);
 		
+		env.setAnalyzer(new EnvAnalyzer(env, settings));
 	}
 	
 	public void repaint() {
