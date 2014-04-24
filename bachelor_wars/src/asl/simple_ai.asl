@@ -156,7 +156,8 @@ getTypeOfIntention(Intention, Type) :-
 											Type \== "knowledge" & 
 											jason.getFreeKnowledgeInReach(UnitID, Knowledge) &
 											getKnowledgeId(Knowledge, TargetObject) & 
-											TargetObject \== Type //desired action for domination mode - higher priority
+											TargetObject \== Type & //desired action for domination mode - higher priority
+											.print("Unit: ", UnitID, " adding class based intention(knowledge): ", Knowledge)
 	<-	jason.addIntention(UnitID, TargetObject, 0, "knowledge").
 		
 +!addClassBasedIntention(UnitID, Class, Type) : 	isDominationMode &
@@ -165,14 +166,16 @@ getTypeOfIntention(Intention, Type) :-
 												jason.getFriendlyUnitInReach(UnitID, FriendlyUnit) & 
 												jason.shouldHeal(FriendlyUnit) &
 												getID(FriendlyUnit, TargetObject) &
-												TargetObject \== Type
+												TargetObject \== Type &
+												.print("Unit: ", UnitID, " adding class based intention(friendly): ", FriendlyUnit)
 	<-	jason.addIntention(UnitID, TargetObject, 0, "friendly").
 	
 +!addClassBasedIntention(UnitID, _, Type) : 	isDominationMode &
 											Type \== "enemy" &
 											jason.getEnemyUnitInReach(UnitID, EnemyUnit) &
 											getID(EnemyUnit, TargetObject) &
-											TargetObject \== Type //default action for every unit if none of previous is possible
+											TargetObject \== Type &//default action for every unit if none of previous is possible
+											.print("Unit: ", UnitID, " adding class based intention(enemy): ", EnemyUnit)
 	<-	jason.addIntention(UnitID, TargetObject, 0, "enemy").
 //##################################################################################################################################################################
 
@@ -183,7 +186,7 @@ getTypeOfIntention(Intention, Type) :-
 //--------------------------------------------------------------------Without-Intentions---------------------------------------------------------------------------			
 //####################################################################--MODE-DOMINATION--##########################################################################
 +!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isDominationMode & jason.getNearestFreeKnowledge(UnitID,Knowledge) 
-	& .print("Moving unit: ", UnitID, " to knowledge: ", Knowledge, " adding intention")
+	& .print("Unit: ", UnitID, " to knowledge: ", Knowledge, " adding intention")
 	<-	!getKnowledgeId(Knowledge, TargetObject);
 		jason.addIntention(UnitID, TargetObject, 1, "knowledge");
 		!getClass(Unit,Class);
@@ -191,7 +194,7 @@ getTypeOfIntention(Intention, Type) :-
 		!moveUnit(Unit).
 		
 +!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isDominationMode & jason.getNearestFreeEnemy(UnitID,Enemy) 
-	& .print("Moving unit: ", UnitID, " to free enemy: ", Enemy, " adding intention")
+	& .print("Unit: ", UnitID, " to free enemy: ", Enemy, " adding intention")
 	<-	!getID(Enemy,TargetObject);
 		jason.addIntention(UnitID, TargetObject, 1, "enemy");
 		!getClass(Unit,Class);
@@ -200,7 +203,7 @@ getTypeOfIntention(Intention, Type) :-
 		
 		
 +!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isDominationMode & jason.getNearestEnemy(UnitID,Enemy) 
-	& .print("Moving unit: ", UnitID, " to enemy: ", Enemy, " adding intention")
+	& .print("Unit: ", UnitID, " to enemy: ", Enemy, " adding intention")
 	<-	!getPostion(Enemy,Place);
 		!getID(Enemy,TargetObject);
 		jason.addIntention(UnitID, TargetObject, 1, "enemy");

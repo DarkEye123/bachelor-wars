@@ -439,7 +439,8 @@ public class GameMap extends JPanel {
 							}
 						}
 						if (cunit != null && playerBase.getUsableUnits().contains(cunit)) {
-							drawPossibleMovement(cunit);
+							if (cunit.canMove())
+								drawPossibleMovement(cunit);
 							drawBasicAtkRange(cunit.getLocation(), cunit.getBasicAtkRange());
 						} else {
 							cunit = null;
@@ -450,11 +451,15 @@ public class GameMap extends JPanel {
 							cunit.setLocation(loc);
 							movementLocations.clear();
 							atkLocations.clear();
-							playerBase.getUsableUnits().remove(cunit);
+							cunit.setCanMove(false);
 						} else {
 							movementLocations.clear();
 							if (atkLocations.contains(loc)) {
-								Node.getNode(loc.x, loc.y).getUnit().addDamage(cunit.getAtk());
+								Unit u = Node.getNode(loc.x, loc.y).getUnit();
+								if (u.getOwner() != cunit.getOwner()) {
+									Node.getNode(loc.x, loc.y).getUnit().addDamage(cunit.getAtk());
+									playerBase.getUsableUnits().remove(cunit);
+								}
 							}
 						}
 						atkLocations.clear();

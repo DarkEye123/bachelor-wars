@@ -204,6 +204,9 @@ public class Base extends GameObject implements Clickable{
 
 	public void reInit() {
 		usableUnits = (LinkedList<Unit>) unitList.clone();
+		for (Unit u:usableUnits) {
+			u.setCanMove(true);
+		}
 	}
 
 	public GameObject searchUnit(int targetID) {

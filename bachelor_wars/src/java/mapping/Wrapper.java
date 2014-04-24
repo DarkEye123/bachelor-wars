@@ -27,7 +27,8 @@ public class Wrapper {
 			else
 				nodes =  nodes + ", " + path.get(x);
 		}
-		return "[" + from.getId() + ", " + to.getId() + ", " + nodes + "]";
+//		return "[" + from.getId() + ", " + to.getId() + ", " + nodes + "]";
+		return "[" + from.getId() + ", " + to.getId() + ", " + path.size() + "]";
 	}
 
 	public static void sort(LinkedList<Wrapper> objects) {

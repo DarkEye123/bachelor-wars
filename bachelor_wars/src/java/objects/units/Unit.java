@@ -64,8 +64,10 @@ public abstract class Unit extends GameObject implements Clickable {
 	protected int cost;
 	protected int atk;
 	protected int sp;
+	protected int maxSp;//TODO if will powers will be used, add this to UnitInfoPanel
 	protected int uClass; //Healer, Damage, Support, Defense
 	public Base base; //it's like owner from GameObject but due to some dependencies is better set a base on it's own too
+	private boolean canMove = true;
 	
 	HashMap<GameObject, Intention> intentions; //id of object and id of intention
 	
@@ -315,5 +317,13 @@ public abstract class Unit extends GameObject implements Clickable {
 		return "[" + getType() + ", " + getId() + ", " + getCost() + ", " + getHp() + ", " +
 				getAtk() + ", " + getMov() + ", " + getBasicAtkRange() + ", " + getSp() + ", " + 
 				getX() + ", " + getY() + ", "  + getOwner() + ", "  + getUnitClass() +  "]";
+	}
+
+	public boolean canMove() {
+		return canMove;
+	}
+	
+	public void setCanMove(boolean canMove) {
+		this.canMove = canMove;
 	}
 }
