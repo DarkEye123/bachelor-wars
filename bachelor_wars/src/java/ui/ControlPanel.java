@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
+import mapping.GameSettings;
 import ui.BTextPane;
 
 
@@ -59,11 +60,13 @@ public class ControlPanel extends JPanel {
 		constraints.gridwidth = GridBagConstraints.REMAINDER;
 		constraints.weightx = 0;
 		
-		gamePanel = new GamePanel(this);
-		GameView.setComponentSize(new Dimension(Math.round(getWidth() * GAME_PANEL_WIDTH_MULTIPLIER), getHeight()), gamePanel);
-		gamePanel.setBackground(Color.GREEN);
-		this.add(gamePanel, constraints);
-		gamePanel.init();
+		if (GameMap.getBaseList().getFirst().getOwner() == GameSettings.PLAYER) {
+			gamePanel = new GamePanel(this);
+			GameView.setComponentSize(new Dimension(Math.round(getWidth() * GAME_PANEL_WIDTH_MULTIPLIER), getHeight()), gamePanel);
+			gamePanel.setBackground(Color.GREEN);
+			this.add(gamePanel, constraints);
+			gamePanel.init();
+		}
 		
 	}
 

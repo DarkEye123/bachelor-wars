@@ -12,7 +12,8 @@ public class EnvAnalyzer {
 	protected GameSettings settings;
 	protected String winner;
 	private HashMap<Base, Integer> statistics = new HashMap<>();
-	private int counter;
+	private int conditionCounter;
+	private int baseCounter;
 	
 	public EnvAnalyzer(GameEnv environment, GameSettings settings) {
 		this.environment = environment;
@@ -62,26 +63,39 @@ public class EnvAnalyzer {
 	 * if there is a limited number of rounds and nobody was able to possess them -> the one which
 	 * possess the most knowledge at the end is the winner
 	 */
-	public void analyzeEnvironment() {
+	/**
+	 * 
+	 * @return true if there is winner
+	 */
+	public boolean analyzeEnvironment() {
+		if (baseCounter >= GameSettings.DEFAULT_SEIZE_ROUNDS) {
+//			GameMap.getBaseList().remove
+		}
+		
+		
+		
 		if (settings.getMode() == GameSettings.DOMINATION) {
-				if (counter == GameSettings.DOMINATION_WIN_ROUNDS) {
+				if (conditionCounter == GameSettings.DOMINATION_WIN_ROUNDS) {
 					environment.view.getGameMap().setEnabled(false);
 					winner = findDominantBase().getName();
 					environment.view.getGameMap().printWinner(winner);
+					return true;
 				} else {
 					Base base = findDominantBase();
 					if (base.getKnowledgeList().size() >= settings.getTreshold()) {
-						counter++;
+						conditionCounter++;
 					} else {
-						counter = 0; //winning rounds were cut off
+						conditionCounter = 0; //winning rounds were cut off
 					}
 				}
 			if(settings.getMaxRounds() != GameSettings.INFINITE && GameMap.ROUND >= settings.getMaxRounds()) { //we are at limit of rounds
 				environment.view.getGameMap().setEnabled(false);
 				winner = findDominantBase().getName();
 				environment.view.getGameMap().printWinner(winner);
+				return true;
 			} 
 		}
+		return false;
 	}
 	
 }

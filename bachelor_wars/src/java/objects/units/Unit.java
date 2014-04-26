@@ -149,7 +149,8 @@ public abstract class Unit extends GameObject implements Clickable {
 			for (Unit u: GameMap.getUnitList()) {
 				u.getIntentions().remove(this);
 			}
-			GameMap.removeUnit(this);;
+			GameMap.removeUnit(this);
+			getNode().remove(this);
 		}
 	}
 	
@@ -275,6 +276,7 @@ public abstract class Unit extends GameObject implements Clickable {
 //				addIntention(unit, new Intention(KILL, Intention.Type.PERSISTENT));
 //			}
 //		}
+		System.out.println("PAAAAAAAAAAAAAAAATH for: " + this.getId() + " " + path.size());
 		for (int x = 0; x < path.size() && x < getMov(); ++x) {
 			g.setColor(Color.red);
 			g.drawRoundRect(node.getX() * cellSizeW, node.getY() * cellSizeH, cellSizeW, cellSizeH, ARC_W, ARC_H);

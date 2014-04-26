@@ -54,7 +54,7 @@ public abstract class GameObject implements Clickable{
 		int maxX = minX + (width * cellSizeW); //get cell most right side
 		int minY = this.y * cellSizeH; //get cell most upper side
 		int maxY = minY + (height * cellSizeH); //get cell most lower side
-//		System.out.println("minX: " + minX + " maxX: " + maxX + " minY: " + minY + " maxY: " + maxY + " x: " + x + " y: " + y);
+//		System.out.println("minX: " + minX + " maxX: " + maxX + " minY: " + minY + " maxY: " + maxY + " x: " + x + " y: " + y + " this.x: " + this.x + " this.y: " + this.y);
 		if ( (x >= minX && x <= maxX) && (y >= minY && y <= maxY))
 			return true;
 		else

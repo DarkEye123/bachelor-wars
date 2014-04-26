@@ -4,6 +4,7 @@ import jason.NoValueException;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Term;
+import jason.environment.grid.Location;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -25,6 +26,7 @@ public class Node {
 	int fScore;
 	private int x;
 	private int y;
+	private Location location;
 	List<GameObject> gameObjects = new LinkedList<GameObject>(); //list of objects that are in actual node
 	
 	public boolean equals(Node node) {
@@ -53,7 +55,7 @@ public class Node {
 		
 		
 		if (Unit.class.isInstance(object) && containKnowledge()) {
-			System.out.println(((Unit)object).base);
+//			System.out.println(((Unit)object).base);
 			getKnowledge().setBase(((Unit)object).base);
 		}
 		
@@ -169,6 +171,7 @@ public class Node {
 	private Node(int x, int y) {
 		this.setX(x);
 		this.setY(y);
+		this.location = new Location(x, y);
 	}
 	
 	public List<GameObject> getGameObjects() {
@@ -336,6 +339,10 @@ public class Node {
 		return Node.getNode(x, y);
 	}
 	
+	public Location getLocation() {
+		return location;
+	}
+
 	//For testing purpose only
 	public static void main(String[] args) {
 		Node.generateGrid(5, 5);

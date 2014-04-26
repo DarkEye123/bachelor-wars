@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import mapping.Node;
 import objects.units.Unit;
 import ui.GameMap;
 import jason.environment.grid.Location;
@@ -17,6 +18,11 @@ import jason.environment.grid.Location;
  */
 public class Base extends GameObject implements Clickable{
 	
+	@Override
+	public String toString() {
+		return Integer.toString(getOwner());
+	}
+
 	public final static int DEFAULT_SLOT_SIZE = 6;
 	public final static int DEFAULT_KNOWLEDGE = 100;
 	public final static Dimension DEFAULT_BASE_SIZE = new Dimension(2,2); //size on grid (x,y)
@@ -236,5 +242,30 @@ public class Base extends GameObject implements Clickable{
 	
 	public LinkedList<Base> getAllies() {
 		return allies;
+	}
+	
+	public Node getNode() {
+		int x,y;
+		if (this.x > 1)
+			x = this.x + 1;
+		else
+			x = this.x;
+		if (this.y > 1)
+			y = this.y + 1;
+		else
+			y = this.y;
+		return Node.getNode(x, y);
+	}
+	
+	public boolean isSeized() {
+		Node node = null;
+		for (int x = this.x; x < this.x + width; ++x) {
+			for (int y = this.y; y < this.y + height; ++y) {
+				node = Node.getNode(x, y);
+				if (node.containUnit() && !node.getUnit().base.equals(this))
+					return true;
+			}
+		}
+		return false;
 	}
 }

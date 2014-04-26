@@ -36,7 +36,6 @@ public class GameEnv extends Environment {
 	public static final Literal CA = Literal.parseLiteral("can_act");
 	
     private Logger logger = Logger.getLogger("bachelor_wars."+GameEnv.class.getName());
-    private int marker;
     
     GameView view;
 
@@ -137,13 +136,11 @@ public class GameEnv extends Environment {
     	}
     }
     private void markDone(Structure action) {
-    	marker++;
     	GameMap.removeActiveBase();
     	GameMap.allowActions(GameMap.getActiveBases(), this);
 //    	if (marker == view.getSettings().getNumPlayers() -1 ) { //-1 cos we have a living player too 
     	if (GameMap.getActiveBases().isEmpty()) {
     		view.getGameMap().setEnabled(true);
-    		marker = 0;
 			for (Base base:GameMap.getBaseList()) {
     			int sum = view.getSettings().getIncomePerRound();
     			for (Knowledge knowledge:base.getKnowledgeList())
@@ -153,7 +150,9 @@ public class GameEnv extends Environment {
     		}
     		GameMap.ROUND++;
     		GameMap.reinitActiveBases();
-    		analyzer.analyzeEnvironment();
+    		boolean isEnd = analyzer.analyzeEnvironment();
+    		if (!isEnd && GameMap.getBaseList().getFirst().getOwner() != GameSettings.PLAYER)
+    			GameMap.allowActions(GameMap.getActiveBases(), this);
     	}
     }
     
@@ -162,7 +161,7 @@ public class GameEnv extends Environment {
 			int agentID = (int)(((NumberTerm)action.getTerm(0)).solve());
 			int type = (int)(((NumberTerm)action.getTerm(1)).solve());
 			Base base = GameMap.searchBase(agentID);
-			Unit u = view.getGameMap().createUnit(base.getLocation(), agentID, type);
+			Unit u = view.getGameMap().createUnit(base.getNode(), agentID, type);
 			clearPercepts(base.getAgent());
 			addPercept(base.getAgent(), Literal.parseLiteral("created_unit(" + u + ")"));
 		} catch (NoValueException e) {

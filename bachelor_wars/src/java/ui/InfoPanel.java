@@ -3,11 +3,10 @@ package ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.util.List;
+import java.util.LinkedList;
 
 import javax.swing.JPanel;
 
-import mapping.GameSettings;
 import objects.Base;
 import objects.units.Unit;
 
@@ -18,7 +17,7 @@ public class InfoPanel extends JPanel implements Informative{
 
 	ControlPanel controlPanel;
 	BaseInfoPanel basePanel;
-	List<Base> baseList;
+	LinkedList<Base> baseList;
 	Base actualBase;
 	
 	int actualType = NOTHING;
@@ -37,15 +36,8 @@ public class InfoPanel extends JPanel implements Informative{
 		/*
 		 * Initialize panel for base
 		 */
-		baseList = controlPanel.view.gameMap.getBaseList();
-		
-		for (Base base:baseList) {
-			if (base.getOwner() == GameSettings.PLAYER) {
-				actualBase = base;
-				break;
-			}
-		}
-		this.add(new BaseInfoPanel(actualBase, controlPanel));
+		baseList = GameMap.getBaseList();
+		this.add(new BaseInfoPanel(baseList.getFirst(), controlPanel));
 	}
 	
 	/**

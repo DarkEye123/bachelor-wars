@@ -547,7 +547,13 @@ public class GameSettingsMenu extends Menu {
 //======================================Player-Creation=========================================================
 		int width = Base.DEFAULT_BASE_SIZE.width;
 		int height = Base.DEFAULT_BASE_SIZE.height;
-		settings.addPlayer(GameSettings.PLAYER, colorPanelP1.getBackground(), new Location(0, 0));
+		if (!comboP1.getSelectedItem().equals("Closed")) {
+			String player = (String)comboP1.getSelectedItem();
+			if (player.equals("Player"))
+				settings.addPlayer(GameSettings.PLAYER, colorPanelP1.getBackground(), new Location(0, 0));
+			else
+				settings.addPlayer(getAI(player), colorPanelP1.getBackground(),  new Location(0, 0));
+		}
 		if (!comboP2.getSelectedItem().equals("Closed"))
 			settings.addPlayer(getAI((String)comboP2.getSelectedItem()), colorPanelP2.getBackground(), new Location(settings.getMapColumns() - width, 0));
 		if (!comboP3.getSelectedItem().equals("Closed"))

@@ -92,12 +92,15 @@ public class GameMap extends JPanel {
 		Dimension gridSize = new Dimension(cellSizeW,cellSizeH);
 		Base base = null;
 		int[] indexes = {0, 0, 0}; //for setting names for bases (basic name is for example SIMPLE_AI and base name is SIMPLE_AI 1
+		boolean incrementOwner = settings.getPlayers().get(0) != GameSettings.PLAYER; //real player is everytime first
 		for (int x=0; x < settings.getNumPlayers(); ++x) {
 			base = new Base(settings.getBaseLocations().get(x), Base.DEFAULT_BASE_SIZE, gridSize);
 			base.setColor(settings.getColors().get(x));
 			base.setType(settings.getPlayers().get(x));
-			base.setOwner(x);
-			
+			if (incrementOwner)
+				base.setOwner(x + 1);
+			else
+				base.setOwner(x);
 			
 			//set names for players (AI, real player ..) 
 			if (base.getType() == GameSettings.PLAYER) {
@@ -129,12 +132,15 @@ public class GameMap extends JPanel {
 		}
 		repaint();
 		reinitActiveBases();
+		if (incrementOwner) //there is now real player, let fight begin!! 
+			GameMap.allowActions(GameMap.getActiveBases(), view.env);
 	}
 	
 	public static void reinitActiveBases() {
 		synchronized (countLock) {
 			activeBasesInRound = (LinkedList<Base>) getBaseList().clone();
-			activeBasesInRound.removeFirst(); //this is player, there is need only for AI bases
+			if (activeBasesInRound.getFirst().getOwner() == GameSettings.PLAYER)
+				activeBasesInRound.removeFirst(); //this is player, there is need only for AI bases
 		}
 	}
 	
@@ -238,19 +244,19 @@ public class GameMap extends JPanel {
     
     /**
      * creates a unit with given type and add it into grid. It checks if given node doesn't contain a unit already. If so, it will return null, or created unit otherwise
-     * @param gridLocation - Coordinates on the grid (0,0) means upper left corner
+     * @param node - Coordinates on the grid (0,0) means upper left corner
      * @param owner - owner of this unit (player, agent1, etc ...)
      * @param type - type of unit
      * @return Unit if creation is successful, null otherwise.
      * @see objects.units.Unit Unit
      */
-    public Unit createUnit(Location gridLocation, int owner, int type) {
-    	assert !Node.getNode(gridLocation.x, gridLocation.y).containUnit() : "Can't create unit for owner: " + owner;
-    	if (! Node.getNode(gridLocation.x, gridLocation.y).containUnit()) {
+    public Unit createUnit(Node node, int owner, int type) {
+    	assert !node.containUnit() : "Can't create unit for owner: " + owner;
+    	if (! node.containUnit()) {
 	    	Dimension cellSize = new Dimension(cellSizeW, cellSizeH);
 	    	Unit unit = null; //TODO here should be some parametrized function that can make instances from types by generic way
 	    	if (type == FirstYear.TYPE)
-	    		unit = new FirstYear(gridLocation, Unit.DEFAULT_UNIT_SIZE, cellSize);
+	    		unit = new FirstYear(node.getLocation(), Unit.DEFAULT_UNIT_SIZE, cellSize);
 	    	unit.setOwner(owner);
 	    	Base base = Base.getOwnerBase(owner,baseList); //seek for base
 	    	base.addUnit(unit); //list of units of actual player

@@ -121,7 +121,8 @@ public class UnitInfoPanel extends JPanel {
 			boolean canBuy = unit.getCost() <= player.getKnowledge();
 			boolean hasFreeSlot = player.getFreeSlots() > 0;
 			boolean isMapEnabled = controlPanel.view.getGameMap().isEnabled();
-			addButton.setEnabled(isMapEnabled & hasFreeSlot & canBuy);
+			boolean containUnit = player.getNode().containUnit();
+			addButton.setEnabled(isMapEnabled & hasFreeSlot & canBuy && !containUnit);
 		}
 	}
 
@@ -133,11 +134,14 @@ public class UnitInfoPanel extends JPanel {
 	    
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			if (controlPanel.view.getGameMap().isEnabled()) {
-				Base playerBase = controlPanel.view.getGameMap().getPlayerBase();
-				if (playerBase.getFreeSlots() > 0 && unit.getCost() <= playerBase.getKnowledge()) {
-					Location loc = playerBase.getLocation(); //player location must be EVERYTIME FIRST
-					unit = controlPanel.view.gameMap.createUnit(loc, GameSettings.PLAYER_ID, unit.getType());
+			Base playerBase = controlPanel.view.getGameMap().getPlayerBase();
+			boolean isMapEnabled = controlPanel.view.getGameMap().isEnabled();
+			if (isMapEnabled) {
+				boolean canBuy = unit.getCost() <= playerBase.getKnowledge();
+				boolean hasFreeSlot = playerBase.getFreeSlots() > 0;
+				boolean containUnit = playerBase.getNode().containUnit();
+				if (hasFreeSlot && canBuy && !containUnit) {
+					unit = controlPanel.view.gameMap.createUnit(playerBase.getNode(), GameSettings.PLAYER_ID, unit.getType());
 					controlPanel.statusArea.append(ft.format(dNow) + ": Player: created unit" + unit.getName());
 				}
 			}
