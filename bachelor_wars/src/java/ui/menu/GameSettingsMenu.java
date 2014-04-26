@@ -4,14 +4,21 @@ import jason.environment.grid.Location;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.HashMap;
 
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.JSpinner;
 import javax.swing.UIManager;
 
+import cartago.new_array;
+import mapping.GameSettings;
 import objects.Base;
 import objects.Knowledge;
-import mapping.GameSettings;
 import ui.GameView;
 import env.GameEnv;
 
@@ -30,6 +37,10 @@ public class GameSettingsMenu extends Menu {
 	private javax.swing.JComboBox comboP2;
 	private javax.swing.JComboBox comboP3;
 	private javax.swing.JComboBox comboP4;
+	private javax.swing.JComboBox comboT1;
+	private javax.swing.JComboBox comboT2;
+	private javax.swing.JComboBox comboT3;
+	private javax.swing.JComboBox comboT4;
 	private javax.swing.JTextPane descriptionPane;
 	private javax.swing.JPanel gameSettingsContainer;
 	private javax.swing.JPanel generalSettings;
@@ -72,19 +83,32 @@ public class GameSettingsMenu extends Menu {
 	private javax.swing.JSpinner rounds;
 	private javax.swing.JSlider rowsSlider;
 	private JFrame frame;
+	private ArrayList<JComboBox> comboArray;
 
 	public GameSettingsMenu(GameEnv env) {
 		super(env);
 		initComponents();
 	}
+	
+	private boolean startEnabled() {
+		int cnt = 0;
+		for (JComboBox box:comboArray) {
+			if (box.isEnabled())
+				cnt++;
+		}
+		if (cnt >= 2) 
+			return true;
+		else 
+			return false;
+	}
 
 	private void initComponents() {
-		int x = 800, y = 600;
+		int x = 860, y = 600;
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 		} catch (Exception e) {
 			e.printStackTrace();
-			x = 820;
+			x = 880;
 			y = 630;
 		}
 		frame = new JFrame();
@@ -96,6 +120,10 @@ public class GameSettingsMenu extends Menu {
 		comboP2 = new javax.swing.JComboBox();
 		comboP3 = new javax.swing.JComboBox();
 		comboP4 = new javax.swing.JComboBox();
+		comboT1 = new javax.swing.JComboBox();
+		comboT2 = new javax.swing.JComboBox();
+		comboT3 = new javax.swing.JComboBox();
+		comboT4 = new javax.swing.JComboBox();
 		jLabel2 = new javax.swing.JLabel();
 		jLabel3 = new javax.swing.JLabel();
 		jLabel4 = new javax.swing.JLabel();
@@ -142,6 +170,7 @@ public class GameSettingsMenu extends Menu {
 		jLabel13 = new javax.swing.JLabel();
 		jLabel14 = new javax.swing.JLabel();
 		playerName = new javax.swing.JTextField();
+		comboArray = new ArrayList<>();
 
 		frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		frame.setMaximumSize(new java.awt.Dimension(x, y));
@@ -151,6 +180,11 @@ public class GameSettingsMenu extends Menu {
 		gameSettingsContainer.setMaximumSize(new java.awt.Dimension(x, y));
 		gameSettingsContainer.setMinimumSize(new java.awt.Dimension(x, y));
 		gameSettingsContainer.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+		
+		comboArray.add(comboT1);
+		comboArray.add(comboT2);
+		comboArray.add(comboT3);
+		comboArray.add(comboT4);
 
 		buttonStart.setText("Start Game");
 		buttonStart.addActionListener(new java.awt.event.ActionListener() {
@@ -158,28 +192,98 @@ public class GameSettingsMenu extends Menu {
 				buttonStartActionPerformed(evt);
 			}
 		});
-		gameSettingsContainer.add(buttonStart, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 560, -1, -1));
-
+		gameSettingsContainer.add(buttonStart, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 560, -1, -1));
+		
+//-------------------------------------------------------------------PLAYER-SELECTION----------------------------------------------------------	
 		agentSelectPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Players Selection", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("VL Gothic", 0, 12))); // NOI18N
 		agentSelectPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
 		comboP1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Player", "Simple AI", "Medium AI", "Advanced AI", "Closed" }));
-		comboP1.setToolTipText("");
+		comboP1.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					if (e.getItem().equals("Closed")) {
+						decideStatus(comboT1, jComboBox1, jSpinner1, false);
+					} else {
+						decideStatus(comboT1, jComboBox1, jSpinner1, true);
+					}
+				}
+			}
+		});
 		agentSelectPanel.add(comboP1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 50, 120, 25));
 
 		comboP2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Closed", "Simple AI", "Medium AI", "Advanced AI" }));
 		comboP2.setSelectedIndex(1);
-		comboP2.setToolTipText("");
+		comboP2.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					if (e.getItem().equals("Closed")) {
+						decideStatus(comboT2, jComboBox2, jSpinner2, false);
+					} else {
+						decideStatus(comboT2, jComboBox2, jSpinner2, true);
+					}
+				}
+			}
+		});
 		agentSelectPanel.add(comboP2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 90, 120, 25));
 
 		comboP3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Closed", "Simple AI", "Medium AI", "Advanced AI" }));
-		comboP3.setToolTipText("");
+		comboP3.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					if (e.getItem().equals("Closed")) {
+						decideStatus(comboT3, jComboBox3, jSpinner3, false);
+					} else {
+						decideStatus(comboT3, jComboBox3, jSpinner3, true);
+					}
+				}
+			}
+		});
 		agentSelectPanel.add(comboP3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 130, 120, 25));
 
 		comboP4.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Closed", "Simple AI", "Medium AI", "Advanced AI" }));
-		comboP4.setToolTipText("");
+		comboP4.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					if (e.getItem().equals("Closed")) {
+						decideStatus(comboT4, jComboBox4, jSpinner4, false);
+					} else {
+						decideStatus(comboT4, jComboBox4, jSpinner4, true);
+					}
+				}
+			}
+		});
 		agentSelectPanel.add(comboP4, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 170, 120, 25));
+//===========================================================================================================================================	
+		
+//-------------------------------------------------------------------TEAM-SELECTION----------------------------------------------------------	
+		comboT1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "--", "1", "2" }));
+		comboT1.setToolTipText("");
+		agentSelectPanel.add(comboT1, new org.netbeans.lib.awtextra.AbsoluteConstraints(415, 50, 50, 25));
 
+		comboT2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "--", "1", "2" }));
+		comboT2.setToolTipText("");
+		agentSelectPanel.add(comboT2, new org.netbeans.lib.awtextra.AbsoluteConstraints(415, 90, 50, 25));
+
+		comboT3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "--", "1", "2" }));
+		comboT3.setToolTipText("");
+		comboT3.setEnabled(false);
+		jComboBox3.setEnabled(false);
+		jSpinner3.setEnabled(false);
+		agentSelectPanel.add(comboT3, new org.netbeans.lib.awtextra.AbsoluteConstraints(415, 130, 50, 25));
+
+		comboT4.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "--", "1", "2" }));
+		comboT4.setToolTipText("");
+		comboT4.setEnabled(false);
+		jComboBox4.setEnabled(false);
+		jSpinner4.setEnabled(false);
+		agentSelectPanel.add(comboT4, new org.netbeans.lib.awtextra.AbsoluteConstraints(415, 170, 50, 25));
+		agentSelectPanel.add(new JLabel("Team"), new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 20, -1, -1));
+//===========================================================================================================================================
 		jLabel2.setText("4.");
 		agentSelectPanel.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, -1, 30));
 
@@ -316,13 +420,13 @@ public class GameSettingsMenu extends Menu {
 
 		jSpinner3.setFont(new java.awt.Font("Cantarell", 0, 14)); // NOI18N
 		jSpinner3.setModel(new javax.swing.SpinnerNumberModel(6, 3, 15, 1));
-		agentSelectPanel.add(jSpinner3, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 170, 50, 25));
+		agentSelectPanel.add(jSpinner3, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 130, 50, 25));
 
 		jSpinner4.setFont(new java.awt.Font("Cantarell", 0, 14)); // NOI18N
 		jSpinner4.setModel(new javax.swing.SpinnerNumberModel(6, 3, 15, 1));
-		agentSelectPanel.add(jSpinner4, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 130, 50, 25));
+		agentSelectPanel.add(jSpinner4, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 170, 50, 25));
 
-		gameSettingsContainer.add(agentSelectPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, 440, 220));
+		gameSettingsContainer.add(agentSelectPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, 500, 220));
 
 		buttonExit.setText("Exit");
 		gameSettingsContainer.add(buttonExit, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 560, 90, -1));
@@ -389,7 +493,7 @@ public class GameSettingsMenu extends Menu {
 		resolution.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 		jScrollPane1.setViewportView(resolution);
 
-		gameSettingsContainer.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 20, 130, 130));
+		gameSettingsContainer.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 20, 130, 130));
 
 /*===============================================================================================================================================*
  * Modes
@@ -426,42 +530,42 @@ public class GameSettingsMenu extends Menu {
 		});
 
 		descriptionPane.setText("DOMINATION\nMode where you have to own at least 80% of \"knowledge resources\" for 3 rounds.");
-		gameSettingsContainer.add(modePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 20, 150, 150));
+		gameSettingsContainer.add(modePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 20, 150, 150));
 //*****************************************************************************************************************************************************************
 		
 		descriptionPane.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Mode Description", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("VL Gothic", 0, 12))); // NOI18N
 		descriptionPane.setFont(new java.awt.Font("WenQuanYi Zen Hei Sharp", 0, 12)); // NOI18N
 		jScrollPane2.setViewportView(descriptionPane);
 
-		gameSettingsContainer.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 180, 310, 100));
+		gameSettingsContainer.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 180, 310, 100));
 
 		generalSettings.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "General Settings", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("VL Gothic", 0, 12))); // NOI18N
 		generalSettings.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
 		jLabel11.setFont(new java.awt.Font("Cantarell", 0, 14)); // NOI18N
 		jLabel11.setText("Number of Rounds");
-		generalSettings.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, -1, 30));
+		generalSettings.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, -1, 30));
 
 		rounds.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
 		rounds.setToolTipText("0 means infinite number of rounds");
-		generalSettings.add(rounds, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 100, 50, -1));
+		generalSettings.add(rounds, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 100, 60, -1));
 
 		incomePerRound.setModel(new javax.swing.SpinnerNumberModel(10, 5, 40, 1));
-		generalSettings.add(incomePerRound, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 20, 50, -1));
+		generalSettings.add(incomePerRound, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 20, 60, -1));
 
 		incomePerKnowledge.setModel(new javax.swing.SpinnerNumberModel(5, 5, 40, 1));
-		generalSettings.add(incomePerKnowledge, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 60, 50, -1));
+		generalSettings.add(incomePerKnowledge, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 60, 60, -1));
 
 		jLabel12.setFont(new java.awt.Font("Cantarell", 0, 14)); // NOI18N
 		jLabel12.setText("Income per Round");
-		generalSettings.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, 30));
+		generalSettings.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, 30));
 
 		jLabel13.setFont(new java.awt.Font("Cantarell", 0, 14)); // NOI18N
 		jLabel13.setText("Income per Knowledge");
-		generalSettings.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, -1, 30));
+		generalSettings.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, -1, 30));
 
 		jLabel14.setText("Player Nickname:");
-		generalSettings.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 150, -1, 20));
+		generalSettings.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 150, -1, 20));
 
 		playerName.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 		playerName.setText("Player");
@@ -470,15 +574,22 @@ public class GameSettingsMenu extends Menu {
 //				playerNameActionPerformed(evt);
 			}
 		});
-		generalSettings.add(playerName, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 190, 170, 40));
+		generalSettings.add(playerName, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 190, 170, 40));
 
-		gameSettingsContainer.add(generalSettings, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 290, 220, 250));
+		gameSettingsContainer.add(generalSettings, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 290, 280, 250));
 
 		frame.getContentPane().add(gameSettingsContainer, java.awt.BorderLayout.CENTER);
 
 		frame.pack();
 		frame.setVisible(true);
 		frame.setLocationRelativeTo(null);
+	}
+
+	protected void decideStatus(JComboBox jComboBox1, JComboBox jComboBox2, JSpinner jSpinner, boolean enabled) {
+		jComboBox1.setEnabled(enabled);
+		jComboBox2.setEnabled(enabled);
+		jSpinner.setEnabled(enabled);
+		buttonStart.setEnabled(startEnabled());
 	}
 
 	protected Color getSelColor(String selectedItem) {
@@ -547,12 +658,15 @@ public class GameSettingsMenu extends Menu {
 //======================================Player-Creation=========================================================
 		int width = Base.DEFAULT_BASE_SIZE.width;
 		int height = Base.DEFAULT_BASE_SIZE.height;
+		int index = 0;
 		if (!comboP1.getSelectedItem().equals("Closed")) {
 			String player = (String)comboP1.getSelectedItem();
 			if (player.equals("Player"))
 				settings.addPlayer(GameSettings.PLAYER, colorPanelP1.getBackground(), new Location(0, 0));
-			else
+			else {
 				settings.addPlayer(getAI(player), colorPanelP1.getBackground(),  new Location(0, 0));
+				index = 1;
+			}
 		}
 		if (!comboP2.getSelectedItem().equals("Closed"))
 			settings.addPlayer(getAI((String)comboP2.getSelectedItem()), colorPanelP2.getBackground(), new Location(settings.getMapColumns() - width, 0));
@@ -561,6 +675,20 @@ public class GameSettingsMenu extends Menu {
 		if (!comboP4.getSelectedItem().equals("Closed"))
 			settings.addPlayer(getAI((String)comboP4.getSelectedItem()), colorPanelP4.getBackground(), new Location(settings.getMapColumns() - width, settings.getMapRows() - height));
 		settings.init();
+		
+		HashMap<String, ArrayList<Integer>> teams = new HashMap<>();
+		for (int i = 0; i < comboT1.getItemCount(); ++i) {
+			teams.put((String) comboT1.getItemAt(i), new ArrayList<Integer>());
+		}
+		
+		for (JComboBox box:comboArray) {
+			if (box.isEnabled()) {
+				teams.get((String)box.getSelectedItem()).add(index++);
+			}
+		}
+//		System.out.println(teams);
+		
+		settings.addTeams(teams);
 		
 		env.setView(new GameView(settings));
 	}

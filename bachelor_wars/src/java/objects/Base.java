@@ -33,6 +33,7 @@ public class Base extends GameObject implements Clickable{
 	private LinkedList<Unit> usableUnits = new LinkedList<Unit>();
 	private LinkedList<Knowledge> knowledgeList = new LinkedList<Knowledge>();
 	private LinkedList<Base> allies = new LinkedList<>();
+	private LinkedList<Base> enemies = new LinkedList<>();
 	
 	
 	protected int freeSlots = DEFAULT_SLOT_SIZE; //number of free slots to create new units
@@ -267,5 +268,13 @@ public class Base extends GameObject implements Clickable{
 			}
 		}
 		return false;
+	}
+
+	public LinkedList<Base> getEnemies() {
+		return enemies;
+	}
+
+	public void setEnemies(LinkedList<Base> enemies) {
+		this.enemies = enemies;
 	}
 }

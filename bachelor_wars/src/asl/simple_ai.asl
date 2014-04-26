@@ -189,6 +189,7 @@ getTypeOfIntention(Intention, Type) :-
 	& .print("Unit: ", UnitID, " to knowledge: ", Knowledge, " adding intention")
 	<-	!getKnowledgeId(Knowledge, TargetObject);
 		jason.addIntention(UnitID, TargetObject, 1, "knowledge");
+		!addEnemyBases(Unit);
 		!getClass(Unit,Class);
 		!addClassBasedIntention(UnitID, Class, "knowledge");
 		!moveUnit(Unit).

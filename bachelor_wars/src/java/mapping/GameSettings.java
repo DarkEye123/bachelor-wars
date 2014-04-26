@@ -3,6 +3,7 @@ import jason.environment.grid.Location;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import objects.Base;
@@ -56,6 +57,7 @@ public class GameSettings {
 	private float boostProbability;
 	private int mode;
 	private int treshold = INFINITE;
+	private HashMap<String, ArrayList<Integer>> teams;
 	
 	public GameSettings() {
 		setPlayers(new ArrayList<Integer>());
@@ -219,5 +221,13 @@ public class GameSettings {
 		if (treshold == INFINITE)
 			treshold = (int) (((float)getNumKnowledgeResources()/100.0f) * DOMINATION_WIN_PERCENTAGE);
 		return treshold;
+	}
+
+	public void addTeams(HashMap<String, ArrayList<Integer>> teams) {
+		this.teams = teams;
+	}
+	
+	public HashMap<String, ArrayList<Integer>> getTeams() {
+		return teams;
 	}
 }

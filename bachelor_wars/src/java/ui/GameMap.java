@@ -9,8 +9,11 @@ import java.awt.Graphics;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.Set;
 
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
@@ -132,10 +135,34 @@ public class GameMap extends JPanel {
 		}
 		repaint();
 		reinitActiveBases();
+		sortIntoTeams();
 		if (incrementOwner) //there is now real player, let fight begin!! 
 			GameMap.allowActions(GameMap.getActiveBases(), view.env);
 	}
 	
+	private void sortIntoTeams() {
+		Set<String> keys = settings.getTeams().keySet();
+		HashMap<String, ArrayList<Integer>> map = settings.getTeams();
+		for (Base base:baseList) {
+			base.setEnemies( (LinkedList<Base>) getBaseList().clone() ); //all players are enemies by default
+			base.getEnemies().remove(base);
+			for (String s:keys) {
+				if (map.get(s).contains(base.getOwner())) {
+					if (!s.equals("--")) { 
+						for (Integer i:map.get(s)) {
+							if (i != base.getOwner()) {
+								Base pomBase = searchBase(i);
+								base.getAllies().add(pomBase);
+								base.getEnemies().remove(pomBase);
+							}
+						}
+					}
+				}
+			}
+			System.out.println("Base: " + base + " enemies: " + base.getEnemies() + " allies: " + base.getAllies());
+		}
+	}
+
 	public static void reinitActiveBases() {
 		synchronized (countLock) {
 			activeBasesInRound = (LinkedList<Base>) getBaseList().clone();
