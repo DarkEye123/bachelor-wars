@@ -48,11 +48,9 @@ public class GameMap extends JPanel {
 	private static LinkedList<Knowledge> knowledgeList = new LinkedList<Knowledge>();
 	private LinkedList<Location> movementLocations = new LinkedList<Location>();
 	private LinkedList<Location> atkLocations = new LinkedList<Location>();
-	private static final Object countLock = new Object();
+	public static final Object countLock = new Object();
 	
 	MapMouseInputAdapter mouseListener;
-	
-	
 	
 	public static Font defaultFont = new Font("Arial", Font.BOLD, 10);
 	protected GameSettings settings;
@@ -65,7 +63,7 @@ public class GameMap extends JPanel {
 	
 	public void init() {
 		Node.generateGrid(settings.getMapColumns(), settings.getMapRows());
-		mouseListener = new MapMouseInputAdapter();
+		mouseListener = new MapMouseInputAdapter(this);
 		initBases();
 		generateKnowledgeResources(settings.getNumKnowledgeResources());
 		this.addMouseListener(mouseListener);
@@ -226,27 +224,34 @@ public class GameMap extends JPanel {
         g.drawRect(x * cellSizeW, y * cellSizeH, cellSizeW, cellSizeH);
     }
     
-    public void drawBasicAtkRange(Location loc, int max) {
-    	findPossibleLocations(loc, 0, max, atkLocations, null);
-    	atkLocations.remove(loc);
-    	
-    	Graphics g = this.getGraphics();
-        for (Location location:atkLocations) {
-        	g.setColor(Color.red);
-        	int x = Math.round(location.x * cellSizeW);
-        	int y = Math.round(location.y * cellSizeH);
-        	g.drawRect(x + 1, y + 1, cellSizeW - 1, cellSizeH - 1);
-        }
+    public void drawBasicAtkRange(Location loc, int max, Graphics g) {
+    	synchronized (countLock) {
+	    	findPossibleLocations(loc, 0, max, atkLocations, null);
+	    	atkLocations.remove(loc);
+	//    	System.out.println("LOCATIOOOONS1 :" + atkLocations + "\n\n");
+	        for (Location location:atkLocations) {
+	        	g.setColor(Color.red);
+	        	int x = Math.round(location.x * cellSizeW);
+	        	int y = Math.round(location.y * cellSizeH);
+	        	g.drawRect(x + 1, y + 1, cellSizeW - 1, cellSizeH - 1);
+	        }
+    	}
+//        System.out.println("LOCATIOOOONS2 :" + atkLocations + "\n\n");
 //        repaint();
     }
-    
-    public void drawMovementGrid(LinkedList<Location> locations) {
-    	Graphics g = this.getGraphics();
+
+    public void drawMovementGrid(LinkedList<Location> locations, Graphics g) {
+//    	System.out.println(locations + "\n");
         for (Location location:locations) {
         	g.setColor(Color.GREEN);
         	int centerX = Math.round(location.x * cellSizeW);
         	int centerY = Math.round(location.y * cellSizeH);
         	g.fillOval(centerX, centerY, cellSizeW, cellSizeH);
+        	g.setColor(Color.black);
+        	g.drawOval(centerX, centerY, cellSizeW, cellSizeH);
+        }
+        if (cunit != null) {
+        	cunit.draw(g, cellSizeW, cellSizeH);
         }
     }
 
@@ -313,8 +318,8 @@ public class GameMap extends JPanel {
     private void drawPossibleMovement(Location loc, int max) {
     	findPossibleLocations(loc, 1, max, movementLocations, getForbiddenLocations());
     	movementLocations.removeAll(getForbiddenLocations());	
-    	movementLocations.remove(loc);
-    	drawMovementGrid(movementLocations);
+//    	movementLocations.remove(loc);
+    	drawMovementGrid(movementLocations, getGraphics());
 //    	repaint();
     }
     
@@ -348,17 +353,18 @@ public class GameMap extends JPanel {
     
     public void drawPossibleMovement(Unit unit) {
     	cunit = unit;
-//    	if (unit.getOwner() != GameSettings.PLAYER)
-    		drawPossibleMovement(unit.getLocation(), unit.getMov());
-//    	else
-//    		drawPossibleMovement(unit.getOldLocation(), unit.getMov());
+    	drawPossibleMovement(unit.getLocation(), unit.getMov());
     }
     
     public void paint(Graphics g) {
+//    	g.setColor(Color.white);
+//    	super.paint(g);
+//    	System.out.println("PAINT");
     	int mwidth = settings.getMapColumns();
     	int mheight = settings.getMapRows();
         cellSizeW = this.getWidth() / mwidth;
         cellSizeH = this.getHeight() / mheight;
+        drawMovementGrid(movementLocations, g);
         for (Base base:baseList) {
         	base.draw(g, cellSizeW, cellSizeH);
         }
@@ -370,12 +376,17 @@ public class GameMap extends JPanel {
 	        	unit.draw(g, cellSizeW, cellSizeH);
 	        };
         }
+        if (cunit != null)
+        	drawBasicAtkRange(cunit.getLocation(), cunit.getBasicAtkRange(), g);
     }
     
     public void repaint() {
+//    	super.repaint();
+//    	System.out.println("REPAINT");
         if (view != null) {
 	    	cellSizeW = this.getWidth() / settings.getMapColumns();
 	        cellSizeH = this.getHeight() / settings.getMapRows();
+	        drawMovementGrid(movementLocations, getGraphics());
 	        for (Base base:baseList) {
 	        	base.draw(this.getGraphics(), cellSizeW, cellSizeH);
 	        }
@@ -390,6 +401,8 @@ public class GameMap extends JPanel {
 		        	unit.drawUsableSign(this.getGraphics());
 		        }
 	        }
+	        if (cunit != null)
+	        	drawBasicAtkRange(cunit.getLocation(), cunit.getBasicAtkRange(), this.getGraphics());
         }
     }
 
@@ -438,6 +451,10 @@ public class GameMap extends JPanel {
 		Node test1 = null;
 		Node test2 = null;
 		int testCounter = 0;
+		GameMap map;
+		public MapMouseInputAdapter(GameMap map) {
+			this.map = map;
+		}
 		
 		private void canDebugPath(boolean debug, MouseEvent e) {
 			if (debug) {
@@ -473,32 +490,40 @@ public class GameMap extends JPanel {
 								break;
 							}
 						}
-						if (cunit != null && playerBase.getUsableUnits().contains(cunit)) {
-							if (cunit.canMove())
+						if (cunit != null) {
+							if (playerBase.getUsableUnits().contains(cunit)) {
 								drawPossibleMovement(cunit);
-							drawBasicAtkRange(cunit.getLocation(), cunit.getBasicAtkRange());
-//							drawBasicAtkRange(cunit.getOldLocation(), cunit.getBasicAtkRange());
-						} else {
-							cunit = null;
+								drawBasicAtkRange(cunit.getLocation(), cunit.getBasicAtkRange(), map.getGraphics());
+							}
+							else {
+								cunit.setLocation(cunit.getOldLocation());
+								cunit = null;
+							}
 						}
 					} else {
-						Location loc = new Location(e.getX() / cellSizeW, e.getY() / cellSizeH); //get a cell where mouse clicked
-						if (movementLocations.contains(loc)) {
-							cunit.setLocation(loc);
-							cunit.setCanMove(false); //TODO this add to the unit panel on the right (buttons done back)
-							clearMovement();
-						} else {
-							movementLocations.clear();
-							if (atkLocations.contains(loc)) {
-								Unit u = Node.getNode(loc.x, loc.y).getUnit();
-								if ( u != null && u.getOwner() != cunit.getOwner()) {
-									Node.getNode(loc.x, loc.y).getUnit().addDamage(cunit.getAtk());
-									playerBase.getUsableUnits().remove(cunit);
-								}
+						if (cunit != null) {
+							Location loc = new Location(e.getX() / cellSizeW, e.getY() / cellSizeH); //get a cell where mouse clicked
+							if (movementLocations.contains(loc) && !cunit.getLocation().equals(loc)) {
+								cunit.setLocation(loc);
+								atkLocations.clear();
+								map.view.repaint();
+	//							map.repaint();
+	//							cunit.setCanMove(false); //TODO this add to the unit panel on the right (buttons done back)
+	//							clearMovement();
+	//							drawMovementGrid(movementLocations);
+							} else {
+	//							movementLocations.clear();
+	//							if (atkLocations.contains(loc)) {
+	//								Unit u = Node.getNode(loc.x, loc.y).getUnit();
+	//								if ( u != null && u.getOwner() != cunit.getOwner()) {
+	//									Node.getNode(loc.x, loc.y).getUnit().addDamage(cunit.getAtk());
+	//									playerBase.getUsableUnits().remove(cunit);
+	//								}
+	//							}
+	//							clearMovement();
+	//							e.getComponent().getParent().repaint(); //view
 							}
-							clearMovement();
 						}
-						e.getComponent().getParent().repaint(); //view
 					}
 				}
 			}
@@ -561,5 +586,9 @@ public class GameMap extends JPanel {
 
 	public Base getPlayerBase() {
 		return playerBase;
+	}
+
+	public LinkedList<Location> getAtkLocations() {
+		return atkLocations;
 	}
 }

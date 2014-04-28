@@ -30,6 +30,8 @@ public class UnitInfoPanel extends JPanel {
 	
 	JLabel name, cost, hp, moveRange, atk, sp;
 	JButton addButton;
+	JButton cancelButton;
+	JButton doneButton;
 	GridBagConstraints constraints;
 	ControlPanel controlPanel;
 	ImagePanel image;
@@ -110,6 +112,24 @@ public class UnitInfoPanel extends JPanel {
 		constraints.gridy = 5;
 		this.add(cost, constraints);
 		
+		if (unit.getOwner() == GameSettings.PLAYER) {
+			buttonMouseInputAdapter = new ButtonMouseInputAdapter();
+			doneButton = new JButton("done");
+			doneButton.setName(doneButton.getText());
+			doneButton.addMouseListener(buttonMouseInputAdapter);
+			cancelButton = new JButton("cancel");
+			cancelButton.setName(cancelButton.getText());
+			cancelButton.addMouseListener(buttonMouseInputAdapter);
+			
+			constraints.gridx = 0;
+			constraints.gridy = 6;
+//			constraints.anchor = GridBagConstraints.CENTER;
+			constraints.gridwidth = 1;
+			this.add(cancelButton, constraints);
+			constraints.gridx = 1;
+			this.add(doneButton, constraints);
+		}
+		
 //		GameView.setComponentSize(controlPanel.getSize(), this);
 	}
 	
@@ -137,12 +157,27 @@ public class UnitInfoPanel extends JPanel {
 			Base playerBase = controlPanel.view.getGameMap().getPlayerBase();
 			boolean isMapEnabled = controlPanel.view.getGameMap().isEnabled();
 			if (isMapEnabled) {
-				boolean canBuy = unit.getCost() <= playerBase.getKnowledge();
-				boolean hasFreeSlot = playerBase.getFreeSlots() > 0;
-				boolean containUnit = playerBase.getNode().containUnit();
-				if (hasFreeSlot && canBuy && !containUnit) {
-					unit = controlPanel.view.gameMap.createUnit(playerBase.getNode(), GameSettings.PLAYER_ID, unit.getType());
-					controlPanel.statusArea.append(ft.format(dNow) + ": Player: created unit" + unit.getName());
+				String name = e.getComponent().getName();
+				if (name.equals("buy unit")) {
+					boolean canBuy = unit.getCost() <= playerBase.getKnowledge();
+					boolean hasFreeSlot = playerBase.getFreeSlots() > 0;
+					boolean containUnit = playerBase.getNode().containUnit();
+					if (hasFreeSlot && canBuy && !containUnit) {
+						unit = controlPanel.view.gameMap.createUnit(playerBase.getNode(), GameSettings.PLAYER_ID, unit.getType());
+						controlPanel.statusArea.append(ft.format(dNow) + ": Player: created unit" + unit.getName());
+					}
+				} else if (name.equals("done")) {
+					unit.setOldLocation(unit.getLocation());
+					controlPanel.view.getGameMap().clearMovement();
+					unit.base.getUsableUnits().remove(unit);
+					controlPanel.view.repaint();
+					controlPanel.view.getGameMap().repaint();
+					
+				} else if (name.equals("cancel")) {
+					unit.setLocation(unit.getOldLocation());
+					controlPanel.view.getGameMap().clearMovement();
+					controlPanel.view.repaint();
+					controlPanel.view.getGameMap().repaint();
 				}
 			}
 		}

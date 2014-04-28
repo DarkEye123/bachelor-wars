@@ -67,7 +67,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	protected int maxSp;//TODO if will powers will be used, add this to UnitInfoPanel
 	protected int uClass; //Healer, Damage, Support, Defense
 	public Base base; //it's like owner from GameObject but due to some dependencies is better set a base on it's own too
-	private boolean canMove = true;
+	private boolean canFillMovement = true;
 	private Location oldLocation;
 	
 	HashMap<GameObject, Intention> intentions; //id of object and id of intention
@@ -234,7 +234,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	 */
 	public boolean hasIntention(GameObject key) {
 		synchronized (countLock) {
-			System.out.println("Looking for: " + key + " in: " + intentions );
+//			System.out.println("Looking for: " + key + " in: " + intentions );
 			if (intentions.get(key) != null)
 				return true;
 			else
@@ -268,12 +268,15 @@ public abstract class Unit extends GameObject implements Clickable {
 //		System.out.println("PAAAAAAAAAAAAAAAATH for: " + this.getId() + " " + path.size());
 		for (int x = 0; x < path.size() && x < getMov(); ++x) {
 			g.setColor(Color.red);
-			g.drawRoundRect(node.getX() * cellSizeW, node.getY() * cellSizeH, cellSizeW, cellSizeH, ARC_W, ARC_H);
+			g.drawRoundRect(node.getX() * cellSizeW, node.getY() * cellSizeH, cellSizeW, cellSizeH, ARC_W, ARC_H); //draw target intention
 			waitForDraw();
 			Node t = path.get(x);
 			setLocation(new Location(t.getX(), t.getY()));
 			waitForDraw();
 			view.repaint();
+			synchronized (GameMap.countLock) {
+				view.getGameMap().getAtkLocations().clear();
+			}
 			view.getGameMap().repaint();
 		}
 	}
@@ -310,12 +313,12 @@ public abstract class Unit extends GameObject implements Clickable {
 				getX() + ", " + getY() + ", "  + getOwner() + ", "  + getUnitClass() +  "]";
 	}
 
-	public boolean canMove() {
-		return canMove;
+	public boolean canFillMovement() {
+		return canFillMovement;
 	}
 	
-	public void setCanMove(boolean canMove) {
-		this.canMove = canMove;
+	public void setFillMovement(boolean canFillMovement) {
+		this.canFillMovement = canFillMovement;
 	}
 
 	public void drawUsableSign(Graphics graphics) {

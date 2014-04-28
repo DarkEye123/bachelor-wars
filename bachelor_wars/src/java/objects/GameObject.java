@@ -14,11 +14,12 @@ import mapping.Node;
  *
  */
 public abstract class GameObject implements Clickable{
+	private static final int UNKNOWN = -1;
 	protected int x, y; //coordinates in grid
 	protected int width, height;// object size in cells
 	protected int cellSizeW, cellSizeH; //real cell size - width and height in pixels
 	protected int type; //sets type of object - for example which AI type is used for base etc
-	protected int owner; //owner of GameObject .. it could be Player agent1 .. agentx - it doesn't indicate AI level, that is up to "type"
+	protected int owner = UNKNOWN; //owner of GameObject .. it could be Player agent1 .. agentx - it doesn't indicate AI level, that is up to "type"
 	protected Location location;
 	protected String name; //Objects name - TODO generate some file with names and read it
 	protected static final Object countLock = new Object();

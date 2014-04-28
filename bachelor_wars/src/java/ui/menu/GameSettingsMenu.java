@@ -296,7 +296,7 @@ public class GameSettingsMenu extends Menu {
 		jLabel5.setText("3.");
 		agentSelectPanel.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, -1, 30));
 
-		colorPanelP1.setBackground(java.awt.Color.green);
+		colorPanelP1.setBackground(java.awt.Color.orange);
 		colorPanelP1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
 		javax.swing.GroupLayout colorPanelP1Layout = new javax.swing.GroupLayout(colorPanelP1);
@@ -360,7 +360,7 @@ public class GameSettingsMenu extends Menu {
 
 		agentSelectPanel.add(colorPanelP4, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 170, 25, 25));
 //===========================================================COLORS=============================================
-		String[] colors = { "green", "red", "blue", "purple", "black", "white", "orange"};
+		String[] colors = { "orange", "red", "blue", "purple", "green"};
 		jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(colors));
 		agentSelectPanel.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 50, -1, 25));
 		jComboBox1.addActionListener(new ActionListener() {
@@ -593,8 +593,8 @@ public class GameSettingsMenu extends Menu {
 	}
 
 	protected Color getSelColor(String selectedItem) {
-		String[] colors = { "green", "red", "blue", "purple", "black", "white", "orange"};
-		Color[] cArr = {Color.green, Color.red, Color.blue, new java.awt.Color(192, 97, 192), Color.black, Color.white, Color.orange};
+		String[] colors = { "orange", "red", "blue", "purple", "green"};
+		Color[] cArr = {Color.orange, Color.red, Color.blue, new java.awt.Color(192, 97, 192), Color.green};
 		return cArr[getIndex(colors, selectedItem)];
 	}
 

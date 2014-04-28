@@ -55,7 +55,7 @@ public abstract class getNearest extends DefaultInternalAction {
     	else {
     		Wrapper.sort(interests);
     		closest = interests.getFirst();
-    		System.out.println(interests);
+//    		System.out.println(interests);
         	un.unifies(terms[1], ListTermImpl.parseList(closest.to.toString()));
         	return true;
     	}
