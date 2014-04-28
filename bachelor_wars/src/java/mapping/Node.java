@@ -56,7 +56,7 @@ public class Node {
 		
 		if (Unit.class.isInstance(object) && containKnowledge()) {
 //			System.out.println(((Unit)object).base);
-			getKnowledge().setBase(((Unit)object).base);
+			getKnowledge().STATE = GameMap.ROUND;
 		}
 		
 		Node.getNode(object.getX(), object.getY()).remove(object); //remove from previous node

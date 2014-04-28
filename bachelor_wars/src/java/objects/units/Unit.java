@@ -68,6 +68,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	protected int uClass; //Healer, Damage, Support, Defense
 	public Base base; //it's like owner from GameObject but due to some dependencies is better set a base on it's own too
 	private boolean canMove = true;
+	private Location oldLocation;
 	
 	HashMap<GameObject, Intention> intentions; //id of object and id of intention
 	
@@ -83,6 +84,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	 */
 	public Unit(Location location, Dimension unitSize, Dimension cellSize) {
 		super(location, unitSize, cellSize);
+		oldLocation = location;
 	}
 
 	/**
@@ -262,21 +264,8 @@ public abstract class Unit extends GameObject implements Clickable {
 		if (path.isEmpty()) { //there is no route to given object (but there could be path, but is temporarily blocked, so find this path till blocking unit is reached)
 			path = Node.searchPath(getNode(), node, true); //here ignore units (in practice find path till blocking unit)
 		}
-		//TODO tu je chyba, ked predosla AI umiestni napr jednotku na knowledge co je v intentions tak ju nezamerne nasledujuci tah priradi do intentions novej AI
 		Graphics g = view.getGameMap().getGraphics();
-//		if (node.containKnowledge())
-//			addIntention(node.getKnowledge(), new Intention(SEIZE, Intention.Type.PERSISTENT));
-//		if (node.containBase())
-//			addIntention(node.getBase(), new Intention(SEIZE, Intention.Type.PERSISTENT));
-//		if (node.containUnit()) { //TODO kill intention
-//			Unit unit = node.getUnit();
-//			if (unit.getOwner() == owner)  {// it is friendly unit TODO add friendly unit of another agent too
-//				
-//			} else { //enemy
-//				addIntention(unit, new Intention(KILL, Intention.Type.PERSISTENT));
-//			}
-//		}
-		System.out.println("PAAAAAAAAAAAAAAAATH for: " + this.getId() + " " + path.size());
+//		System.out.println("PAAAAAAAAAAAAAAAATH for: " + this.getId() + " " + path.size());
 		for (int x = 0; x < path.size() && x < getMov(); ++x) {
 			g.setColor(Color.red);
 			g.drawRoundRect(node.getX() * cellSizeW, node.getY() * cellSizeH, cellSizeW, cellSizeH, ARC_W, ARC_H);
@@ -327,5 +316,20 @@ public abstract class Unit extends GameObject implements Clickable {
 	
 	public void setCanMove(boolean canMove) {
 		this.canMove = canMove;
+	}
+
+	public void drawUsableSign(Graphics graphics) {
+		int nx = x * cellSizeW;
+		int ny = y * cellSizeH;
+		graphics.setColor(Color.black);
+		graphics.fillOval(nx, ny, cellSizeW / 5, cellSizeH / 5);
+	}
+
+	public Location getOldLocation() {
+		return oldLocation;
+	}
+
+	public void setOldLocation(Location oldLocation) {
+		this.oldLocation = oldLocation;
 	}
 }

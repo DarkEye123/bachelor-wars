@@ -13,6 +13,8 @@ import objects.units.Unit;
 
 public class GameSettings {
 	public static final int INFINITE = 0;
+	public static final int BASE_SEIZE_ROUNDS = 1;
+	public static final int KNOWLEDGE_SEIZE_ROUNDS = 1;
 	//TODO add new units, should be 6 units, but now it's only one
 	public static final LinkedList<Unit> AVAILABLE_UNITS = new LinkedList<Unit>();
 	public static final int GSize = 24;
@@ -22,7 +24,6 @@ public class GameSettings {
 	
 	public static final int DEFAULT_KNOWLEDGE_RESOURCES = 6;
 	public static final int DEFAULT_KNOWLEDGE_PADDING = Base.DEFAULT_BASE_SIZE.width + 1; //how much space in cells should be to be able insert knowledge
-	public static final int DEFAULT_SEIZE_ROUNDS = 1;
 	
 	public static final int PLAYER = 0; // types of players - needed for creation of bases
 	public static final int SIMPLE_AI = 1;

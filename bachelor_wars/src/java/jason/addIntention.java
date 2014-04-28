@@ -42,6 +42,9 @@ public class addIntention extends DefaultInternalAction{
 		} else if (sorter.equals("friendly")) {
 			target = unit.base.searchUnit(targetID);
 			unit.addIntention(target, new Intention(Unit.HEAL, iType));
+		} else if (sorter.equals("base")) {
+			target = GameMap.searchBase(targetID);
+			unit.addIntention(target, new Intention(Unit.SEIZE, iType));
 		}
 		
 		return true;

@@ -182,6 +182,18 @@ getTypeOfIntention(Intention, Type) :-
 +!addClassBasedIntention(_, _, _). //end point if there is nothing in reach
 //===================================================================================================================================================================
 
++!addEnemyBases(UnitID) : true
+	<- 	?agentID(ID);
+		jason.getEnemyBases(ID, Bases);
+		!addEnemyBases(UnitID, Bases). //list
+
++!addEnemyBases(UnitID, [H|B]): true
+	<-	.nth(0, H, N);
+		jason.addIntention(UnitID, N, 1, "base");
+		.print("Adding enemy base: ", N);
+		!addEnemyBases(UnitID, B).
+
++!addEnemyBases(_, []).
 
 //--------------------------------------------------------------------Without-Intentions---------------------------------------------------------------------------			
 //####################################################################--MODE-DOMINATION--##########################################################################
@@ -189,7 +201,7 @@ getTypeOfIntention(Intention, Type) :-
 	& .print("Unit: ", UnitID, " to knowledge: ", Knowledge, " adding intention")
 	<-	!getKnowledgeId(Knowledge, TargetObject);
 		jason.addIntention(UnitID, TargetObject, 1, "knowledge");
-		!addEnemyBases(Unit);
+		!addEnemyBases(UnitID);
 		!getClass(Unit,Class);
 		!addClassBasedIntention(UnitID, Class, "knowledge");
 		!moveUnit(Unit).
@@ -288,7 +300,7 @@ getTypeOfIntention(Intention, Type) :-
 -!check_action(ID): true <- update_percepts; mark_done.
 
 
-+can_act <- .print("preparing action"); ?agentID(N); update_percepts; !check_action(N).
++can_act <- .print("preparing action"); ?agentID(N); update_percepts; mark_start; !check_action(N).
 		
 -can_act <- .print("can_act removed, waiting for next turn").
 

@@ -18,7 +18,7 @@ public class getNearestEnemy extends jason.getNearest {
     public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {
     	super.execute(ts, un, terms);
     	LinkedList<Unit> listOfInterest = (LinkedList<Unit>) GameMap.getUnitList().clone();
-    	listOfInterest.removeAll(unit.base.getUnitList()); //remove our units
+    	listOfInterest.removeAll(unit.base.getFriendlyUnits()); //remove our units
     	
     	LinkedList<Wrapper> interests = findInterests(listOfInterest);
     	

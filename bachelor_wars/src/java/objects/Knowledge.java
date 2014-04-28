@@ -11,6 +11,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import ui.GameMap;
+
 public class Knowledge extends GameObject {
 	
 	private BufferedImage image;
@@ -18,8 +20,7 @@ public class Knowledge extends GameObject {
 	private Base base;
 	private static int _id_; //identifier of a unit
 	protected int id;
-	
-	
+	public int STATE = GameMap.ROUND;
 
 	public Knowledge(Location location, Dimension cellSize) {
 		super(location, new Dimension(1,1), cellSize);
@@ -63,16 +64,21 @@ public class Knowledge extends GameObject {
 
 
 	public Base getBase() {
-		return base;
+		synchronized (countLock) {
+			return base;
+		}
 	}
 
 
 
 	public void setBase(Base base) {
-		if (this.base != null)
-			this.base.getKnowledgeList().remove(this);
-		this.base = base;
-		base.getKnowledgeList().add(this);
+		synchronized (countLock) {
+			if (this.base != null) 
+				this.base.getKnowledgeList().remove(this);
+			if (base != null)
+				base.getKnowledgeList().add(this);
+			this.base = base;
+		}
 	}
 
 

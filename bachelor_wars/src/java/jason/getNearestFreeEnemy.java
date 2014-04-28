@@ -19,7 +19,7 @@ public class getNearestFreeEnemy extends jason.getNearest {
     public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {
 		super.execute(ts, un, terms);
     	LinkedList<Unit> listOfInterest = (LinkedList<Unit>) GameMap.getUnitList().clone();
-    	listOfInterest.removeAll(unit.base.getUnitList()); //remove our units
+    	listOfInterest.removeAll(unit.base.getFriendlyUnits()); //remove our units
     	LinkedList<Unit> toRemove = new LinkedList<>();
     	
     	for (Unit enemyUnit:listOfInterest) { //search knowledge resources that are free, but have some unit with intention assigned

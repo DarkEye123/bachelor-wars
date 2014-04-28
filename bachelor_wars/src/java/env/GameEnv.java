@@ -39,7 +39,9 @@ public class GameEnv extends Environment {
     
     GameView view;
 
-	private EnvAnalyzer analyzer;
+	public EnvAnalyzer analyzer;
+
+	private boolean isEnd;
 
     /** Called before the MAS execution with the args informed in .mas2j */
     @Override
@@ -75,6 +77,12 @@ public class GameEnv extends Environment {
         } else if (action.getFunctor().equals("mark_done")) {
         	markDone(action);
         	return true;
+        } else if (action.getFunctor().equals("mark_start")) {
+        	isEnd = analyzer.analyzeEnvironment(false);
+        	if (isEnd)
+        		return false;
+        	else
+        		return true;
         } else if (action.getFunctor().equals("move")) {
         	move(action);
         	return true;
@@ -135,6 +143,7 @@ public class GameEnv extends Environment {
 			}
     	}
     }
+    
     private void markDone(Structure action) {
     	GameMap.removeActiveBase();
     	GameMap.allowActions(GameMap.getActiveBases(), this);
@@ -150,9 +159,13 @@ public class GameEnv extends Environment {
     		}
     		GameMap.ROUND++;
     		GameMap.reinitActiveBases();
-    		boolean isEnd = analyzer.analyzeEnvironment();
-    		if (!isEnd && GameMap.getBaseList().getFirst().getOwner() != GameSettings.PLAYER)
-    			GameMap.allowActions(GameMap.getActiveBases(), this);
+    		isEnd = analyzer.analyzeEnvironment(true);
+    		if (!isEnd) { //if there is no real player play new round
+    			if (GameMap.getBaseList().getFirst().getOwner() != GameSettings.PLAYER)
+    				GameMap.allowActions(GameMap.getActiveBases(), this);
+    			else
+    				analyzer.seizeKnowledge(GameMap.getBaseList().getFirst());
+    		}
     	}
     }
     

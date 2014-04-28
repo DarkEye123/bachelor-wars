@@ -36,12 +36,9 @@ public class GameMap extends JPanel {
 	public static final float HEIGHT_MULTIPLIER = 0.7f ;
 	
 	GameView view;
-	private PopupMenu menu;
 	private Unit cunit = null;
 	private Base playerBase;
 
-	//protected GridCanvas drawArea;
-	
 	protected int cellSizeW = 0;
 	protected int cellSizeH = 0;
 	
@@ -71,9 +68,6 @@ public class GameMap extends JPanel {
 		mouseListener = new MapMouseInputAdapter();
 		initBases();
 		generateKnowledgeResources(settings.getNumKnowledgeResources());
-		menu = new PopupMenu();
-		menu.add(new MenuItem("Test"));
-		this.add(menu);
 		this.addMouseListener(mouseListener);
 	}
 	
@@ -159,7 +153,7 @@ public class GameMap extends JPanel {
 					}
 				}
 			}
-			System.out.println("Base: " + base + " enemies: " + base.getEnemies() + " allies: " + base.getAllies());
+//			System.out.println("Base: " + base + " enemies: " + base.getEnemies() + " allies: " + base.getAllies());
 		}
 	}
 
@@ -354,7 +348,10 @@ public class GameMap extends JPanel {
     
     public void drawPossibleMovement(Unit unit) {
     	cunit = unit;
-    	drawPossibleMovement(unit.getLocation(), unit.getMov());
+//    	if (unit.getOwner() != GameSettings.PLAYER)
+    		drawPossibleMovement(unit.getLocation(), unit.getMov());
+//    	else
+//    		drawPossibleMovement(unit.getOldLocation(), unit.getMov());
     }
     
     public void paint(Graphics g) {
@@ -387,6 +384,11 @@ public class GameMap extends JPanel {
 	        }
 	        for (Unit unit:unitList) {
 	        	unit.draw(this.getGraphics(), cellSizeW, cellSizeH);
+	        }
+	        for (Base base:baseList) {
+	        	for (Unit unit:base.getUsableUnits()) {
+		        	unit.drawUsableSign(this.getGraphics());
+		        }
 	        }
         }
     }
@@ -454,7 +456,7 @@ public class GameMap extends JPanel {
 				if (e.getButton() == MouseEvent.BUTTON1) { 
 					canDebugPath(false, e);
 					
-					if (movementLocations.isEmpty()) {
+					if (movementLocations.isEmpty() && atkLocations.isEmpty()) {
 						for (Base base:baseList) {
 							if ( base.wasSelected( e.getX(),  e.getY()) ) {
 								cbase = base;
@@ -475,6 +477,7 @@ public class GameMap extends JPanel {
 							if (cunit.canMove())
 								drawPossibleMovement(cunit);
 							drawBasicAtkRange(cunit.getLocation(), cunit.getBasicAtkRange());
+//							drawBasicAtkRange(cunit.getOldLocation(), cunit.getBasicAtkRange());
 						} else {
 							cunit = null;
 						}
@@ -482,26 +485,21 @@ public class GameMap extends JPanel {
 						Location loc = new Location(e.getX() / cellSizeW, e.getY() / cellSizeH); //get a cell where mouse clicked
 						if (movementLocations.contains(loc)) {
 							cunit.setLocation(loc);
-							movementLocations.clear();
-							atkLocations.clear();
-							cunit.setCanMove(false);
+							cunit.setCanMove(false); //TODO this add to the unit panel on the right (buttons done back)
+							clearMovement();
 						} else {
 							movementLocations.clear();
 							if (atkLocations.contains(loc)) {
 								Unit u = Node.getNode(loc.x, loc.y).getUnit();
-								if (u.getOwner() != cunit.getOwner()) {
+								if ( u != null && u.getOwner() != cunit.getOwner()) {
 									Node.getNode(loc.x, loc.y).getUnit().addDamage(cunit.getAtk());
 									playerBase.getUsableUnits().remove(cunit);
 								}
 							}
+							clearMovement();
 						}
-						atkLocations.clear();
-						cunit = null;
 						e.getComponent().getParent().repaint(); //view
 					}
-				}
-				if (e.getButton() == MouseEvent.BUTTON3) {
-					menu.show(e.getComponent(), e.getX(),  e.getY());
 				}
 			}
 		}

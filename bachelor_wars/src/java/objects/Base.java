@@ -20,7 +20,7 @@ public class Base extends GameObject implements Clickable{
 	
 	@Override
 	public String toString() {
-		return Integer.toString(getOwner());
+		return "[ " + getOwner() + ", " + getX() + ", " + getY() + "]";
 	}
 
 	public final static int DEFAULT_SLOT_SIZE = 6;
@@ -34,6 +34,7 @@ public class Base extends GameObject implements Clickable{
 	private LinkedList<Knowledge> knowledgeList = new LinkedList<Knowledge>();
 	private LinkedList<Base> allies = new LinkedList<>();
 	private LinkedList<Base> enemies = new LinkedList<>();
+	private LinkedList<Node> baseNodes;
 	
 	
 	protected int freeSlots = DEFAULT_SLOT_SIZE; //number of free slots to create new units
@@ -42,7 +43,7 @@ public class Base extends GameObject implements Clickable{
 	protected int knowledge = DEFAULT_KNOWLEDGE; //this represents how many "money" player has. 
 	protected int mapWidth, mapHeight; //set number of cells in a row and column
 	protected String agent;
-	
+	public int STATE = GameMap.ROUND;
 	
 	/**
 	 * Constructor of Base
@@ -52,6 +53,7 @@ public class Base extends GameObject implements Clickable{
 	 */
 	public Base(Location location, Dimension baseSize, Dimension cellSize) {
 		super(location, baseSize, cellSize);
+		baseNodes = baseNodes();
 	}
 	
 	public int getFreeSlots() {
@@ -154,11 +156,15 @@ public class Base extends GameObject implements Clickable{
 	}
 
 	public LinkedList<Knowledge> getKnowledgeList() {
-		return knowledgeList;
+		synchronized (countLock) {
+			return knowledgeList;
+		}
 	}
 
 	public void setKnowledgeList(LinkedList<Knowledge> knowledgeList) {
-		this.knowledgeList = knowledgeList;
+		synchronized (countLock) {
+			this.knowledgeList = knowledgeList;
+		}
 	}
 	
 	/**
@@ -206,7 +212,9 @@ public class Base extends GameObject implements Clickable{
 	}
 
 	public LinkedList<Unit> getUsableUnits() {
-		return usableUnits;
+		synchronized (countLock) {
+			return usableUnits;
+		}
 	}
 
 	public void reInit() {
@@ -258,13 +266,23 @@ public class Base extends GameObject implements Clickable{
 		return Node.getNode(x, y);
 	}
 	
+	private LinkedList<Node> baseNodes() {
+		LinkedList<Node> nodes = new LinkedList<>();
+		for (int x = this.x; x < this.x + width; ++x) 
+			for (int y = this.y; y < this.y + height; ++y) 
+				nodes.add(Node.getNode(x, y));
+		return nodes;
+	}
+	
 	public boolean isSeized() {
-		Node node = null;
-		for (int x = this.x; x < this.x + width; ++x) {
-			for (int y = this.y; y < this.y + height; ++y) {
-				node = Node.getNode(x, y);
-				if (node.containUnit() && !node.getUnit().base.equals(this))
+		for (Node node:baseNodes) {
+			if (node.containUnit() && !node.getUnit().base.equals(this)) { //there is enemy unit and it is the same unit
+				if (STATE == GameMap.ROUND - 1) //
 					return true;
+				else {
+					STATE = GameMap.ROUND;
+					return false;
+				}
 			}
 		}
 		return false;
@@ -276,5 +294,9 @@ public class Base extends GameObject implements Clickable{
 
 	public void setEnemies(LinkedList<Base> enemies) {
 		this.enemies = enemies;
+	}
+
+	public LinkedList<Node> getBaseNodes() {
+		return baseNodes;
 	}
 }
