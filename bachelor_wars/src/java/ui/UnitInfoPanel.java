@@ -54,7 +54,7 @@ public class UnitInfoPanel extends JPanel {
 			}
 		}
 		
-		buttonMouseInputAdapter = new ButtonMouseInputAdapter();
+		buttonMouseInputAdapter = new ButtonMouseInputAdapter(this);
 		addButton = new JButton("buy unit");
 		addButton.setName(addButton.getText());
 		addButton.addMouseListener(buttonMouseInputAdapter);
@@ -112,8 +112,8 @@ public class UnitInfoPanel extends JPanel {
 		constraints.gridy = 5;
 		this.add(cost, constraints);
 		
-		if (unit.getOwner() == GameSettings.PLAYER) {
-			buttonMouseInputAdapter = new ButtonMouseInputAdapter();
+		if (unit.getOwner() == GameSettings.PLAYER && unit.base.getUsableUnits().contains(unit)) {
+			buttonMouseInputAdapter = new ButtonMouseInputAdapter(this);
 			doneButton = new JButton("done");
 			doneButton.setName(doneButton.getText());
 			doneButton.addMouseListener(buttonMouseInputAdapter);
@@ -144,6 +144,11 @@ public class UnitInfoPanel extends JPanel {
 			boolean containUnit = player.getNode().containUnit();
 			addButton.setEnabled(isMapEnabled & hasFreeSlot & canBuy && !containUnit);
 		}
+		if (doneButton != null && cancelButton != null) {
+			boolean isEnabled = (unit.getOwner() == GameSettings.PLAYER && unit.base.getUsableUnits().contains(unit));
+			doneButton.setEnabled(isEnabled);
+			cancelButton.setEnabled(isEnabled);
+		}
 	}
 
 	class ButtonMouseInputAdapter extends MouseInputAdapter {
@@ -151,7 +156,12 @@ public class UnitInfoPanel extends JPanel {
 	    SimpleDateFormat ft = new SimpleDateFormat ("hh:mm:ss");
 	    String text;
 	    int type;
+	    UnitInfoPanel unitInfoPanel;
 	    
+		public ButtonMouseInputAdapter(UnitInfoPanel unitInfoPanel) {
+			this.unitInfoPanel = unitInfoPanel;
+		}
+
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			Base playerBase = controlPanel.view.getGameMap().getPlayerBase();
@@ -172,6 +182,7 @@ public class UnitInfoPanel extends JPanel {
 					unit.base.getUsableUnits().remove(unit);
 					controlPanel.view.repaint();
 					controlPanel.view.getGameMap().repaint();
+					unitInfoPanel.repaint();
 					
 				} else if (name.equals("cancel")) {
 					unit.setLocation(unit.getOldLocation());

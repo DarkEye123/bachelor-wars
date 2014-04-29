@@ -139,7 +139,12 @@ public class EnvAnalyzer {
 			for (Base enemy:seizedBase.getEnemies()) {
 				enemy.getEnemies().remove(seizedBase);
 			}
+			
 			GameMap.getUnitList().removeAll(seizedBase.getUnitList());
+			for (Unit u: GameMap.getUnitList()) {
+				u.getIntentions().remove(seizedBase);
+			}
+			
 			for (Knowledge k:seizedBase.getKnowledgeList())
 				k.setBase(null);
 		}

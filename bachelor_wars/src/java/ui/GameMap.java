@@ -503,25 +503,27 @@ public class GameMap extends JPanel {
 					} else {
 						if (cunit != null) {
 							Location loc = new Location(e.getX() / cellSizeW, e.getY() / cellSizeH); //get a cell where mouse clicked
-							if (movementLocations.contains(loc) && !cunit.getLocation().equals(loc)) {
-								cunit.setLocation(loc);
-								atkLocations.clear();
+							if (movementLocations.contains(loc)) {
+								if (!cunit.getLocation().equals(loc)) {
+									cunit.setLocation(loc);
+									atkLocations.clear();
+									map.view.repaint();
+								}
+							} else if (atkLocations.contains(loc)) {
+								movementLocations.clear();
+								Unit u = Node.getNode(loc.x, loc.y).getUnit();
+								if ( u != null && !u.isFriendly(cunit.base)) {
+									Node.getNode(loc.x, loc.y).getUnit().addDamage(cunit.getAtk());
+									playerBase.getUsableUnits().remove(cunit);
+								}
+								clearMovement();
 								map.view.repaint();
-	//							map.repaint();
-	//							cunit.setCanMove(false); //TODO this add to the unit panel on the right (buttons done back)
-	//							clearMovement();
-	//							drawMovementGrid(movementLocations);
+								map.repaint();
 							} else {
-	//							movementLocations.clear();
-	//							if (atkLocations.contains(loc)) {
-	//								Unit u = Node.getNode(loc.x, loc.y).getUnit();
-	//								if ( u != null && u.getOwner() != cunit.getOwner()) {
-	//									Node.getNode(loc.x, loc.y).getUnit().addDamage(cunit.getAtk());
-	//									playerBase.getUsableUnits().remove(cunit);
-	//								}
-	//							}
-	//							clearMovement();
-	//							e.getComponent().getParent().repaint(); //view
+								cunit.setLocation(cunit.getOldLocation());
+								clearMovement();
+								map.view.repaint();
+								map.repaint();
 							}
 						}
 					}

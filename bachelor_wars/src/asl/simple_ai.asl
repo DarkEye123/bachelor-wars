@@ -210,6 +210,7 @@ getTypeOfIntention(Intention, Type) :-
 	& .print("Unit: ", UnitID, " to free enemy: ", Enemy, " adding intention")
 	<-	!getID(Enemy,TargetObject);
 		jason.addIntention(UnitID, TargetObject, 1, "enemy");
+		!addEnemyBases(UnitID);
 		!getClass(Unit,Class);
 		!addClassBasedIntention(UnitID, Class, "enemy");
 		!moveUnit(Unit).
@@ -220,8 +221,10 @@ getTypeOfIntention(Intention, Type) :-
 	<-	!getPostion(Enemy,Place);
 		!getID(Enemy,TargetObject);
 		jason.addIntention(UnitID, TargetObject, 1, "enemy");
-		move(UnitID, Place); //move unit in that direction
-		do_intention_if_possible(UnitID, TargetObject).
+		!addEnemyBases(UnitID);
+		!moveUnit(Unit).
+//		move(UnitID, Place); //move unit in that direction
+//		do_intention_if_possible(UnitID, TargetObject).
 //##################################################################################################################################################################
 //===================================================================================================================================================================
 

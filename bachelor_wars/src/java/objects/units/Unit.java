@@ -49,7 +49,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	public static final Dimension DEFAULT_UNIT_SIZE = new Dimension(1,1); //size on grid (x,y)
 	private static final int ARC_W = 12, ARC_H = 12;
 	
-	private static int _id_; //identifier of a unit
+	private static int _id_ = 1000; //identifier of a unit
 	private static final Object countLock = new Object();
 
 	/*
@@ -162,6 +162,14 @@ public abstract class Unit extends GameObject implements Clickable {
 	
 	public boolean isDead() {
 		return hp == 0;
+	}
+	
+	public boolean isFriendly(Base base) {
+		if (base.equals(this.base))
+			return true;
+		if (this.base.getAllies().contains(base))
+			return true;
+		return false;
 	}
 
 	public int getMaxHp() {

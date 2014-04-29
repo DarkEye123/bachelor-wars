@@ -276,7 +276,7 @@ public class Base extends GameObject implements Clickable{
 	
 	public boolean isSeized() {
 		for (Node node:baseNodes) {
-			if (node.containUnit() && !node.getUnit().base.equals(this)) { //there is enemy unit and it is the same unit
+			if (node.containUnit() && !node.getUnit().isFriendly(this)) { //there is enemy unit and it is the same unit
 				if (STATE == GameMap.ROUND - 1) //
 					return true;
 				else {

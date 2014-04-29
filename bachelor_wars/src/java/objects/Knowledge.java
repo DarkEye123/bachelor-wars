@@ -18,7 +18,7 @@ public class Knowledge extends GameObject {
 	private BufferedImage image;
 	private static int kPerR = 5;
 	private Base base;
-	private static int _id_; //identifier of a unit
+	private static int _id_ = 100; //identifier of a unit
 	protected int id;
 	public int STATE = GameMap.ROUND;
 
