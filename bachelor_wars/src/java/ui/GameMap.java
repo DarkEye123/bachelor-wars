@@ -6,8 +6,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
+import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +20,7 @@ import java.util.Random;
 import java.util.Set;
 
 import javax.swing.JPanel;
+import javax.swing.Timer;
 import javax.swing.event.MouseInputAdapter;
 
 import mapping.GameSettings;
@@ -28,7 +33,7 @@ import objects.units.Unit;
 import env.GameEnv;
 
 
-public class GameMap extends JPanel {
+public class GameMap extends JPanel implements ActionListener{
 
 	private static final long serialVersionUID = 6282676586123792528L;
 	public static final int BASE_DEFAULT_SIZE = 2;
@@ -54,6 +59,10 @@ public class GameMap extends JPanel {
 	
 	public static Font defaultFont = new Font("Arial", Font.BOLD, 10);
 	protected GameSettings settings;
+	public Graphics2D g2;
+	private boolean canPrintWinner = false;
+	private String winner;
+	private boolean canManipulate = true;
 	public static int ROUND = 1;
 	
 	public GameMap(GameView gameView) {
@@ -67,6 +76,7 @@ public class GameMap extends JPanel {
 		initBases();
 		generateKnowledgeResources(settings.getNumKnowledgeResources());
 		this.addMouseListener(mouseListener);
+		new Timer(100, this).start();
 	}
 	
 	private void generateKnowledgeResources(int numKnowledgeResources) {
@@ -356,57 +366,48 @@ public class GameMap extends JPanel {
     	drawPossibleMovement(unit.getLocation(), unit.getMov());
     }
     
-    public void paint(Graphics g) {
-//    	g.setColor(Color.white);
-//    	super.paint(g);
-//    	System.out.println("PAINT");
-    	int mwidth = settings.getMapColumns();
-    	int mheight = settings.getMapRows();
-        cellSizeW = this.getWidth() / mwidth;
-        cellSizeH = this.getHeight() / mheight;
-        drawMovementGrid(movementLocations, g);
-        for (Base base:baseList) {
-        	base.draw(g, cellSizeW, cellSizeH);
-        }
-        for (Knowledge knowledge:knowledgeList) {
-        	knowledge.draw(g, cellSizeW, cellSizeH);
-        }
-        synchronized (countLock) {
-	        for (Unit unit:unitList) {
-	        	unit.draw(g, cellSizeW, cellSizeH);
-	        };
-        }
-        if (cunit != null)
-        	drawBasicAtkRange(cunit.getLocation(), cunit.getBasicAtkRange(), g);
+    @Override
+    public void paintComponent(Graphics g) {
+    	super.paintComponent(g);
+    	if (view != null) {
+//	    	setBackground(Color.white);
+	    	g2 = (Graphics2D) g;
+	        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+	        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+	//        super.repaint();
+//	    	System.out.println("PAINT");
+	    	int mwidth = settings.getMapColumns();
+	    	int mheight = settings.getMapRows();
+	        cellSizeW = this.getWidth() / mwidth;
+	        cellSizeH = this.getHeight() / mheight;
+	        synchronized (countLock) {
+		        drawMovementGrid(movementLocations, g2);
+		        for (Base base:baseList) {
+		        	base.draw(g2, cellSizeW, cellSizeH);
+		        }
+		        for (Knowledge knowledge:knowledgeList) {
+		        	knowledge.draw(g2, cellSizeW, cellSizeH);
+		        }
+		       
+		        for (Unit unit:unitList) {
+		        	unit.draw(g2, cellSizeW, cellSizeH);
+		        };
+	
+		        for (Base base:baseList) {
+		        	for (Unit unit:base.getUsableUnits()) {
+			        	unit.drawUsableSign(g2);
+			        }
+		        }
+		        if (cunit != null)
+		        	drawBasicAtkRange(cunit.getLocation(), cunit.getBasicAtkRange(), g2);
+		        
+		        if (canPrintWinner)
+		        	printWinner();
+	        }
+    	}
     }
     
-    public void repaint() {
-//    	super.repaint();
-//    	System.out.println("REPAINT");
-        if (view != null) {
-	    	cellSizeW = this.getWidth() / settings.getMapColumns();
-	        cellSizeH = this.getHeight() / settings.getMapRows();
-	        drawMovementGrid(movementLocations, getGraphics());
-	        for (Base base:baseList) {
-	        	base.draw(this.getGraphics(), cellSizeW, cellSizeH);
-	        }
-	        for (Knowledge knowledge:knowledgeList) {
-	        	knowledge.draw(this.getGraphics(), cellSizeW, cellSizeH);
-	        }
-	        for (Unit unit:unitList) {
-	        	unit.draw(this.getGraphics(), cellSizeW, cellSizeH);
-	        }
-	        for (Base base:baseList) {
-	        	for (Unit unit:base.getUsableUnits()) {
-		        	unit.drawUsableSign(this.getGraphics());
-		        }
-	        }
-	        if (cunit != null)
-	        	drawBasicAtkRange(cunit.getLocation(), cunit.getBasicAtkRange(), this.getGraphics());
-        }
-    }
-
-
 	public static LinkedList<Unit> getUnitList() {
 		synchronized (countLock) {
 			return unitList;
@@ -469,7 +470,7 @@ public class GameMap extends JPanel {
 		}
 		
 		public void mouseClicked(MouseEvent e) {
-			if (isEnabled()) {
+			if (canManipulate()) {
 				if (e.getButton() == MouseEvent.BUTTON1) { 
 					canDebugPath(false, e);
 					
@@ -493,7 +494,7 @@ public class GameMap extends JPanel {
 						if (cunit != null) {
 							if (playerBase.getUsableUnits().contains(cunit)) {
 								drawPossibleMovement(cunit);
-								drawBasicAtkRange(cunit.getLocation(), cunit.getBasicAtkRange(), map.getGraphics());
+								drawBasicAtkRange(cunit.getLocation(), cunit.getBasicAtkRange(), g2);
 							}
 							else {
 								cunit.setLocation(cunit.getOldLocation());
@@ -578,12 +579,17 @@ public class GameMap extends JPanel {
 	}
 
 	public void printWinner(String winner) {
-		Graphics g = this.getGraphics();
+//		Graphics g = this.getGraphics();
+		this.winner = winner;
+		this.canPrintWinner = true;
+	}
+	
+	private void printWinner() {
 		Font defaultFont = new Font("Arial", Font.BOLD, 32);
-		g.setColor(Color.MAGENTA);
-		g.setFont(defaultFont);
+		g2.setColor(Color.MAGENTA);
+		g2.setFont(defaultFont);
 		String pom = "Winner: " + winner;
-		g.drawString(pom, this.getWidth()/2 - ((defaultFont.getSize()*pom.length())/3), this.getHeight()/2);
+		g2.drawString(pom, this.getWidth()/2 - ((defaultFont.getSize()*pom.length())/3), this.getHeight()/2);
 	}
 
 	public Base getPlayerBase() {
@@ -592,5 +598,18 @@ public class GameMap extends JPanel {
 
 	public LinkedList<Location> getAtkLocations() {
 		return atkLocations;
+	}
+
+	public void setCanManipulate(boolean enabled) {
+		this.canManipulate = enabled;
+	}
+
+	public boolean canManipulate() {
+		return canManipulate;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		repaint();
 	}
 }

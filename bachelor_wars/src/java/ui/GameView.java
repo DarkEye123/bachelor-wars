@@ -86,11 +86,11 @@ public class GameView extends JPanel {
 		env.setAnalyzer(new EnvAnalyzer(env, settings));
 	}
 	
-	public void repaint() {
-		super.repaint();
-		if (gameMap != null)
-			gameMap.repaint();
-	}
+//	public void repaint() {
+//		super.repaint();
+//		if (gameMap != null)
+//			gameMap.repaint();
+//	}
 	
 	public ControlMenu createControlMenu(GridBagConstraints constraints) {
 		ControlMenu controlMenu = new ControlMenu(this);
@@ -108,6 +108,9 @@ public class GameView extends JPanel {
 		setComponentSize(size, gameMap);
 		this.add(gameMap, constraints);
 		gameMap.init();
+		gameMap.setBackground(Color.white);
+		gameMap.setOpaque(true);
+		gameMap.repaint();
 		return gameMap;
 	}
 	

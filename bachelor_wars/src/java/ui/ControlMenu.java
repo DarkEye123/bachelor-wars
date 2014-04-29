@@ -69,7 +69,7 @@ public class ControlMenu extends JPanel implements ActionListener{
 	public void repaint() {
 		super.repaint();
 		if (buttonEndRound != null)
-			buttonEndRound.setEnabled(view.getGameMap().isEnabled());
+			buttonEndRound.setEnabled(view.getGameMap().canManipulate());
 		if (canRepaint) {
 			Date dNow = new Date( );
 		    SimpleDateFormat ft = new SimpleDateFormat ("hh:mm:ss");
@@ -102,7 +102,7 @@ public class ControlMenu extends JPanel implements ActionListener{
 		
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			view.getGameMap().setEnabled(false);
+			view.getGameMap().setCanManipulate(false);
 			GameMap.allowActions(GameMap.getActiveBases(), view.env);
 		}
 		

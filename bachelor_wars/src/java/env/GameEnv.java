@@ -140,7 +140,7 @@ public class GameEnv extends Environment {
     	GameMap.allowActions(GameMap.getActiveBases(), this);
 //    	if (marker == view.getSettings().getNumPlayers() -1 ) { //-1 cos we have a living player too 
     	if (GameMap.getActiveBases().isEmpty()) {
-    		view.getGameMap().setEnabled(true);
+    		view.getGameMap().setCanManipulate(true);
 			for (Base base:GameMap.getBaseList()) {
     			int sum = view.getSettings().getIncomePerRound();
     			for (Knowledge knowledge:base.getKnowledgeList())

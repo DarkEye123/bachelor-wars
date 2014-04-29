@@ -90,7 +90,7 @@ public class EnvAnalyzer {
 			seizeKnowledge(GameMap.getActiveBases().getFirst());
 			deleteSeizedBases(getSeizedBases());
 			if (GameMap.getBaseList().size() == 1) { // there is only one left, so it is winner
-				environment.view.getGameMap().setEnabled(false);
+				environment.view.getGameMap().setCanManipulate(false);
 				winner = GameMap.getBaseList().getFirst().getName();
 				environment.view.getGameMap().printWinner(winner);
 				return true;
@@ -99,7 +99,7 @@ public class EnvAnalyzer {
 		else {
 			if (settings.getMode() == GameSettings.DOMINATION) {
 					if (conditionCounter == GameSettings.DOMINATION_WIN_ROUNDS) {
-						environment.view.getGameMap().setEnabled(false);
+						environment.view.getGameMap().setCanManipulate(false);
 						winner = findDominantBase().getName();
 						environment.view.getGameMap().printWinner(winner);
 						return true;
@@ -112,7 +112,7 @@ public class EnvAnalyzer {
 						}
 					}
 				if(settings.getMaxRounds() != GameSettings.INFINITE && GameMap.ROUND >= settings.getMaxRounds()) { //we are at limit of rounds
-					environment.view.getGameMap().setEnabled(false);
+					environment.view.getGameMap().setCanManipulate(false);
 					winner = findDominantBase().getName();
 					environment.view.getGameMap().printWinner(winner);
 					return true;
@@ -123,33 +123,37 @@ public class EnvAnalyzer {
 	}
 	
 	public void seizeKnowledge(Base activeBase) {
-    	for (Knowledge k:GameMap.getKnowledgeList()) {
-    		for (Unit u:activeBase.getUnitList()) {
-    			if (k.getNode().equals(u.getNode()) && k.STATE < GameMap.ROUND) //seized last round
-    				k.setBase(activeBase);
-    		}
-    	}
+		synchronized (GameMap.countLock) {
+	    	for (Knowledge k:GameMap.getKnowledgeList()) {
+	    		for (Unit u:activeBase.getUnitList()) {
+	    			if (k.getNode().equals(u.getNode()) && k.STATE < GameMap.ROUND) //seized last round
+	    				k.setBase(activeBase);
+	    		}
+	    	}
+		}
 	}
 
 	private void deleteSeizedBases(LinkedList<Base> seizedBases) {
-		for (Base seizedBase:seizedBases) {
-			for (Base ally:seizedBase.getAllies()) {
-				ally.getAllies().remove(seizedBase);
+		synchronized (GameMap.countLock) {
+			for (Base seizedBase:seizedBases) {
+				for (Base ally:seizedBase.getAllies()) {
+					ally.getAllies().remove(seizedBase);
+				}
+				for (Base enemy:seizedBase.getEnemies()) {
+					enemy.getEnemies().remove(seizedBase);
+				}
+				
+				GameMap.getUnitList().removeAll(seizedBase.getUnitList());
+				for (Unit u: GameMap.getUnitList()) {
+					u.getIntentions().remove(seizedBase);
+				}
+				
+				for (Knowledge k:seizedBase.getKnowledgeList())
+					k.setBase(null);
 			}
-			for (Base enemy:seizedBase.getEnemies()) {
-				enemy.getEnemies().remove(seizedBase);
-			}
-			
-			GameMap.getUnitList().removeAll(seizedBase.getUnitList());
-			for (Unit u: GameMap.getUnitList()) {
-				u.getIntentions().remove(seizedBase);
-			}
-			
-			for (Knowledge k:seizedBase.getKnowledgeList())
-				k.setBase(null);
+			GameMap.getBaseList().removeAll(seizedBases);
+			GameMap.getActiveBases().removeAll(seizedBases);
 		}
-		GameMap.getBaseList().removeAll(seizedBases);
-		GameMap.getActiveBases().removeAll(seizedBases);
 	}
 	
 }

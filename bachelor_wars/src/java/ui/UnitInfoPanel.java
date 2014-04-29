@@ -140,7 +140,7 @@ public class UnitInfoPanel extends JPanel {
 			Base player = controlPanel.view.getGameMap().getPlayerBase();
 			boolean canBuy = unit.getCost() <= player.getKnowledge();
 			boolean hasFreeSlot = player.getFreeSlots() > 0;
-			boolean isMapEnabled = controlPanel.view.getGameMap().isEnabled();
+			boolean isMapEnabled = controlPanel.view.getGameMap().canManipulate();
 			boolean containUnit = player.getNode().containUnit();
 			addButton.setEnabled(isMapEnabled & hasFreeSlot & canBuy && !containUnit);
 		}
@@ -165,7 +165,7 @@ public class UnitInfoPanel extends JPanel {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			Base playerBase = controlPanel.view.getGameMap().getPlayerBase();
-			boolean isMapEnabled = controlPanel.view.getGameMap().isEnabled();
+			boolean isMapEnabled = controlPanel.view.getGameMap().canManipulate();
 			if (isMapEnabled) {
 				String name = e.getComponent().getName();
 				if (name.equals("buy unit")) {

@@ -329,11 +329,11 @@ public abstract class Unit extends GameObject implements Clickable {
 		this.canFillMovement = canFillMovement;
 	}
 
-	public void drawUsableSign(Graphics graphics) {
+	public void drawUsableSign(Graphics g) {
 		int nx = x * cellSizeW;
 		int ny = y * cellSizeH;
-		graphics.setColor(Color.black);
-		graphics.fillOval(nx, ny, cellSizeW / 5, cellSizeH / 5);
+		g.setColor(Color.black);
+		g.fillOval(nx, ny, cellSizeW / 5, cellSizeH / 5);
 	}
 
 	public Location getOldLocation() {
