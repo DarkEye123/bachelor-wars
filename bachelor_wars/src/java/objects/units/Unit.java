@@ -50,7 +50,6 @@ public abstract class Unit extends GameObject implements Clickable {
 	private static final int ARC_W = 12, ARC_H = 12;
 	
 	private static int _id_ = 1000; //identifier of a unit
-	private static final Object countLock = new Object();
 
 	/*
 	 * --------------------------------------------------------Stats------------------------------------------------------------------------------------
@@ -63,9 +62,6 @@ public abstract class Unit extends GameObject implements Clickable {
 	protected int mov;
 	protected int cost;
 	protected int atk;
-	protected int sp;
-	protected int maxSp;//TODO if will powers will be used, add this to UnitInfoPanel
-	protected int uClass; //Healer, Damage, Support, Defense
 	public Base base; //it's like owner from GameObject but due to some dependencies is better set a base on it's own too
 	private boolean canFillMovement = true;
 	private Location oldLocation;
@@ -192,14 +188,6 @@ public abstract class Unit extends GameObject implements Clickable {
 		return null;
 	}
 
-	public int getSp() {
-		return sp;
-	}
-
-	public void setSp(int sp) {
-		this.sp = sp;
-	}
-
 	public int getBasicAtkRange() {
 		return basicAtkRange;
 	}
@@ -213,13 +201,13 @@ public abstract class Unit extends GameObject implements Clickable {
 	}
 	
 	public void addIntention(GameObject key, Intention value) {
-		synchronized (countLock) {
+		synchronized (GameMap.countLock) {
 			intentions.put(key, value);
 		}
 	}
 	
 	public HashMap<GameObject, Intention> getIntentions() {
-		synchronized (countLock) {
+		synchronized (GameMap.countLock) {
 			return intentions;
 		}
 	}
@@ -241,7 +229,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	 * @return true if unit has some intetion with given GameObject
 	 */
 	public boolean hasIntention(GameObject key) {
-		synchronized (countLock) {
+		synchronized (GameMap.countLock) {
 //			System.out.println("Looking for: " + key + " in: " + intentions );
 			if (intentions.get(key) != null)
 				return true;
@@ -289,14 +277,6 @@ public abstract class Unit extends GameObject implements Clickable {
 		}
 	}
 
-	public int getUnitClass() {
-		return uClass;
-	}
-
-	public void setUnitClass(int uClass) {
-		this.uClass = uClass;
-	}
-	
 	public GameObject searchIntentionTargetById(int id) {
 		for (GameObject o:getIntentions().keySet()) {
 			if (o.getId() == id)
@@ -317,8 +297,8 @@ public abstract class Unit extends GameObject implements Clickable {
 	//type, id, cost, hp, atk, mov, atkRange, sp, x, y, owner - later class
 	public String toString() {
 		return "[" + getType() + ", " + getId() + ", " + getCost() + ", " + getHp() + ", " +
-				getAtk() + ", " + getMov() + ", " + getBasicAtkRange() + ", " + getSp() + ", " + 
-				getX() + ", " + getY() + ", "  + getOwner() + ", "  + getUnitClass() +  "]";
+				getAtk() + ", " + getMov() + ", " + getBasicAtkRange() + ", " + 
+				getX() + ", " + getY() + ", "  + getOwner() +  "]";
 	}
 
 	public boolean canFillMovement() {

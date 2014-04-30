@@ -38,11 +38,9 @@ public class FirstYear extends Unit {
 		cost = COST;
 		atk = ATK;
 		hp = HP;
-		sp = SP;
 		mov = MOV;
 		name = NAME;
 		type = TYPE;
-		uClass = Unit.SUPPORTER;
 	}
 	
 	public static FirstYear getPrototype() {

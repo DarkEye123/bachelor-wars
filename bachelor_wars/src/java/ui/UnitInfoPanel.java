@@ -28,7 +28,7 @@ public class UnitInfoPanel extends JPanel {
 	private static final float PIC_WIDTH = 0.1f;
 	private static final float PIC_HEIGHT = 0.5f;
 	
-	JLabel name, cost, hp, moveRange, atk, sp;
+	JLabel name, cost, hp, moveRange, atk;
 	JButton addButton;
 	JButton cancelButton;
 	JButton doneButton;
@@ -63,7 +63,7 @@ public class UnitInfoPanel extends JPanel {
 		
 //		constraints.gridheight = GridBagConstraints.REMAINDER;
 		constraints.gridx = 0;
-		constraints.gridy = 6;
+		constraints.gridy = 5;
 		constraints.anchor = GridBagConstraints.CENTER;
 		constraints.gridwidth = 1;
 		this.add(addButton, constraints);
@@ -80,14 +80,12 @@ public class UnitInfoPanel extends JPanel {
 		
 		name = new JLabel(unit.getName());
 		hp = new JLabel("HP: " + unit.getHp());
-		sp = new JLabel("SP: " + unit.getSp());
 		atk = new JLabel("ATK: " + unit.getAtk());
 		moveRange = new JLabel("MOV: " + unit.getMov());
 		cost = new JLabel("COST: " + unit.getCost());
 		
 		name.setFont(new Font("VL Gothic", 0, 14));
 		hp.setFont(font);
-		sp.setFont(font);
 		atk.setFont(font);
 		moveRange.setFont(font);
 		cost.setFont(font);
@@ -104,12 +102,10 @@ public class UnitInfoPanel extends JPanel {
 		constraints.gridy = 1;
 		this.add(hp, constraints);
 		constraints.gridy = 2;
-		this.add(sp, constraints);
-		constraints.gridy = 3;
 		this.add(atk, constraints);
-		constraints.gridy = 4;
+		constraints.gridy = 3;
 		this.add(moveRange, constraints);
-		constraints.gridy = 5;
+		constraints.gridy = 4;
 		this.add(cost, constraints);
 		
 		if (unit.getOwner() == GameSettings.PLAYER && unit.base.getUsableUnits().contains(unit)) {
@@ -122,7 +118,7 @@ public class UnitInfoPanel extends JPanel {
 			cancelButton.addMouseListener(buttonMouseInputAdapter);
 			
 			constraints.gridx = 0;
-			constraints.gridy = 6;
+			constraints.gridy = 5;
 //			constraints.anchor = GridBagConstraints.CENTER;
 			constraints.gridwidth = 1;
 			this.add(cancelButton, constraints);

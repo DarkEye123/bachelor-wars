@@ -159,13 +159,13 @@ public class Base extends GameObject implements Clickable{
 	}
 
 	public LinkedList<Knowledge> getKnowledgeList() {
-		synchronized (countLock) {
+		synchronized (GameMap.countLock) {
 			return knowledgeList;
 		}
 	}
 
 	public void setKnowledgeList(LinkedList<Knowledge> knowledgeList) {
-		synchronized (countLock) {
+		synchronized (GameMap.countLock) {
 			this.knowledgeList = knowledgeList;
 		}
 	}
@@ -215,7 +215,7 @@ public class Base extends GameObject implements Clickable{
 	}
 
 	public LinkedList<Unit> getUsableUnits() {
-		synchronized (countLock) {
+		synchronized (GameMap.countLock) {
 			return usableUnits;
 		}
 	}

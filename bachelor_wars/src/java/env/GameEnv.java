@@ -30,7 +30,6 @@ public class GameEnv extends Environment {
 	
 	public static final String VERSION = "0.0.1";
 	private static final int TIME_TO_WAIT = 50; //800
-	private static final Object countLock = new Object();
 	public static final Literal CA = Literal.parseLiteral("can_act");
 	
     private Logger logger = Logger.getLogger("bachelor_wars."+GameEnv.class.getName());
@@ -107,7 +106,7 @@ public class GameEnv extends Environment {
     
     private void doInteractionIfPossible(Structure action) {
 //    	System.out.println("here");
-    	synchronized (countLock) {
+    	synchronized (GameMap.countLock) {
 	    	try {
 		    	int unitId = (int)(((NumberTerm)action.getTerm(0)).solve());
 				int gameObjectId = (int)(((NumberTerm)action.getTerm(1)).solve());

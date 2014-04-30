@@ -22,7 +22,6 @@ public abstract class GameObject implements Clickable{
 	protected int owner = UNKNOWN; //owner of GameObject .. it could be Player agent1 .. agentx - it doesn't indicate AI level, that is up to "type"
 	protected Location location;
 	protected String name; //Objects name - TODO generate some file with names and read it
-	protected static final Object countLock = new Object();
 	
 	public GameObject() {
 		

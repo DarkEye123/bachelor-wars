@@ -64,7 +64,7 @@ public class Knowledge extends GameObject {
 
 
 	public Base getBase() {
-		synchronized (countLock) {
+		synchronized (GameMap.countLock) {
 			return base;
 		}
 	}
@@ -72,7 +72,7 @@ public class Knowledge extends GameObject {
 
 
 	public void setBase(Base base) {
-		synchronized (countLock) {
+		synchronized (GameMap.countLock) {
 			if (this.base != null) 
 				this.base.getKnowledgeList().remove(this);
 			if (base != null)

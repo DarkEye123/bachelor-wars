@@ -121,9 +121,6 @@ public class getSortedIntentions extends DefaultInternalAction {
     	int counterSupport = 0;
     	LinkedList<SemanticIntention> sortedIntentions = new LinkedList<>();
     	
-    	if (unit.getUnitClass() != Unit.HEALER)
-    		counterHeal = Integer.MAX_VALUE;
-    	
     	while (counterSeize != Integer.MAX_VALUE || counterKill != Integer.MAX_VALUE || counterHeal != Integer.MAX_VALUE || counterSupport != Integer.MAX_VALUE) {
     		System.out.println(counterSeize + " " + counterKill + " " + counterHeal + " " + counterSupport);
     		for (Integer intention: list) {
@@ -132,9 +129,6 @@ public class getSortedIntentions extends DefaultInternalAction {
 	    		}
 	    		if (intention == Unit.KILL && counterKill != Integer.MAX_VALUE) {
 	    			counterKill = getNextIntention(wrapper, counterKill, intentions, intention, sortedIntentions);
-	    		}
-	    		if (intention == Unit.HEAL && unit.getUnitClass() == Unit.HEALER &&  counterHeal != Integer.MAX_VALUE) {
-	    			counterHeal = getNextIntention(wrapper, counterHeal, intentions, intention, sortedIntentions);
 	    		}
 	    		if (intention == Unit.SUPPORT && counterSupport != Integer.MAX_VALUE) {
 	    			counterSupport = getNextIntention(wrapper, counterSupport, intentions, intention, sortedIntentions);
