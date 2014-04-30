@@ -73,7 +73,7 @@ public class ControlMenu extends JPanel implements ActionListener{
 		}
 		else if (view.settings.getMode() == GameSettings.ANIHLIATION) {
 			value = new JLabel("killed: --");
-			roundsToWin = new JLabel("Rounds to win: " + 1 + "/" + maxRounds);
+			roundsToWin = new JLabel("Kills to win: " + 0 + "/" + maxRounds);
 		}
 		else {
 			value = new JLabel("survived: --");
@@ -144,11 +144,9 @@ public class ControlMenu extends JPanel implements ActionListener{
 				}
 				else if (view.settings.getMode() == GameSettings.ANIHLIATION) {
 					if (view.env.analyzer.winningBase == null)
-						value.setText("killed: --");
+						value.setText("killed: --/" + view.settings.getKillQuota());
 					else
-						value.setText("killed: " + view.env.analyzer.winningBase.getKilledEnemies());
-						
-					roundsToWin.setText("Rounds to win: " + view.env.analyzer.getConditionCounter() + "/" + maxRounds);
+						value.setText("killed: " + view.env.analyzer.winningBase.getKilledEnemies() + "/" + view.settings.getKillQuota());
 				}
 				else {
 					if (view.env.analyzer.winningBase == null)
@@ -159,7 +157,7 @@ public class ControlMenu extends JPanel implements ActionListener{
 				}
 		    }
 		    
-			round.setText("Round: " + GameMap.ROUND);
+			round.setText("Round: " + GameMap.ROUND + "/" + maxRounds);
 			time.setText("time: " + ft.format(dNow));
 		}
 	}

@@ -76,8 +76,10 @@ public class GameEnv extends Environment {
         	return true;
         } else if (action.getFunctor().equals("mark_start")) {
         	isEnd = analyzer.analyzeEnvironment();
-        	if (isEnd) 
+        	if (isEnd) {
+        		view.getGameMap().setLivingPlayer(false);
             	return false;
+        	}
         	else
         		return true;
         } else if (action.getFunctor().equals("move")) {

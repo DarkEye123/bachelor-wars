@@ -59,6 +59,7 @@ public class GameSettings {
 	private int mode;
 	private int treshold = INFINITE;
 	private HashMap<String, ArrayList<Integer>> teams;
+	private int killQuota;
 	
 	public GameSettings() {
 		setPlayers(new ArrayList<Integer>());
@@ -230,5 +231,9 @@ public class GameSettings {
 	
 	public HashMap<String, ArrayList<Integer>> getTeams() {
 		return teams;
+	}
+
+	public int getKillQuota() {
+		return killQuota;
 	}
 }

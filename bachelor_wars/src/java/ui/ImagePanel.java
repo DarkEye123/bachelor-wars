@@ -3,29 +3,29 @@ package ui;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
-public class ImagePanel extends JPanel {
+public class ImagePanel extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 6644886751888735917L;
 	
-	ImageIcon image;
+	Image image;
 	int width;
 	int height;
 	boolean canDraw = false;
 	
 	public ImagePanel(Image image, int width, int height) {
-		this.image = new ImageIcon(image);;
+		this.image = image;
 		this.width = width;
 		this.height = height;
 		GameView.setComponentSize(new Dimension(width, height), this);
-//		image.get
-		JLabel l = new JLabel(this.image);
-		GameView.setComponentSize(new Dimension(width, height), l);
-		this.add(l);
+		new Timer(100, this).start();
 	}
 	
 	public ImagePanel(Image image, float width, float height) {
@@ -37,11 +37,10 @@ public class ImagePanel extends JPanel {
 			g.drawRect(0, 0, width-2, height-2);
 		}
 	}
-
 	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
-		g.drawImage(image.getImage(), 0, 0, width, height, image.getImageObserver());
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		g.drawImage(image, 0, 0, width, height, null);
 		drawBounds(g, canDraw);
 	}
 
@@ -51,6 +50,11 @@ public class ImagePanel extends JPanel {
 
 	public void setCanDraw(boolean canDraw) {
 		this.canDraw = canDraw;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		repaint();
 	}
 	
 	
