@@ -35,6 +35,7 @@ public class Base extends GameObject implements Clickable{
 	private LinkedList<Base> allies = new LinkedList<>();
 	private LinkedList<Base> enemies = new LinkedList<>();
 	private LinkedList<Node> baseNodes;
+	private int killedEnemies = 0;
 	
 	
 	protected int freeSlots = DEFAULT_SLOT_SIZE; //number of free slots to create new units
@@ -43,7 +44,9 @@ public class Base extends GameObject implements Clickable{
 	protected int knowledge = DEFAULT_KNOWLEDGE; //this represents how many "money" player has. 
 	protected int mapWidth, mapHeight; //set number of cells in a row and column
 	protected String agent;
-	public int STATE = GameMap.ROUND;
+	private LinkedList<Base> seizingBases = new LinkedList<>();
+	private int basicIncome;
+	private int roundSurvived;
 	
 	/**
 	 * Constructor of Base
@@ -274,17 +277,29 @@ public class Base extends GameObject implements Clickable{
 		return nodes;
 	}
 	
-	public boolean isSeized() {
-		for (Node node:baseNodes) {
-			if (node.containUnit() && !node.getUnit().isFriendly(this)) { //there is enemy unit and it is the same unit
-				if (STATE == GameMap.ROUND - 1) //
+	/**
+	 * Checks if base is seized by enemy base or not
+	 * @param enemyBase - base to check if is seizing or not
+	 * @return true if this base is already seized, false if not
+	 */
+	public boolean isSeized(Base enemyBase) {
+		LinkedList<Unit> seizingUnits = new LinkedList<>();
+		for (Node node:baseNodes) { //check base nodes
+			if (node.containUnit() && !node.getUnit().isFriendly(this)) { //there is enemy unit
+				seizingUnits.add(node.getUnit());
+			}
+		}
+		for (Unit unit:seizingUnits) {
+			if (unit.base.equals(enemyBase)) { //and it is a unit of actual enemy base
+				if (seizingBases.contains(enemyBase)) //and if this enemy base was already seizing this base round before
 					return true;
 				else {
-					STATE = GameMap.ROUND;
+					seizingBases.add(enemyBase); //or add it to the seizing bases
 					return false;
 				}
 			}
 		}
+		seizingBases.remove(enemyBase); //at this point enemyBase could be at seizingBases but it doesn't contain any unit now, so it is not seizing, remove it
 		return false;
 	}
 
@@ -298,5 +313,39 @@ public class Base extends GameObject implements Clickable{
 
 	public LinkedList<Node> getBaseNodes() {
 		return baseNodes;
+	}
+
+	public int getKilledEnemies() {
+		return killedEnemies;
+	}
+	
+	public void addKilledEnemy() {
+		killedEnemies++;
+	}
+	
+	public void setBasicIncome(int income) {
+		basicIncome = income;
+	}
+	
+	/**
+	 * Compute income per round for given Base instance
+	 * @param base
+	 * @return - income of "knowledge" per round
+	 */
+	public int computeIncome() {
+		int sum = basicIncome;
+		
+		for (Knowledge knowledge:getKnowledgeList()) {
+			sum += knowledge.getKnowledgePerRound();
+		}
+		return sum;
+	}
+
+	public int getRoundsSurvived() {
+		return roundSurvived;
+	}
+	
+	public void addRoundSurvived() {
+		roundSurvived++;
 	}
 }

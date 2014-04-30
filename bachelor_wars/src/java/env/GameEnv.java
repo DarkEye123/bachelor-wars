@@ -29,17 +29,15 @@ import ui.menu.MainMenu;
 public class GameEnv extends Environment {
 	
 	public static final String VERSION = "0.0.1";
-	
 	private static final int TIME_TO_WAIT = 50; //800
 	private static final Object countLock = new Object();
-	
 	public static final Literal CA = Literal.parseLiteral("can_act");
 	
     private Logger logger = Logger.getLogger("bachelor_wars."+GameEnv.class.getName());
     
     GameView view;
 
-	public EnvAnalyzer analyzer;
+	public EnvAnalyzer analyzer; //initialized in GameView
 
 	private boolean isEnd;
 
@@ -78,9 +76,9 @@ public class GameEnv extends Environment {
         	markDone(action);
         	return true;
         } else if (action.getFunctor().equals("mark_start")) {
-        	isEnd = analyzer.analyzeEnvironment(false);
-        	if (isEnd)
-        		return false;
+        	isEnd = analyzer.analyzeEnvironment();
+        	if (isEnd) 
+            	return false;
         	else
         		return true;
         } else if (action.getFunctor().equals("move")) {
@@ -122,6 +120,8 @@ public class GameEnv extends Environment {
 				if (unit.getIntentions().get(target).intention == Unit.KILL) {
 					if (unit.getNode().distance(target.getNode()) <= unit.getBasicAtkRange()) { // unit is able to do damage TODO special attacks
 						((Unit)target).addDamage(unit.getAtk());
+						if (((Unit)target).isDead())
+							unit.base.addKilledEnemy();
 					}
 				}
 				else if (unit.getIntentions().get(target).intention == Unit.SEIZE) {
@@ -136,27 +136,22 @@ public class GameEnv extends Environment {
     }
     
     private void markDone(Structure action) {
-    	GameMap.removeActiveBase();
-    	GameMap.allowActions(GameMap.getActiveBases(), this);
-//    	if (marker == view.getSettings().getNumPlayers() -1 ) { //-1 cos we have a living player too 
-    	if (GameMap.getActiveBases().isEmpty()) {
-    		view.getGameMap().setCanManipulate(true);
-			for (Base base:GameMap.getBaseList()) {
-    			int sum = view.getSettings().getIncomePerRound();
-    			for (Knowledge knowledge:base.getKnowledgeList())
-    				sum += knowledge.getKnowledgePerRound();
-    			base.addKnowledge(sum);
-    			base.reInit();
-    		}
-    		GameMap.ROUND++;
-    		GameMap.reinitActiveBases();
-    		isEnd = analyzer.analyzeEnvironment(true);
-    		if (!isEnd) { //if there is no real player play new round
-    			if (GameMap.getBaseList().getFirst().getOwner() != GameSettings.PLAYER)
-    				GameMap.allowActions(GameMap.getActiveBases(), this);
-    			else
-    				analyzer.seizeKnowledge(GameMap.getBaseList().getFirst());
-    		}
+    	if (! GameMap.getBaseList().isEmpty()) { //game was not ended
+	    	GameMap.removeActiveBase();
+	    	GameMap.allowActions(GameMap.getActiveBases(), this);
+	//    	if (marker == view.getSettings().getNumPlayers() -1 ) { //-1 cos we have a living player too 
+	    	if (GameMap.getActiveBases().isEmpty()) {
+	    		view.getGameMap().setCanManipulate(true);
+				for (Base base:GameMap.getBaseList()) {
+	    			base.reInit();
+	    		}
+	    		GameMap.ROUND++;
+	    		GameMap.reinitActiveBases();
+	    		if (GameMap.getBaseList().getFirst().getOwner() != GameSettings.PLAYER) //if there is no real player play new round
+	    			GameMap.allowActions(GameMap.getActiveBases(), this);
+	    		else
+	    			analyzer.seizeKnowledge(GameMap.getBaseList().getFirst()); //player need to seize knowledge too
+	    	}
     	}
     }
     

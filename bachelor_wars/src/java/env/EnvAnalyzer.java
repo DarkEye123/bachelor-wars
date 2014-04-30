@@ -14,8 +14,9 @@ public class EnvAnalyzer {
 	protected GameSettings settings;
 	protected String winner;
 	private HashMap<Base, Integer> statistics = new HashMap<>();
-	private int conditionCounter;
+	private int conditionCounter = 1;
 	private int baseCounter;
+	public Base winningBase;
 	
 	public EnvAnalyzer(GameEnv environment, GameSettings settings) {
 		this.environment = environment;
@@ -48,17 +49,13 @@ public class EnvAnalyzer {
 		return null;
 	}
 	
-	private LinkedList<Base> getSeizedBases() {
+	private LinkedList<Base> getSeizedBases(Base activeBase) {
 		LinkedList<Base> toRemove = new LinkedList<>();
 		for (Base base:GameMap.getBaseList()) {
-			if (base.isSeized()) {
-				baseCounter = statistics.get(base) + 1;
-				statistics.put(base, baseCounter);
-				if (baseCounter >= GameSettings.BASE_SEIZE_ROUNDS) { //TODO
-					toRemove.add(base);
-				}
-			} else {
-				statistics.put(base, 0);
+			if (!base.equals(activeBase)) {
+				if (base.isSeized(activeBase)) { //TODO if more than 1 round for seizing will be needed, here will be need some hash<activeBase<targetBase,Integer>>
+						toRemove.add(base);
+				} 
 			}
 		}
 		return toRemove;
@@ -85,51 +82,62 @@ public class EnvAnalyzer {
 	 * 
 	 * @return true if there is winner
 	 */
-	public boolean analyzeEnvironment(boolean isRoundEnd) {
-		if (!isRoundEnd) {
+	public boolean analyzeEnvironment() {
 			seizeKnowledge(GameMap.getActiveBases().getFirst());
-			deleteSeizedBases(getSeizedBases());
+			deleteSeizedBases(getSeizedBases(GameMap.getActiveBases().getFirst()));
 			if (GameMap.getBaseList().size() == 1) { // there is only one left, so it is winner
 				environment.view.getGameMap().setCanManipulate(false);
 				winner = GameMap.getBaseList().getFirst().getName();
 				environment.view.getGameMap().printWinner(winner);
 				return true;
 			}
-		}
-		else {
 			if (settings.getMode() == GameSettings.DOMINATION) {
 					if (conditionCounter == GameSettings.DOMINATION_WIN_ROUNDS) {
 						environment.view.getGameMap().setCanManipulate(false);
-						winner = findDominantBase().getName();
+						winner = winningBase.getName();
 						environment.view.getGameMap().printWinner(winner);
 						return true;
 					} else {
 						Base base = findDominantBase();
-						if (base.getKnowledgeList().size() >= settings.getTreshold()) {
+						if (winningBase == null)
+							winningBase = base;
+						
+//						System.out.println(base.getKnowledgeList().size() + " " + settings.getTreshold());
+						
+						if (winningBase.equals(base) && base.getKnowledgeList().size() >= settings.getTreshold()) {
 							conditionCounter++;
 						} else {
-							conditionCounter = 0; //winning rounds were cut off
+							if (base.getKnowledgeList().size() >= settings.getTreshold()) { //there is another base, that gets into leading in this round - need to has same conditions
+								winningBase = base;
+								conditionCounter = 2; 
+							} else { //there is no base with sufficient domination, counter is reseted
+								winningBase = null;
+								conditionCounter = 1; //winning rounds were cut off
+							}
 						}
 					}
 				if(settings.getMaxRounds() != GameSettings.INFINITE && GameMap.ROUND >= settings.getMaxRounds()) { //we are at limit of rounds
 					environment.view.getGameMap().setCanManipulate(false);
-					winner = findDominantBase().getName();
+					winner = winningBase == null ? findDominantBase().getName() : winningBase.getName();
 					environment.view.getGameMap().printWinner(winner);
 					return true;
 				} 
 			}
-		}
 		return false;
 	}
 	
 	public void seizeKnowledge(Base activeBase) {
 		synchronized (GameMap.countLock) {
+			int sum = settings.getIncomePerRound();
 	    	for (Knowledge k:GameMap.getKnowledgeList()) {
 	    		for (Unit u:activeBase.getUnitList()) {
-	    			if (k.getNode().equals(u.getNode()) && k.STATE < GameMap.ROUND) //seized last round
+	    			if (k.getNode().equals(u.getNode()) && k.STATE < GameMap.ROUND) {//seized last round
 	    				k.setBase(activeBase);
+	    				sum += k.getKnowledgePerRound();
+	    			}
 	    		}
 	    	}
+	    	activeBase.addKnowledge(sum);
 		}
 	}
 
@@ -154,6 +162,10 @@ public class EnvAnalyzer {
 			GameMap.getBaseList().removeAll(seizedBases);
 			GameMap.getActiveBases().removeAll(seizedBases);
 		}
+	}
+
+	public int getConditionCounter() {
+		return conditionCounter;
 	}
 	
 }

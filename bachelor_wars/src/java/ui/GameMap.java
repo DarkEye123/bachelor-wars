@@ -61,8 +61,9 @@ public class GameMap extends JPanel implements ActionListener{
 	protected GameSettings settings;
 	public Graphics2D g2;
 	private boolean canPrintWinner = false;
-	private String winner;
 	private boolean canManipulate = true;
+	private boolean isLivingPlayer = true;
+	private String winner;
 	public static int ROUND = 1;
 	
 	public GameMap(GameView gameView) {
@@ -134,12 +135,15 @@ public class GameMap extends JPanel implements ActionListener{
 			base.setMapWidth(settings.getMapColumns()); //set number of cells in a row
 			base.setMapHeight(settings.getMapRows()); //set number of cells in a column
 			Node.getNode(base.getX(), base.getY()).add(base);
+			base.setBasicIncome(settings.getIncomePerRound());
 		}
 		repaint();
 		reinitActiveBases();
 		sortIntoTeams();
-		if (incrementOwner) //there is now real player, let fight begin!! 
+		if (incrementOwner) { //there is now real player, let fight begin!!  {
+			isLivingPlayer = false;
 			GameMap.allowActions(GameMap.getActiveBases(), view.env);
+		}
 	}
 	
 	private void sortIntoTeams() {
@@ -470,7 +474,7 @@ public class GameMap extends JPanel implements ActionListener{
 		}
 		
 		public void mouseClicked(MouseEvent e) {
-			if (canManipulate()) {
+			if (canManipulate() || !isLivingPlayer) {
 				if (e.getButton() == MouseEvent.BUTTON1) { 
 					canDebugPath(false, e);
 					
@@ -514,8 +518,10 @@ public class GameMap extends JPanel implements ActionListener{
 								movementLocations.clear();
 								Unit u = Node.getNode(loc.x, loc.y).getUnit();
 								if ( u != null && !u.isFriendly(cunit.base)) {
-									Node.getNode(loc.x, loc.y).getUnit().addDamage(cunit.getAtk());
+									u.addDamage(cunit.getAtk());
 									playerBase.getUsableUnits().remove(cunit);
+									if (u.isDead())
+										cunit.base.addKilledEnemy();
 								}
 								clearMovement();
 								map.view.repaint();
@@ -611,5 +617,9 @@ public class GameMap extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		repaint();
+	}
+
+	public boolean isLivingPlayer() {
+		return isLivingPlayer;
 	}
 }

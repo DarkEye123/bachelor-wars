@@ -84,6 +84,7 @@ public class GameView extends JPanel {
 		controlPanel = createControlPanel(constraints);
 		
 		env.setAnalyzer(new EnvAnalyzer(env, settings));
+		repaint();
 	}
 	
 //	public void repaint() {
@@ -98,6 +99,7 @@ public class GameView extends JPanel {
 		Dimension size = new Dimension(this.getWidth(), Math.round(this.getHeight() * ControlMenu.HEIGHT_MULTIPLIER));
 		setComponentSize(size, controlMenu);
 		this.add(controlMenu, constraints);
+		controlMenu.repaint();
 		return controlMenu;
 	}
 	
