@@ -162,7 +162,7 @@ getTypeOfIntention(Intention, Type) :-
 
 //####################################################################--MODE-ANIHILATION--##########################################################################
 
-+!addPossibleIntention(UnitID, Type) : 	isDominationMode &
++!addPossibleIntention(UnitID, Type) : 	isAnihilationMode &
 											Type \== "enemy" &
 											jason.getEnemyUnitInReach(UnitID, EnemyUnit) &
 											getID(EnemyUnit, TargetObject) &
@@ -170,7 +170,7 @@ getTypeOfIntention(Intention, Type) :-
 											.print("Unit: ", UnitID, " adding class based intention(enemy): ", EnemyUnit)
 	<-	jason.addIntention(UnitID, TargetObject, 0, "enemy").
 	
-+!addPossibleIntention(UnitID, Type) : 	isDominationMode & 
++!addPossibleIntention(UnitID, Type) : 	isAnihilationMode & 
 											Type \== "knowledge" & 
 											jason.getFreeKnowledgeInReach(UnitID, Knowledge) & //desired action for domination mode - higher priority
 											getKnowledgeId(Knowledge, TargetObject) & 

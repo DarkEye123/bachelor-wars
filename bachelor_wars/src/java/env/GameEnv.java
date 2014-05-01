@@ -119,15 +119,34 @@ public class GameEnv extends Environment {
 				System.out.println("ID : " + gameObjectId + " " + unit.getIntentions());
 				
 				if (unit.getIntentions().get(target).intention == Unit.KILL) {
-					if (unit.getNode().distance(target.getNode()) <= unit.getBasicAtkRange()) { // unit is able to do damage TODO special attacks
+					if (unit.getNode().distance(target.getNode()) <= unit.getBasicAtkRange()) { // unit is able to do damage
 						((Unit)target).addDamage(unit.getAtk());
 						if (((Unit)target).isDead())
 							unit.base.addKilledEnemy();
+					}
+					for (GameObject object:unit.getIntentions().keySet()) { //unit may stand on the knowledge, so it is seizing too
+						if (unit.getIntentions().get(object).intention == Unit.SEIZE) {
+							if (unit.getNode().distance(object.getNode()) == 0 ) {//we are at position
+								unit.getIntentions().remove(object);
+								break;
+							}
+						}
 					}
 				}
 				else if (unit.getIntentions().get(target).intention == Unit.SEIZE) {
 					if (unit.getNode().distance(target.getNode()) == 0 ) //we are at position
 						unit.getIntentions().remove(target);
+					
+					for (GameObject object:unit.getIntentions().keySet()) { //unit may stand on the knowledge, so it is seizing too
+						if (unit.getIntentions().get(object).intention == Unit.KILL) {
+							if (unit.getNode().distance(object.getNode()) <= unit.getBasicAtkRange() ) {//we are damage range
+								((Unit)object).addDamage(unit.getAtk());
+								if (((Unit)object).isDead())
+									unit.base.addKilledEnemy();
+								break;
+							}
+						}
+					}
 				}
 				
 	    	} catch (NoValueException e) {
