@@ -122,6 +122,16 @@ public class EnvAnalyzer {
 					environment.view.getGameMap().printWinner(winner);
 					return true;
 				} 
+			} else if (settings.getMode() == GameSettings.ANIHLIATION) {
+				
+				winningBase = findDominantBase();
+				
+				if (winningBase.getKilledEnemies() >= settings.getKillQuota()) {
+					environment.view.getGameMap().setCanManipulate(false);
+					winner = winningBase.getName();
+					environment.view.getGameMap().printWinner(winner);
+					return true;
+				}
 			}
 		return false;
 	}

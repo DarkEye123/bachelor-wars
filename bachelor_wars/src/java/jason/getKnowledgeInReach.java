@@ -7,11 +7,12 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Term;
 
-public class getFreeKnowledgeInReach extends jason.getNearestFreeKnowledge {
+public class getKnowledgeInReach extends jason.getNearestFreeKnowledge {
 	private static final long serialVersionUID = 1287083926924478575L;
 
 	@Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {
+		canRemove = false;
 		if (!(boolean)super.execute(ts, un, terms)) //empty
 			return false;
 		

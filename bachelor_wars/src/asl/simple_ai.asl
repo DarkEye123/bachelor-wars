@@ -145,7 +145,7 @@ getTypeOfIntention(Intention, Type) :-
 
 +!addPossibleIntention(UnitID, Type) : 	isDominationMode & 
 											Type \== "knowledge" & 
-											jason.getFreeKnowledgeInReach(UnitID, Knowledge) & //desired action for domination mode - higher priority
+											jason.getKnowledgeInReach(UnitID, Knowledge) & //desired action for domination mode - higher priority
 											getKnowledgeId(Knowledge, TargetObject) & 
 											TargetObject \== Type & //check if this intention isn't the same as
 											.print("Unit: ", UnitID, " adding class based intention(knowledge): ", Knowledge)
@@ -172,7 +172,7 @@ getTypeOfIntention(Intention, Type) :-
 	
 +!addPossibleIntention(UnitID, Type) : 	isAnihilationMode & 
 											Type \== "knowledge" & 
-											jason.getFreeKnowledgeInReach(UnitID, Knowledge) & //desired action for domination mode - higher priority
+											jason.getKnowledgeInReach(UnitID, Knowledge) & //desired action for domination mode - higher priority
 											getKnowledgeId(Knowledge, TargetObject) & 
 											TargetObject \== Type & //check if this intention isn't the same as
 											.print("Unit: ", UnitID, " adding class based intention(knowledge): ", Knowledge)
