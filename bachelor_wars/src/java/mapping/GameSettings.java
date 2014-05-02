@@ -7,7 +7,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import objects.Base;
+import objects.units.CommonBachelor;
 import objects.units.FirstYear;
+import objects.units.FitBachelor;
+import objects.units.FourthYear;
+import objects.units.SecondYear;
+import objects.units.ThirdYear;
 import objects.units.Unit;
 
 
@@ -34,6 +39,8 @@ public class GameSettings {
 	public static final int DOMINATION = 0, ANIHLIATION = 1, MADNESS = 2;
 	public static final int DOMINATION_WIN_ROUNDS = 3;//, ANIHLIATION = 1, MADNESS = 2;
 	public static final float DOMINATION_WIN_PERCENTAGE = 80.0f;
+	public static final int MADNESS_KILL = 25;
+	public static final int MADNESS_ROUNDS = 6;
 	
 	
 	public static final int DEFAULT_PLAYERS = 2;
@@ -85,11 +92,11 @@ public class GameSettings {
 	
 	private void initDefaultUnits() {
 		AVAILABLE_UNITS.add(FirstYear.getPrototype());
-		AVAILABLE_UNITS.add(FirstYear.getPrototype());
-		AVAILABLE_UNITS.add(FirstYear.getPrototype());
-		AVAILABLE_UNITS.add(FirstYear.getPrototype());
-		AVAILABLE_UNITS.add(FirstYear.getPrototype());
-		AVAILABLE_UNITS.add(FirstYear.getPrototype());
+		AVAILABLE_UNITS.add(SecondYear.getPrototype());
+		AVAILABLE_UNITS.add(ThirdYear.getPrototype());
+		AVAILABLE_UNITS.add(FourthYear.getPrototype());
+		AVAILABLE_UNITS.add(CommonBachelor.getPrototype());
+		AVAILABLE_UNITS.add(FitBachelor.getPrototype());
 	}
 	
 	public void addPlayer(int aiType, Color color , Location location) {

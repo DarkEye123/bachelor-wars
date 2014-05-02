@@ -53,7 +53,7 @@ public class EnvAnalyzer {
 		LinkedList<Base> toRemove = new LinkedList<>();
 		for (Base base:GameMap.getBaseList()) {
 			if (!base.equals(activeBase)) {
-				if (base.isSeized(activeBase)) { //TODO if more than 1 round for seizing will be needed, here will be need some hash<activeBase<targetBase,Integer>>
+				if (base.isSeized(activeBase)) {
 					toRemove.add(base);
 				} 
 			}
@@ -138,15 +138,15 @@ public class EnvAnalyzer {
 	
 	public void seizeKnowledge(Base activeBase) {
 		synchronized (GameMap.countLock) {
-			int sum = settings.getIncomePerRound();
 	    	for (Knowledge k:GameMap.getKnowledgeList()) {
 	    		for (Unit u:activeBase.getUnitList()) {
-	    			if (k.getNode().equals(u.getNode()) && k.STATE < GameMap.ROUND) {//seized last round
+	    			if (k.getNode().equals(u.getNode()) && k.STATE < GameMap.ROUND) //seized last round
 	    				k.setBase(activeBase);
-	    				sum += k.getKnowledgePerRound();
-	    			}
 	    		}
 	    	}
+	    	int sum = settings.getIncomePerRound();
+	    	for (Knowledge k:activeBase.getKnowledgeList())
+	    		sum += k.getKnowledgePerRound();
 	    	activeBase.addKnowledge(sum);
 		}
 	}

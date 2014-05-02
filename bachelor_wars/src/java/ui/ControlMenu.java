@@ -22,6 +22,7 @@ import javax.swing.Timer;
 
 import objects.Base;
 import objects.Knowledge;
+import objects.units.Unit;
 import mapping.GameSettings;
 
 
@@ -43,6 +44,7 @@ public class ControlMenu extends JPanel implements ActionListener{
 	boolean canRepaint = false;
 	Image pic;
 	String maxRounds;
+	Base playerBase;
 	
 	public ControlMenu(GameView gameView) {
 		view = gameView;
@@ -115,6 +117,7 @@ public class ControlMenu extends JPanel implements ActionListener{
 		round.setFont(font);
 		
 		repaint();
+		playerBase = view.getGameMap().getPlayerBase();
 	}
 	
 	@Override
@@ -167,10 +170,15 @@ public class ControlMenu extends JPanel implements ActionListener{
 	}
 	
 	protected class EndRoundListener implements MouseListener {
-		
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			view.getGameMap().setCanManipulate(false);
+			if (playerBase != null) {
+				for (Unit u:playerBase.getUnitList())
+					u.setLocation(u.getOldLocation());
+				view.getGameMap().clearMovement();
+				view.getGameMap().repaint();
+			}
 			GameMap.allowActions(GameMap.getActiveBases(), view.env);
 		}
 		

@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import objects.Base;
 import objects.units.Unit;
 
-public class InfoPanel extends JPanel implements Informative{
+public class InfoPanel extends JPanel{
 	private static final long serialVersionUID = 1895792502596588154L;
 	public static final int NOTHING = 0;
 	public static final int UNIT = 1;
@@ -37,7 +37,7 @@ public class InfoPanel extends JPanel implements Informative{
 		 * Initialize panel for base
 		 */
 		baseList = GameMap.getBaseList();
-		this.add(new BaseInfoPanel(baseList.getFirst(), controlPanel));
+		this.add(new BaseInfoPanel(baseList.getFirst()));
 	}
 	
 	/**
@@ -54,7 +54,7 @@ public class InfoPanel extends JPanel implements Informative{
 
 	public void showBaseContext(Base base) {
 		eraseContainer();
-		this.add(new BaseInfoPanel(base, controlPanel));
+		this.add(new BaseInfoPanel(base));
 	}
 	
 	//TODO try real erase

@@ -49,7 +49,6 @@ public class Node {
 		if (Unit.class.isInstance(object) && containUnit()) 
 			return false; //can't add two units into same node
 		
-		//TODO if it is base - it seizes more nodes, it should be added to all of them
 		if (Base.class.isInstance(object) && containBase()) 
 			return false; //can't add two bases into same node
 		

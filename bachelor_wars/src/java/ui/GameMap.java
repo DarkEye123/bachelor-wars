@@ -30,7 +30,12 @@ import mapping.Node;
 import objects.Base;
 import objects.GameObject;
 import objects.Knowledge;
+import objects.units.CommonBachelor;
 import objects.units.FirstYear;
+import objects.units.FitBachelor;
+import objects.units.FourthYear;
+import objects.units.SecondYear;
+import objects.units.ThirdYear;
 import objects.units.Unit;
 import env.GameEnv;
 
@@ -300,6 +305,16 @@ public class GameMap extends JPanel implements ActionListener{
 	    	Unit unit = null; //TODO here should be some parametrized function that can make instances from types by generic way
 	    	if (type == FirstYear.TYPE)
 	    		unit = new FirstYear(node.getLocation(), Unit.DEFAULT_UNIT_SIZE, cellSize);
+	    	if (type == SecondYear.TYPE)
+	    		unit = new SecondYear(node.getLocation(), Unit.DEFAULT_UNIT_SIZE, cellSize);
+	    	if (type == ThirdYear.TYPE)
+	    		unit = new ThirdYear(node.getLocation(), Unit.DEFAULT_UNIT_SIZE, cellSize);
+	    	if (type == FourthYear.TYPE)
+	    		unit = new FourthYear(node.getLocation(), Unit.DEFAULT_UNIT_SIZE, cellSize);
+	    	if (type == CommonBachelor.TYPE)
+	    		unit = new CommonBachelor(node.getLocation(), Unit.DEFAULT_UNIT_SIZE, cellSize);
+	    	if (type == FitBachelor.TYPE)
+	    		unit = new FitBachelor(node.getLocation(), Unit.DEFAULT_UNIT_SIZE, cellSize);
 	    	unit.setOwner(owner);
 	    	Base base = Base.getOwnerBase(owner,baseList); //seek for base
 	    	base.addUnit(unit); //list of units of actual player
@@ -406,6 +421,10 @@ public class GameMap extends JPanel implements ActionListener{
 		        	for (Unit unit:base.getUsableUnits()) {
 			        	unit.drawUsableSign(g2);
 			        }
+		        	for (Knowledge k: getKnowledgeList()) {
+		        		if (k.getNode().containUnit())
+		        			k.getNode().getUnit().drawKnowledgeSign(g2);
+		        	}
 		        }
 		        if (cunit != null)
 		        	drawBasicAtkRange(cunit.getLocation(), cunit.getBasicAtkRange(), g2);
@@ -523,6 +542,7 @@ public class GameMap extends JPanel implements ActionListener{
 								Unit u = Node.getNode(loc.x, loc.y).getUnit();
 								if ( u != null && !u.isFriendly(cunit.base)) {
 									u.addDamage(cunit.getAtk());
+									cunit.setOldLocation(cunit.getLocation());
 									playerBase.getUsableUnits().remove(cunit);
 									if (u.isDead())
 										cunit.base.addKilledEnemy();

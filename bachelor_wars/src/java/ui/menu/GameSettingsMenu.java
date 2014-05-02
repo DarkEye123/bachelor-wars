@@ -13,7 +13,12 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import org.netbeans.lib.awtextra.AbsoluteConstraints;
 
 import cartago.new_array;
 import mapping.GameSettings;
@@ -66,6 +71,7 @@ public class GameSettingsMenu extends Menu {
 	private javax.swing.JLabel jLabel7;
 	private javax.swing.JLabel jLabel8;
 	private javax.swing.JLabel jLabel9;
+	private javax.swing.JLabel valueLabel;
 	private javax.swing.JList resolution;
 	private javax.swing.JScrollPane jScrollPane1;
 	private javax.swing.JScrollPane jScrollPane2;
@@ -73,6 +79,7 @@ public class GameSettingsMenu extends Menu {
 	private javax.swing.JSpinner jSpinner2;
 	private javax.swing.JSpinner jSpinner3;
 	private javax.swing.JSpinner jSpinner4;
+	private javax.swing.JSpinner value;
 	private javax.swing.JSlider knowledgeSlider;
 	private javax.swing.JRadioButton madnessModeButton;
 	private javax.swing.JPanel mapGenerationPanel;
@@ -142,6 +149,7 @@ public class GameSettingsMenu extends Menu {
 		jSpinner2 = new javax.swing.JSpinner();
 		jSpinner3 = new javax.swing.JSpinner();
 		jSpinner4 = new javax.swing.JSpinner();
+		value = new javax.swing.JSpinner();
 		buttonExit = new javax.swing.JButton();
 		mapGenerationPanel = new javax.swing.JPanel();
 		knowledgeSlider = new javax.swing.JSlider();
@@ -169,6 +177,7 @@ public class GameSettingsMenu extends Menu {
 		jLabel12 = new javax.swing.JLabel();
 		jLabel13 = new javax.swing.JLabel();
 		jLabel14 = new javax.swing.JLabel();
+		valueLabel = new javax.swing.JLabel();
 		playerName = new javax.swing.JTextField();
 		comboArray = new ArrayList<>();
 
@@ -564,8 +573,21 @@ public class GameSettingsMenu extends Menu {
 		jLabel13.setText("Income per Knowledge");
 		generalSettings.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, -1, 30));
 
+		value.setModel(new SpinnerNumberModel(GameSettings.DOMINATION_WIN_ROUNDS, 1, 5, 1));
+		valueLabel.setText("Rounds to seize");
+		valueLabel.setFont(new java.awt.Font("Cantarell", 0, 14)); // NOI18N
+		generalSettings.add(valueLabel,new AbsoluteConstraints(20, 140, -1, 30));
+		generalSettings.add(value,new AbsoluteConstraints(200, 140, 60, -1));
+		
+		value.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				valueStateChanged(e);
+			}
+		});
+		
 		jLabel14.setText("Player Nickname:");
-		generalSettings.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 150, -1, 20));
+		generalSettings.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 170, -1, 20));
 
 		playerName.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 		playerName.setText("Player");
@@ -574,7 +596,7 @@ public class GameSettingsMenu extends Menu {
 //				playerNameActionPerformed(evt);
 			}
 		});
-		generalSettings.add(playerName, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 190, 170, 40));
+		generalSettings.add(playerName, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 200, 170, 40));
 
 		gameSettingsContainer.add(generalSettings, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 290, 280, 250));
 
@@ -583,6 +605,10 @@ public class GameSettingsMenu extends Menu {
 		frame.pack();
 		frame.setVisible(true);
 		frame.setLocationRelativeTo(null);
+	}
+
+	protected void valueStateChanged(ChangeEvent e) {
+		//TODO zmena textu ak sa klikne na value
 	}
 
 	protected void decideStatus(JComboBox jComboBox1, JComboBox jComboBox2, JSpinner jSpinner, boolean enabled) {
@@ -600,15 +626,20 @@ public class GameSettingsMenu extends Menu {
 
 	protected void modeMadnessButtonActionPerformed(ActionEvent evt) {
 		descriptionPane.setText("MADNESS\nNot Decided yet what it will be exactly :D Probably combination of Anihilation and Domination");
-		
+		value.setModel(new SpinnerNumberModel(GameSettings.MADNESS_ROUNDS, 1, 25, 1));
+		valueLabel.setText("Seizing limit");
 	}
 
 	protected void modeAnihilationButtonActionPerformed(ActionEvent evt) {
 		descriptionPane.setText("ANIHILIATION\nMode where you have to destroy all your opponents (get to their base and survive one round there)");
+		value.setModel(new SpinnerNumberModel(GameSettings.MADNESS_KILL, 5, null, 1));
+		valueLabel.setText("Kills to win");
 	}
 
 	protected void modeDominationButtonActionPerformed(ActionEvent evt) {
 		descriptionPane.setText("DOMINATION\nMode where you have to own at least 80% of \"knowledge resources\" for 3 rounds.");
+		value.setModel(new SpinnerNumberModel(GameSettings.DOMINATION_WIN_ROUNDS, 1, 5, 1));
+		valueLabel.setText("Rounds to seize");
 	}
 	
 	private int getIndex(Object[] source, Object item) {

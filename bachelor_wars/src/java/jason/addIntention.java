@@ -15,7 +15,6 @@ import jason.asSyntax.NumberTerm;
 public class addIntention extends DefaultInternalAction{
 	private static final long serialVersionUID = -3447388669731589527L;
 	
-	//TODO add into agent power decisions
 	public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {
 		int unitID = (int)( (NumberTerm) terms[0]).solve();
 		int targetID = (int)( (NumberTerm) terms[1]).solve();
@@ -33,15 +32,12 @@ public class addIntention extends DefaultInternalAction{
 			iType =Type.PERSISTENT;
 		}
 		
-		if (sorter.equals("knowledge")) {
+		if (sorter.equals("knowledge")) { //TODO if support add it here probably
 			target = GameMap.searchKnowledge(targetID);
 			unit.addIntention(target, new Intention(Unit.SEIZE, iType));
 		} else if (sorter.equals("enemy")) {
 			target = GameMap.searchUnit(targetID);
 			unit.addIntention(target, new Intention(Unit.KILL, iType));
-		} else if (sorter.equals("friendly")) {
-			target = unit.base.searchUnit(targetID);
-			unit.addIntention(target, new Intention(Unit.HEAL, iType));
 		} else if (sorter.equals("base")) {
 			target = GameMap.searchBase(targetID);
 			unit.addIntention(target, new Intention(Unit.SEIZE, iType));

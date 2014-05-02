@@ -81,7 +81,7 @@ public class UnitInfoPanel extends JPanel {
 		name = new JLabel(unit.getName());
 		hp = new JLabel("HP: " + unit.getHp());
 		atk = new JLabel("ATK: " + unit.getAtk());
-		moveRange = new JLabel("MOV: " + unit.getMov());
+		moveRange = new JLabel("MOV: " + (unit.getMov() - 1));
 		cost = new JLabel("COST: " + unit.getCost());
 		
 		name.setFont(new Font("VL Gothic", 0, 14));

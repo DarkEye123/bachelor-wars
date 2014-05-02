@@ -19,11 +19,8 @@ public class BaseInfoPanel extends JPanel {
 	
 	JLabel baseName, freeSlots, actualKnowledge, killedEnemies, incomePerRound;
 	GridBagConstraints constraints;
-	ControlPanel controlPanel;
 	
-	//TODO check if controlPanel is usable here or not in some way
-	public BaseInfoPanel(Base base, ControlPanel controlPanel) {
-		this.controlPanel = controlPanel;
+	public BaseInfoPanel(Base base) {
 		this.base = base;
 		Font font = new Font("VL Gothic", 0, 15);
 		baseName = new JLabel("Player: " + base.getName());

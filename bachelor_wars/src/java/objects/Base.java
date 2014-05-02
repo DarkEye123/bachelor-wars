@@ -28,7 +28,6 @@ public class Base extends GameObject implements Clickable{
 	public final static Dimension DEFAULT_BASE_SIZE = new Dimension(2,2); //size on grid (x,y)
 	private static final int ARC_W = 12, ARC_H = 12;
 	
-	//TODO add friendly units
 	private LinkedList<Unit> unitList = new LinkedList<Unit>();
 	private LinkedList<Unit> usableUnits = new LinkedList<Unit>();
 	private LinkedList<Knowledge> knowledgeList = new LinkedList<Knowledge>();
@@ -44,7 +43,7 @@ public class Base extends GameObject implements Clickable{
 	protected int knowledge = DEFAULT_KNOWLEDGE; //this represents how many "money" player has. 
 	protected int mapWidth, mapHeight; //set number of cells in a row and column
 	protected String agent;
-	private LinkedList<Base> seizingBases = new LinkedList<>();
+//	private LinkedList<Base> seizingBases = new LinkedList<>();
 	private int basicIncome;
 	private int roundSurvived;
 	
@@ -291,15 +290,9 @@ public class Base extends GameObject implements Clickable{
 		}
 		for (Unit unit:seizingUnits) {
 			if (unit.base.equals(enemyBase)) { //and it is a unit of actual enemy base
-				if (seizingBases.contains(enemyBase)) //and if this enemy base was already seizing this base round before
-					return true;
-				else {
-					seizingBases.add(enemyBase); //or add it to the seizing bases
-					return false;
-				}
+				return true;
 			}
 		}
-		seizingBases.remove(enemyBase); //at this point enemyBase could be at seizingBases but it doesn't contain any unit now, so it is not seizing, remove it
 		return false;
 	}
 

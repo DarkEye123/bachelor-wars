@@ -10,7 +10,6 @@ import java.util.LinkedList;
 
 import mapping.Wrapper;
 import objects.units.Unit;
-//TODO think about this, if it is usable if there are no powers and if it is, return only allies or own units or both
 public class getNearestFriendlyUnit extends jason.getNearest {
 	private static final long serialVersionUID = 2318506250217139138L;
 

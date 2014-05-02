@@ -84,17 +84,17 @@ public class getSortedIntentions extends DefaultInternalAction {
     		un.unifies(terms[2], ListTermImpl.parseList(ret.toString()));
     	}
     	
-    	if (getBy() == MODE) {
+    	if (getBy() == MODE) { //TODO this all need to be rewritten!!!
 	    	if (mode == GameSettings.DOMINATION) {
-	    		int [] pom = {Unit.SEIZE, Unit.KILL, Unit.HEAL, Unit.SUPPORT};
+	    		int [] pom = {Unit.SEIZE, Unit.KILL};
 	    		un.unifies(terms[2], ListTermImpl.parseList(getSortedInt(unit, wrapper, intentions, pom).toString()));
 	    	}
 	    	if (mode == GameSettings.ANIHLIATION) {
-	    		int [] pom = {Unit.KILL, Unit.HEAL, Unit.SEIZE, Unit.SUPPORT};
+	    		int [] pom = {Unit.KILL, Unit.SEIZE};
 	    		un.unifies(terms[2], ListTermImpl.parseList(getSortedInt(unit, wrapper, intentions, pom).toString()));
 	    	}
 	    	if (mode == GameSettings.MADNESS) {
-	    		int [] pom = {Unit.SEIZE, Unit.HEAL, Unit.KILL, Unit.SUPPORT};
+	    		int [] pom = {Unit.KILL, Unit.SEIZE};
 	    		un.unifies(terms[2], ListTermImpl.parseList(getSortedInt(unit, wrapper, intentions, pom).toString()));
 	    	}
     	}
@@ -114,24 +114,18 @@ public class getSortedIntentions extends DefaultInternalAction {
     }
     
     private LinkedList<SemanticIntention> getSortedInt(Unit unit, LinkedList<Wrapper> wrapper, HashMap<GameObject, Intention> intentions, int[] list) {
-    	//TODO if buff will be used too, ad it here
     	int counterSeize = 0;
     	int counterKill = 0;
-    	int counterHeal = 0;
-    	int counterSupport = 0;
     	LinkedList<SemanticIntention> sortedIntentions = new LinkedList<>();
     	
-    	while (counterSeize != Integer.MAX_VALUE || counterKill != Integer.MAX_VALUE || counterHeal != Integer.MAX_VALUE || counterSupport != Integer.MAX_VALUE) {
-    		System.out.println(counterSeize + " " + counterKill + " " + counterHeal + " " + counterSupport);
+    	while (counterSeize != Integer.MAX_VALUE || counterKill != Integer.MAX_VALUE) {
+//    		System.out.println(counterSeize + " " + counterKill + " " + counterHeal + " " + counterSupport);
     		for (Integer intention: list) {
     			if (intention == Unit.SEIZE && counterSeize != Integer.MAX_VALUE) {
 	    			counterSeize = getNextIntention(wrapper, counterSeize, intentions, intention, sortedIntentions);
 	    		}
 	    		if (intention == Unit.KILL && counterKill != Integer.MAX_VALUE) {
 	    			counterKill = getNextIntention(wrapper, counterKill, intentions, intention, sortedIntentions);
-	    		}
-	    		if (intention == Unit.SUPPORT && counterSupport != Integer.MAX_VALUE) {
-	    			counterSupport = getNextIntention(wrapper, counterSupport, intentions, intention, sortedIntentions);
 	    		}
     		}
     	}

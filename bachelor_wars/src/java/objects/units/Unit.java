@@ -27,24 +27,20 @@ public abstract class Unit extends GameObject implements Clickable {
 	private static final int TIME_TO_WAIT = 50;
 	private static final int HEALTH_QUOTE = 50;
 	
-	/*
-	 * --------------------------------------------------------Classes-----------------------------------------------------------------------------------
-	 * These value can be combined, f.e. unit can be tank with one healing ability with certain restrictions, like only self heal and only limited amount of hp etc.
-	 * TODO add these into graphical representation
-	 */
-	public static final int TANK = 1;
-	public static final int HEALER = 2;
-	public static final int DAMAGE_DEALER = 4;
-	public static final int SUPPORTER = 8;
+//	/*
+//	 * --------------------------------------------------------Classes-----------------------------------------------------------------------------------
+//	 * These value can be combined, f.e. unit can be tank with one healing ability with certain restrictions, like only self heal and only limited amount of hp etc.
+//	 */
+//	public static final int TANK = 1;
+//	public static final int HEALER = 2;
+//	public static final int DAMAGE_DEALER = 4;
+//	public static final int SUPPORTER = 8;
 	
 	/*
 	 * --------------------------------------------------------Intentions-------------------------------------------------------------------------------
 	 */
 	public static final int	KILL 	= 0; //damage with atk
-	public static final int	HEAL 	= 1; 
 	public static final int	SEIZE 	= 2;
-	public static final int	BUFF 	= 3; //use a power with given intention TODO try to find out if necessary
-	public static final int	SUPPORT = 4; //Support copy intentions of friendly target unit. Do not forget to remove this intention after that
 
 	public static final Dimension DEFAULT_UNIT_SIZE = new Dimension(1,1); //size on grid (x,y)
 	private static final int ARC_W = 12, ARC_H = 12;
@@ -54,7 +50,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	/*
 	 * --------------------------------------------------------Stats------------------------------------------------------------------------------------
 	 */
-	protected static Image image = null;
+	protected Image image = null;
 	protected int id;
 	protected int hp;
 	protected int basicAtkRange = 1;
@@ -181,7 +177,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	}
 
 	public void setImage(BufferedImage image) {
-		Unit.image = image;
+		this.image = image;
 	}
 	
 	public static Unit getPrototype() {
@@ -292,7 +288,6 @@ public abstract class Unit extends GameObject implements Clickable {
 			return false;
 	}
 	
-	//TODO add class of unit (like heal, damage, etc)
 	@Override
 	//type, id, cost, hp, atk, mov, atkRange, sp, x, y, owner - later class
 	public String toString() {
@@ -313,6 +308,13 @@ public abstract class Unit extends GameObject implements Clickable {
 		int nx = x * cellSizeW;
 		int ny = y * cellSizeH;
 		g.setColor(Color.black);
+		g.fillOval(nx, ny, cellSizeW / 5, cellSizeH / 5);
+	}
+	
+	public void drawKnowledgeSign(Graphics g) {
+		int nx = cellSizeW + x * cellSizeW - cellSizeW / 5;
+		int ny = cellSizeH + y * cellSizeH - cellSizeH / 5;
+		g.setColor(Color.white);
 		g.fillOval(nx, ny, cellSizeW / 5, cellSizeH / 5);
 	}
 
