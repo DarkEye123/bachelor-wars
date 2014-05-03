@@ -145,11 +145,11 @@ public class ControlMenu extends JPanel implements ActionListener{
 			    		value.setText("seized: " + view.env.analyzer.winningBase.getKnowledgeList().size());
 					roundsToWin.setText("Rounds to win: " + view.env.analyzer.getConditionCounter() + "/" + GameSettings.DOMINATION_WIN_ROUNDS);
 				}
-				else if (view.settings.getMode() == GameSettings.ANIHLIATION) {
+				else if (view.settings.getMode() == GameSettings.MADNESS) {
 					if (view.env.analyzer.winningBase == null)
-						value.setText("killed: --/" + view.settings.getKillQuota());
+						value.setText("killed: --/" + view.settings.getWinQuota());
 					else
-						value.setText("killed: " + view.env.analyzer.winningBase.getKilledEnemies() + "/" + view.settings.getKillQuota());
+						value.setText("killed: " + view.env.analyzer.winningBase.getKilledEnemies() + "/" + view.settings.getWinQuota());
 				}
 				else {
 					if (view.env.analyzer.winningBase == null)

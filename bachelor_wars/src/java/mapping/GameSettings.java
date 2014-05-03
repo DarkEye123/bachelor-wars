@@ -40,7 +40,6 @@ public class GameSettings {
 	public static final int DOMINATION_WIN_ROUNDS = 3;//, ANIHLIATION = 1, MADNESS = 2;
 	public static final float DOMINATION_WIN_PERCENTAGE = 80.0f;
 	public static final int MADNESS_KILL = 25;
-	public static final int MADNESS_ROUNDS = 6;
 	
 	
 	public static final int DEFAULT_PLAYERS = 2;
@@ -66,7 +65,7 @@ public class GameSettings {
 	private int mode;
 	private int treshold = INFINITE;
 	private HashMap<String, ArrayList<Integer>> teams;
-	private int killQuota;
+	private int winQuota;
 	
 	public GameSettings() {
 		setPlayers(new ArrayList<Integer>());
@@ -240,7 +239,11 @@ public class GameSettings {
 		return teams;
 	}
 
-	public int getKillQuota() {
-		return killQuota;
+	public int getWinQuota() {
+		return winQuota;
+	}
+	
+	public void setWinQuota(int quota) {
+		winQuota = quota;
 	}
 }

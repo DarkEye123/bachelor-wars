@@ -35,6 +35,7 @@ public class Base extends GameObject implements Clickable{
 	private LinkedList<Base> enemies = new LinkedList<>();
 	private LinkedList<Node> baseNodes;
 	private int killedEnemies = 0;
+	private int seizedBases = 0;
 	
 	
 	protected int freeSlots = DEFAULT_SLOT_SIZE; //number of free slots to create new units
@@ -340,5 +341,17 @@ public class Base extends GameObject implements Clickable{
 	
 	public void addRoundSurvived() {
 		roundSurvived++;
+	}
+
+	public int getSeizedBases() {
+		return seizedBases;
+	}
+	
+	public void addSeizedBase() {
+		seizedBases++;
+	}
+
+	public void addKilledEnemy(int size) {
+		killedEnemies += size;
 	}
 }

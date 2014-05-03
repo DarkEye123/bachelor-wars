@@ -608,7 +608,12 @@ public class GameSettingsMenu extends Menu {
 	}
 
 	protected void valueStateChanged(ChangeEvent e) {
-		//TODO zmena textu ak sa klikne na value
+		if (modeDominationButton.isSelected()) {
+			if (Integer.parseInt(value.getValue().toString()) > 1)
+				descriptionPane.setText("DOMINATION\nMode where you have to own at least 80% of \"knowledge resources\" for " + value.getValue() + " rounds.");
+			else
+				descriptionPane.setText("DOMINATION\nMode where you have to own at least 80% of \"knowledge resources\" for " + value.getValue() + " round.");
+		}
 	}
 
 	protected void decideStatus(JComboBox jComboBox1, JComboBox jComboBox2, JSpinner jSpinner, boolean enabled) {
@@ -625,21 +630,27 @@ public class GameSettingsMenu extends Menu {
 	}
 
 	protected void modeMadnessButtonActionPerformed(ActionEvent evt) {
-		descriptionPane.setText("MADNESS\nNot Decided yet what it will be exactly :D Probably combination of Anihilation and Domination");
-		value.setModel(new SpinnerNumberModel(GameSettings.MADNESS_ROUNDS, 1, 25, 1));
-		valueLabel.setText("Seizing limit");
+		descriptionPane.setText("MADNESS\nMode where the winner is the one with the highest number of killed enemies. If you destroy base, every unit of this base is killed by you.");
+		value.setModel(new SpinnerNumberModel(GameSettings.MADNESS_KILL, 5, null, 1));
+		valueLabel.setText("Kills to win");
+		value.setVisible(true);
+		valueLabel.setVisible(true);
 	}
 
 	protected void modeAnihilationButtonActionPerformed(ActionEvent evt) {
 		descriptionPane.setText("ANIHILIATION\nMode where you have to destroy all your opponents (get to their base and survive one round there)");
-		value.setModel(new SpinnerNumberModel(GameSettings.MADNESS_KILL, 5, null, 1));
-		valueLabel.setText("Kills to win");
+//		value.setModel(new SpinnerNumberModel(GameSettings.MADNESS_KILL, 5, null, 1));
+//		valueLabel.setText("Kills to win");
+		value.setVisible(false);
+		valueLabel.setVisible(false);
 	}
 
 	protected void modeDominationButtonActionPerformed(ActionEvent evt) {
-		descriptionPane.setText("DOMINATION\nMode where you have to own at least 80% of \"knowledge resources\" for 3 rounds.");
+		descriptionPane.setText("DOMINATION\nMode where you have to own at least 80% of \"knowledge resources\" for " + GameSettings.DOMINATION_WIN_ROUNDS + " rounds.");
 		value.setModel(new SpinnerNumberModel(GameSettings.DOMINATION_WIN_ROUNDS, 1, 5, 1));
 		valueLabel.setText("Rounds to seize");
+		value.setVisible(true);
+		valueLabel.setVisible(true);
 	}
 	
 	private int getIndex(Object[] source, Object item) {
@@ -679,12 +690,16 @@ public class GameSettingsMenu extends Menu {
 		settings.setHeight(Integer.parseInt(split[1]));
 
 //======================================Modes===================================================================
-		if (modeDominationButton.isSelected())
+		if (modeDominationButton.isSelected()) {
 			settings.setMode(GameSettings.DOMINATION);
+			settings.setWinQuota(Integer.parseInt(value.getValue().toString()));
+		}
 		if (anihilationModeButton.isSelected())
 			settings.setMode(GameSettings.ANIHLIATION);
-		if (madnessModeButton.isSelected())
+		if (madnessModeButton.isSelected()) {
 			settings.setMode(GameSettings.MADNESS);
+			settings.setWinQuota(Integer.parseInt(value.getValue().toString()));
+		}
 		
 //======================================Player-Creation=========================================================
 		int width = Base.DEFAULT_BASE_SIZE.width;

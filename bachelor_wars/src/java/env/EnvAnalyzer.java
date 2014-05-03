@@ -44,33 +44,84 @@ public class EnvAnalyzer {
 	
 	private Base findDominantBase() {
 		if (settings.getMode() == GameSettings.DOMINATION) {
-			return findBestKnowledgeHolder();
+			return findBestKnowledgeHolder(GameMap.getActiveBases().getFirst());
+		} else if (settings.getMode() == GameSettings.MADNESS) {
+			return findBestKillingHolder(GameMap.getActiveBases().getFirst());
+		} else {
+			return findBestBaseSeizer(GameMap.getActiveBases().getFirst());
 		}
-		return null;
 	}
 	
+	private Base findBestBaseSeizer(Base activeBase) {
+		if (winningBase == null) {  //if there is no winning base, find it
+			int max = Integer.MIN_VALUE;
+			Base ret = null;
+			for (Base b: GameMap.getBaseList()) {
+				if (b.getSeizedBases() > max) {
+					max = b.getSeizedBases();
+					ret = b;
+				}
+			}
+			return ret;
+		} else {  //if there is some winning base, just compare actual one with the winning
+			if (winningBase.getSeizedBases() > activeBase.getSeizedBases())
+				return winningBase;
+			else
+				return activeBase;
+		}
+	}
+
+	private Base findBestKillingHolder(Base activeBase) {
+		if (winningBase == null) {  //if there is no winning base, find it
+			int max = Integer.MIN_VALUE;
+			Base ret = null;
+			for (Base b: GameMap.getBaseList()) {
+				if (b.getKilledEnemies() > max) {
+					max = b.getKilledEnemies();
+					ret = b;
+				}
+			}
+			return ret;
+		} else {  //if there is some winning base, just compare actual one with the winning
+			if (winningBase.getKilledEnemies() > activeBase.getKilledEnemies())
+				return winningBase;
+			else
+				return activeBase;
+		}
+	}
+
 	private LinkedList<Base> getSeizedBases(Base activeBase) {
 		LinkedList<Base> toRemove = new LinkedList<>();
 		for (Base base:GameMap.getBaseList()) {
 			if (!base.equals(activeBase)) {
 				if (base.isSeized(activeBase)) {
 					toRemove.add(base);
+					activeBase.addKilledEnemy(base.getUnitList().size());
+					activeBase.addSeizedBase();
 				} 
 			}
 		}
 		return toRemove;
 	}
 
-	private Base findBestKnowledgeHolder() {
-		Base ret = null;
-		int max = Integer.MIN_VALUE;
-		for (Base base:GameMap.getBaseList()) {
-			if (base.getKnowledgeList().size() > max) {
-				max = base.getKnowledgeList().size();
-				ret = base;
+	private Base findBestKnowledgeHolder(Base activeBase) {
+		if (winningBase == null) { //if there is no winning base, find it
+			int max = Integer.MIN_VALUE;
+			Base ret = null;
+			for (Base base:GameMap.getBaseList()) {
+				if (base.getKnowledgeList().size() > max) {
+					max = base.getKnowledgeList().size();
+					ret = base;
+				}
+			}
+			return ret;
+		} else { //if there is some winning base, just compare actual one with the winning
+			if (activeBase.getKnowledgeList().size() >= winningBase.getKnowledgeList().size()) {
+				return activeBase;
+			} else {
+				return winningBase;
 			}
 		}
-		return ret;
 	}
 
 	/*
@@ -91,14 +142,15 @@ public class EnvAnalyzer {
 				environment.view.getGameMap().printWinner(winner);
 				return true;
 			}
+			
 			if (settings.getMode() == GameSettings.DOMINATION) {
-					if (conditionCounter == GameSettings.DOMINATION_WIN_ROUNDS) {
+				Base base = findDominantBase();
+					if (conditionCounter == settings.getWinQuota() && base.equals(winningBase)) {
 						environment.view.getGameMap().setCanManipulate(false);
 						winner = winningBase.getName();
 						environment.view.getGameMap().printWinner(winner);
 						return true;
 					} else {
-						Base base = findDominantBase();
 						if (winningBase == null)
 							winningBase = base;
 						
@@ -116,23 +168,25 @@ public class EnvAnalyzer {
 							}
 						}
 					}
-				if(settings.getMaxRounds() != GameSettings.INFINITE && GameMap.ROUND >= settings.getMaxRounds()) { //we are at limit of rounds
-					environment.view.getGameMap().setCanManipulate(false);
-					winner = winningBase == null ? findDominantBase().getName() : winningBase.getName();
-					environment.view.getGameMap().printWinner(winner);
-					return true;
-				} 
-			} else if (settings.getMode() == GameSettings.ANIHLIATION) {
+			} else if (settings.getMode() == GameSettings.MADNESS) {
 				
 				winningBase = findDominantBase();
 				
-				if (winningBase.getKilledEnemies() >= settings.getKillQuota()) {
+				if (winningBase.getKilledEnemies() >= settings.getWinQuota()) {
 					environment.view.getGameMap().setCanManipulate(false);
 					winner = winningBase.getName();
 					environment.view.getGameMap().printWinner(winner);
 					return true;
 				}
 			}
+			
+			//when game ended due to round limit
+			if(settings.getMaxRounds() != GameSettings.INFINITE && GameMap.ROUND >= settings.getMaxRounds()) { //we are at limit of rounds
+				environment.view.getGameMap().setCanManipulate(false);
+				winner = winningBase == null ? findDominantBase().getName() : winningBase.getName();
+				environment.view.getGameMap().printWinner(winner);
+				return true;
+			} 
 		return false;
 	}
 	
