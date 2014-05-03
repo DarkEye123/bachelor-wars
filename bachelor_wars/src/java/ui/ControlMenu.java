@@ -68,37 +68,58 @@ public class ControlMenu extends JPanel implements ActionListener{
 		Font font = new Font("VL Gothic", Font.BOLD, 15);
 		
 		winningBase = new JLabel("Winning base: --");
-		
-		if (view.settings.getMode() == GameSettings.DOMINATION)  {
-			value = new JLabel("seized: --");
-			roundsToWin = new JLabel("Rounds to win: " + 1 + "/" + GameSettings.DOMINATION_WIN_ROUNDS);
-		}
-		else if (view.settings.getMode() == GameSettings.ANIHLIATION) {
-			value = new JLabel("killed: --");
-			roundsToWin = new JLabel("Kills to win: " + 0 + "/" + maxRounds);
-		}
-		else {
-			value = new JLabel("survived: --");
-			roundsToWin = new JLabel("Rounds to win: " + 1 + "/" + maxRounds);
-		}
-		
-		
 		round = new JLabel("Round: " + GameMap.ROUND );
 		time = new JLabel("time: " + ft.format(dNow));
 		buttonEndRound = new JButton("end round");
 		buttonEndRound.addMouseListener(new EndRoundListener());
-		this.add(winningBase, constraints);
-		constraints.gridx = 1;
-		this.add(value, constraints);
-		constraints.gridx = 2;
-		this.add(roundsToWin, constraints);
-		constraints.gridx = 3;
-		this.add(round, constraints);
-		constraints.gridx = 4;
-		this.add(time, constraints);
-		constraints.gridx = 5;
-		constraints.gridwidth = GridBagConstraints.REMAINDER;
-		this.add(buttonEndRound, constraints);
+		
+		if (view.settings.getMode() == GameSettings.DOMINATION)  {
+			value = new JLabel("seized: --");
+			roundsToWin = new JLabel("Rounds to win: " + 1 + "/" + view.getSettings().getWinQuota());
+			roundsToWin.setFont(font);
+			roundsToWin.setForeground(Color.white);
+			this.add(winningBase, constraints);
+			constraints.gridx = 1;
+			this.add(value, constraints);
+			constraints.gridx = 2;
+			this.add(roundsToWin, constraints);
+			constraints.gridx = 3;
+			this.add(round, constraints);
+			constraints.gridx = 4;
+			this.add(time, constraints);
+			constraints.gridx = 5;
+			constraints.gridwidth = GridBagConstraints.REMAINDER;
+			this.add(buttonEndRound, constraints);
+		}
+		else if (view.settings.getMode() == GameSettings.MADNESS) {
+			value = new JLabel("killed: 0" + "/" + view.settings.getWinQuota());
+			this.add(winningBase, constraints);
+			constraints.gridx = 1;
+			this.add(value, constraints);
+			constraints.gridx = 2;
+			this.add(round, constraints);
+			constraints.gridx = 3;
+			this.add(time, constraints);
+			constraints.gridx = 4;
+			constraints.gridwidth = GridBagConstraints.REMAINDER;
+			this.add(buttonEndRound, constraints);
+		}
+		else {
+			value = new JLabel("seized bases: 0" + "/" + view.settings.getWinQuota());
+			this.add(winningBase, constraints);
+			constraints.gridx = 1;
+			this.add(value, constraints);
+			constraints.gridx = 2;
+			this.add(round, constraints);
+			constraints.gridx = 3;
+			this.add(time, constraints);
+			constraints.gridx = 4;
+			constraints.gridwidth = GridBagConstraints.REMAINDER;
+			this.add(buttonEndRound, constraints);
+		}
+		
+		
+		
 		canRepaint = true;
 		repaint();
 		timer = new Timer(1000, this);
@@ -108,12 +129,10 @@ public class ControlMenu extends JPanel implements ActionListener{
 		round.setForeground(Color.white);
 		time.setForeground(Color.white);
 		winningBase.setForeground(Color.white);
-		roundsToWin.setForeground(Color.white);
 		
 		time.setFont(font);
 		winningBase.setFont(font);
 		value.setFont(font);
-		roundsToWin.setFont(font);
 		round.setFont(font);
 		
 		repaint();
@@ -139,24 +158,26 @@ public class ControlMenu extends JPanel implements ActionListener{
 //			    roundsToWin.setText("Rounds to win: " + view.env.analyzer.getConditionCounter() + "/" + maxRounds);
 			    
 			    if (view.settings.getMode() == GameSettings.DOMINATION)  {
-			    	if (view.env.analyzer.winningBase == null)
+			    	if (view.env.analyzer.winningBase == null) {
 			    		value.setText("seized: --");
-			    	else 
+			    		roundsToWin.setText("Rounds to win: " + 1 + "/" + view.settings.getWinQuota());
+			    	}
+			    	else  {
 			    		value.setText("seized: " + view.env.analyzer.winningBase.getKnowledgeList().size());
-					roundsToWin.setText("Rounds to win: " + view.env.analyzer.getConditionCounter() + "/" + GameSettings.DOMINATION_WIN_ROUNDS);
+			    		roundsToWin.setText("Rounds to win: " + view.env.analyzer.getConditionCounter() + "/" + view.settings.getWinQuota());
+			    	}
 				}
 				else if (view.settings.getMode() == GameSettings.MADNESS) {
-					if (view.env.analyzer.winningBase == null)
-						value.setText("killed: --/" + view.settings.getWinQuota());
-					else
+					if (view.env.analyzer.winningBase != null)
 						value.setText("killed: " + view.env.analyzer.winningBase.getKilledEnemies() + "/" + view.settings.getWinQuota());
+					else
+						value.setText("killed: 0" + "/" + view.settings.getWinQuota());
 				}
 				else {
-					if (view.env.analyzer.winningBase == null)
-						value.setText("survived: --");
+					if (view.env.analyzer.winningBase != null)
+						value.setText("seized bases: " + view.env.analyzer.winningBase.getSeizedBases());
 					else
-						value.setText("survived: " + view.env.analyzer.winningBase);
-					roundsToWin.setText("Rounds to win: " + view.env.analyzer.winningBase.getRoundsSurvived() + "/" + maxRounds);
+						value.setText("seized bases: " + 0);
 				}
 		    }
 		    

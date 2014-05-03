@@ -42,13 +42,13 @@ public class EnvAnalyzer {
 		}
 	}
 	
-	private Base findDominantBase() {
+	private Base findDominantBase(Base activeBase) {
 		if (settings.getMode() == GameSettings.DOMINATION) {
-			return findBestKnowledgeHolder(GameMap.getActiveBases().getFirst());
+			return findBestKnowledgeHolder(activeBase);
 		} else if (settings.getMode() == GameSettings.MADNESS) {
-			return findBestKillingHolder(GameMap.getActiveBases().getFirst());
+			return findBestKillingHolder(activeBase);
 		} else {
-			return findBestBaseSeizer(GameMap.getActiveBases().getFirst());
+			return findBestBaseSeizer(activeBase);
 		}
 	}
 	
@@ -64,7 +64,7 @@ public class EnvAnalyzer {
 			}
 			return ret;
 		} else {  //if there is some winning base, just compare actual one with the winning
-			if (winningBase.getSeizedBases() > activeBase.getSeizedBases())
+			if (winningBase.getSeizedBases() >= activeBase.getSeizedBases())
 				return winningBase;
 			else
 				return activeBase;
@@ -83,7 +83,7 @@ public class EnvAnalyzer {
 			}
 			return ret;
 		} else {  //if there is some winning base, just compare actual one with the winning
-			if (winningBase.getKilledEnemies() > activeBase.getKilledEnemies())
+			if (winningBase.getKilledEnemies() >= activeBase.getKilledEnemies())
 				return winningBase;
 			else
 				return activeBase;
@@ -123,6 +123,10 @@ public class EnvAnalyzer {
 			}
 		}
 	}
+	
+	public boolean analyzeEnvironment() {
+		return this.analyzeEnvironment(GameMap.getActiveBases().getFirst());
+	}
 
 	/*
 	 * For mode Domination is winner if he posses atleast 80 percent of all resources for 3 rounds or 
@@ -133,9 +137,9 @@ public class EnvAnalyzer {
 	 * 
 	 * @return true if there is winner
 	 */
-	public boolean analyzeEnvironment() {
-			seizeKnowledge(GameMap.getActiveBases().getFirst());
-			deleteSeizedBases(getSeizedBases(GameMap.getActiveBases().getFirst()));
+	public boolean analyzeEnvironment(Base activeBase) {
+			seizeKnowledge(activeBase);
+			deleteSeizedBases(getSeizedBases(activeBase));
 			if (GameMap.getBaseList().size() == 1) { // there is only one left, so it is winner
 				environment.view.getGameMap().setCanManipulate(false);
 				winner = GameMap.getBaseList().getFirst().getName();
@@ -144,7 +148,7 @@ public class EnvAnalyzer {
 			}
 			
 			if (settings.getMode() == GameSettings.DOMINATION) {
-				Base base = findDominantBase();
+				Base base = findDominantBase(activeBase);
 					if (conditionCounter == settings.getWinQuota() && base.equals(winningBase)) {
 						environment.view.getGameMap().setCanManipulate(false);
 						winner = winningBase.getName();
@@ -170,7 +174,7 @@ public class EnvAnalyzer {
 					}
 			} else if (settings.getMode() == GameSettings.MADNESS) {
 				
-				winningBase = findDominantBase();
+				winningBase = findDominantBase(activeBase);
 				
 				if (winningBase.getKilledEnemies() >= settings.getWinQuota()) {
 					environment.view.getGameMap().setCanManipulate(false);
@@ -178,12 +182,14 @@ public class EnvAnalyzer {
 					environment.view.getGameMap().printWinner(winner);
 					return true;
 				}
+			} else {
+				winningBase = findDominantBase(activeBase);
 			}
 			
 			//when game ended due to round limit
 			if(settings.getMaxRounds() != GameSettings.INFINITE && GameMap.ROUND >= settings.getMaxRounds()) { //we are at limit of rounds
 				environment.view.getGameMap().setCanManipulate(false);
-				winner = winningBase == null ? findDominantBase().getName() : winningBase.getName();
+				winner = winningBase == null ? findDominantBase(activeBase).getName() : winningBase.getName();
 				environment.view.getGameMap().printWinner(winner);
 				return true;
 			} 

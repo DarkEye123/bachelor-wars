@@ -156,6 +156,7 @@ public class GameEnv extends Environment {
     }
     
     private void markDone(Structure action) {
+    	System.out.println(GameMap.getActiveBases());
     	if (! GameMap.getBaseList().isEmpty()) { //game was not ended
 	    	GameMap.removeActiveBase();
 	    	GameMap.allowActions(GameMap.getActiveBases(), this);
@@ -169,8 +170,9 @@ public class GameEnv extends Environment {
 	    		GameMap.reinitActiveBases();
 	    		if (GameMap.getBaseList().getFirst().getOwner() != GameSettings.PLAYER) //if there is no real player play new round
 	    			GameMap.allowActions(GameMap.getActiveBases(), this);
-	    		else
-	    			analyzer.seizeKnowledge(GameMap.getBaseList().getFirst()); //player need to seize knowledge too
+	    		else {
+	    			analyzer.analyzeEnvironment(GameMap.getBaseList().getFirst()); //player need to fulfill winning conditions too - it's new round for him
+	    		}
 	    	}
     	}
     }
