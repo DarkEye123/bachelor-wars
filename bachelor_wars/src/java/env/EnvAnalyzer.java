@@ -12,7 +12,7 @@ import mapping.GameSettings;
 public class EnvAnalyzer {
 	protected GameEnv environment;
 	protected GameSettings settings;
-	protected String winner;
+	protected Base winner;
 	private HashMap<Base, Integer> statistics = new HashMap<>();
 	private int conditionCounter = 1;
 	private int baseCounter;
@@ -142,7 +142,7 @@ public class EnvAnalyzer {
 			deleteSeizedBases(getSeizedBases(activeBase));
 			if (GameMap.getBaseList().size() == 1) { // there is only one left, so it is winner
 				environment.view.getGameMap().setCanManipulate(false);
-				winner = GameMap.getBaseList().getFirst().getName();
+				winner = GameMap.getBaseList().getFirst();
 				environment.view.getGameMap().printWinner(winner);
 				return true;
 			}
@@ -151,7 +151,7 @@ public class EnvAnalyzer {
 				Base base = findDominantBase(activeBase);
 					if (conditionCounter == settings.getWinQuota() && base.equals(winningBase)) {
 						environment.view.getGameMap().setCanManipulate(false);
-						winner = winningBase.getName();
+						winner = winningBase;
 						environment.view.getGameMap().printWinner(winner);
 						return true;
 					} else {
@@ -178,7 +178,7 @@ public class EnvAnalyzer {
 				
 				if (winningBase.getKilledEnemies() >= settings.getWinQuota()) {
 					environment.view.getGameMap().setCanManipulate(false);
-					winner = winningBase.getName();
+					winner = winningBase;
 					environment.view.getGameMap().printWinner(winner);
 					return true;
 				}
@@ -189,7 +189,7 @@ public class EnvAnalyzer {
 			//when game ended due to round limit
 			if(settings.getMaxRounds() != GameSettings.INFINITE && GameMap.ROUND >= settings.getMaxRounds()) { //we are at limit of rounds
 				environment.view.getGameMap().setCanManipulate(false);
-				winner = winningBase == null ? findDominantBase(activeBase).getName() : winningBase.getName();
+				winner = winningBase == null ? findDominantBase(activeBase) : winningBase;
 				environment.view.getGameMap().printWinner(winner);
 				return true;
 			} 

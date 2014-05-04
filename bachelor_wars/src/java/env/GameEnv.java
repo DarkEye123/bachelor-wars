@@ -3,10 +3,14 @@ package env;
 
 import jason.NoValueException;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
+import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Structure;
+import jason.asSyntax.Term;
 import jason.environment.Environment;
 import jason.environment.grid.Location;
 
@@ -156,7 +160,6 @@ public class GameEnv extends Environment {
     }
     
     private void markDone(Structure action) {
-    	System.out.println(GameMap.getActiveBases());
     	if (! GameMap.getBaseList().isEmpty()) { //game was not ended
 	    	GameMap.removeActiveBase();
 	    	GameMap.allowActions(GameMap.getActiveBases(), this);
@@ -218,6 +221,18 @@ public class GameEnv extends Environment {
 		        addPercept(base.getAgent(), Literal.parseLiteral("maximumSlots("+base.getMaxSlots()+")"));
 		        addPercept(base.getAgent(), Literal.parseLiteral("agentID("+base.getOwner()+")"));
 		        addPercept(base.getAgent(), Literal.parseLiteral("mode("+view.getSettings().getMode()+")"));
+		        addPercept(base.getAgent(), Literal.parseLiteral("fightingPower("+base.getFightingPower()+")."));
+		        addPercept(base.getAgent(), Literal.parseLiteral("movingPower("+base.getMovingPower()+")."));
+		        LinkedList<String> allies = new LinkedList<>();
+		        for (Base b:base.getAllies()) {
+		        	allies.add("\"" + b.getAgent() + "\"");
+		        }
+//		        System.out.println("ALIEEEEEEEEEES: " + allies);
+		        Literal lit = new LiteralImpl("allies");
+		        Term t = ListTermImpl.parseList(allies.toString());
+		        lit.addTerm(t);
+//		        System.out.println("LITERAAAAAAAAAAAAAAAAAL: " + lit);
+		        addPercept(base.getAgent(), lit);
 		        System.out.println("updating percepts for: " + base.getAgent());
     		}
     	}

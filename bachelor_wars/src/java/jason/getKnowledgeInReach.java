@@ -15,6 +15,8 @@ public class getKnowledgeInReach extends jason.getNearestFreeKnowledge {
 		canRemove = false;
 		if (!(boolean)super.execute(ts, un, terms)) //empty
 			return false;
+
+//		System.out.println(closest.path.size() + " " + unit.getMov());
 		
 		if (closest.path.size() > unit.getMov()) //not in reach
 			return false;

@@ -70,7 +70,7 @@ public class GameMap extends JPanel implements ActionListener{
 	private boolean canPrintWinner = false;
 	private boolean canManipulate = true;
 	private boolean isLivingPlayer = true;
-	private String winner;
+	private Base winner;
 	public static int ROUND = 1;
 	private Image pic = Toolkit.getDefaultToolkit().getImage("pics/map.jpeg");
 	
@@ -168,6 +168,7 @@ public class GameMap extends JPanel implements ActionListener{
 								Base pomBase = searchBase(i);
 								base.getAllies().add(pomBase);
 								base.getEnemies().remove(pomBase);
+								base.setTeam(s);
 							}
 						}
 					}
@@ -606,7 +607,7 @@ public class GameMap extends JPanel implements ActionListener{
 		Node.removePredecessors();
 	}
 
-	public void printWinner(String winner) {
+	public void printWinner(Base winner) {
 //		Graphics g = this.getGraphics();
 		this.winner = winner;
 		this.canPrintWinner = true;
@@ -614,9 +615,13 @@ public class GameMap extends JPanel implements ActionListener{
 	
 	private void printWinner() {
 		Font defaultFont = new Font("Arial", Font.BOLD, 32);
-		g2.setColor(Color.MAGENTA);
+		g2.setColor(winner.getColor());
 		g2.setFont(defaultFont);
-		String pom = "Winner: " + winner;
+		String pom; 
+		if (winner.getTeam() == null)
+			pom = "Winner: " + winner.getName();
+		else
+			pom = "Winning team: " + winner.getTeam();
 		g2.drawString(pom, this.getWidth()/2 - ((defaultFont.getSize()*pom.length())/3), this.getHeight()/2);
 	}
 

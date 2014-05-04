@@ -18,11 +18,6 @@ import jason.environment.grid.Location;
  */
 public class Base extends GameObject implements Clickable{
 	
-	@Override
-	public String toString() {
-		return "[ " + getOwner() + ", " + getX() + ", " + getY() + "]";
-	}
-
 	public final static int DEFAULT_SLOT_SIZE = 6;
 	public final static int DEFAULT_KNOWLEDGE = 100;
 	public final static Dimension DEFAULT_BASE_SIZE = new Dimension(2,2); //size on grid (x,y)
@@ -47,6 +42,7 @@ public class Base extends GameObject implements Clickable{
 //	private LinkedList<Base> seizingBases = new LinkedList<>();
 	private int basicIncome;
 	private int roundSurvived;
+	private String team;
 	
 	/**
 	 * Constructor of Base
@@ -353,5 +349,35 @@ public class Base extends GameObject implements Clickable{
 
 	public void addKilledEnemy(int size) {
 		killedEnemies += size;
+	}
+	
+	@Override
+	public String toString() {
+		return "[ " + getOwner() + ", " + getX() + ", " + getY() + ", " + getKnowledge() + ", " +
+				getFightingPower() + ", " + getMovingPower() + " ]";
+	}
+
+	public int getMovingPower() {
+		int pow = 0;
+		for (Unit u:getUnitList()) {
+			pow += u.getMov();
+		}
+		return pow;
+	}
+
+	public int getFightingPower() {
+		int pow = 0;
+		for (Unit u:getUnitList()) {
+			pow += u.getAtk();
+		}
+		return pow;
+	}
+
+	public void setTeam(String s) {
+		this.team = s;
+	}
+	
+	public String getTeam() {
+		return team;
 	}
 }
