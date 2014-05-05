@@ -354,10 +354,10 @@ public class Base extends GameObject implements Clickable{
 	@Override
 	public String toString() {
 		return "[ " + getOwner() + ", " + getX() + ", " + getY() + ", " + getKnowledge() + ", " +
-				getFightingPower() + ", " + getMovingPower() + " ]";
+				getFightingPower() + ", " + getMovingCapability() + " ]";
 	}
 
-	public int getMovingPower() {
+	public int getMovingCapability() {
 		int pow = 0;
 		for (Unit u:getUnitList()) {
 			pow += u.getMov();

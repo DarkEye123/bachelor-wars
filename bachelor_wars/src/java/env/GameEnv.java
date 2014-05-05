@@ -222,16 +222,15 @@ public class GameEnv extends Environment {
 		        addPercept(base.getAgent(), Literal.parseLiteral("agentID("+base.getOwner()+")"));
 		        addPercept(base.getAgent(), Literal.parseLiteral("mode("+view.getSettings().getMode()+")"));
 		        addPercept(base.getAgent(), Literal.parseLiteral("fightingPower("+base.getFightingPower()+")."));
-		        addPercept(base.getAgent(), Literal.parseLiteral("movingPower("+base.getMovingPower()+")."));
+		        addPercept(base.getAgent(), Literal.parseLiteral("movingCapability("+base.getMovingCapability()+")."));
+		        addPercept(base.getAgent(), Literal.parseLiteral("round("+GameMap.ROUND+")."));
 		        LinkedList<String> allies = new LinkedList<>();
 		        for (Base b:base.getAllies()) {
-		        	allies.add("\"" + b.getAgent() + "\"");
+		        	allies.add(b.getAgent());
 		        }
-//		        System.out.println("ALIEEEEEEEEEES: " + allies);
 		        Literal lit = new LiteralImpl("allies");
 		        Term t = ListTermImpl.parseList(allies.toString());
 		        lit.addTerm(t);
-//		        System.out.println("LITERAAAAAAAAAAAAAAAAAL: " + lit);
 		        addPercept(base.getAgent(), lit);
 		        System.out.println("updating percepts for: " + base.getAgent());
     		}

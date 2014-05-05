@@ -106,8 +106,8 @@ public abstract class getPairs extends DefaultInternalAction {
 		if (act < max) {
 			if (actObj != null)
 				actualPath.add(actObj);
-			for (Wrapper w: input.get(act)) {
-				if (canProceed(actualPath, w))
+			for (Wrapper w: input.get(act)) { //for every Wrapped object from actual group
+				if (canProceed(actualPath, w)) //if is possible to proceed with next Wrapped object, do it
 					doStep(act + 1, max, w, input, (LinkedList<Wrapper>) actualPath.clone(), variants);
 			}
 		} 
@@ -151,7 +151,7 @@ public abstract class getPairs extends DefaultInternalAction {
 			for (Wrapper object:variant) {
 				act += object.path.size(); //evaluate a cost of this path
 			}
-			act += evaluatePenalty(fullPotential, variant);
+			act += evaluatePenalty(fullPotential, variant); //for every unused unit there is penalty
 			if (min > act) {
 				min = act;
 				bestComposition = variant;

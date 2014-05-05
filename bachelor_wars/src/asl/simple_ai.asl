@@ -32,12 +32,11 @@ agentID(unknown)[source(percept)].
 actualKnowledge(unknown)[source(percept)].
 freeSlots(unknown)[source(percept)].
 maximumSlots(unknown)[source(percept)].
+understandSimple("no").
 
 //-----------------------------------------------------------------------Intentions-----------------------------------------------------------
 killIntention(0). //damage with atk
-//healIntention(1).
 seizeIntention(2).
-//buffIntention(3). //use a power with given intention TODO try to find out if necessary
 supportIntention(4). //Support copy intentions of friendly target unit. Do not forget to remove this intention after that
 
 //----------------------------------------------------------------------Available-Modes-------------------------------------------------------
@@ -45,26 +44,34 @@ domination(0).
 anihilation(1).
 madness(2).
 
-//----------------------------------------------------------------------Available-Classes-----------------------------------------------------
-//tank(1).
-//healer(2).
-//damageDealer(4).
-//supporter(8).
-
 //-----------------------------------------------------------------------Rules----------------------------------------------------------------
-enoughSlots :- freeSlots(N)[source(percept)] & N > 0 & .print("free slots: ",N).
-isKillingIntention(Type) :- killIntention(N) & N == Type.
-//isHealingIntention(Type) :- healIntention(N) & N == Type.
-isSeizeIntention(Type) :- seizeIntention(N) & N == Type.
+enoughSlots :- 
+	freeSlots(N)[source(percept)] & 
+	N > 0 & 
+	.print("free slots: ",N).
+	
+isKillingIntention(Type) :- 
+	killIntention(N) & 
+	N == Type.
+	
+isSeizeIntention(Type) :- 
+	seizeIntention(N) & 
+	N == Type.
 
-isDominationMode :- mode(N) & domination(M) & N == M.
-isAnihilationMode :- mode(N) & anihilation(M) & N == M.
-isMadnessMode :- mode(N) & madness(M) & N == M.
-
-//isTankClass(Type) :- tank(M) & Type == M.
-//isHealerClass(Type) :- healer(M) & Type == M.
-//isDamageDealerClass(Type) :- damageDealer(M) & Type == M.
-//isSupporterClass(Type) :- supporter(M) & Type == M.
+isDominationMode :- 
+	mode(N) & 
+	domination(M) & 
+	N == M.
+	
+isAnihilationMode :- 
+	mode(N) & 
+	anihilation(M) & 
+	N == M.
+	
+isMadnessMode :- 
+	mode(N) & 
+	madness(M) & 
+	N == M.
 
 //---------------------------------------------------------------------Rule-Variants-Of-Goals-For-Unit-Stats----------------------------------
 getType(Unit,Stat) :- 
@@ -93,11 +100,6 @@ getTypeOfIntention(Intention, Type) :-
 getKnowledgeId(Knowledge, Stat) :-
 	.nth(0,Knowledge,Stat).
 	
-//test(Val) :- .nth(1,[1,2,3],X) & .nth(2,[1,2,3],Y) & Val=[X,Y].
-//
-//!start.
-//+!start : test(Val) <- .print(Val). 
-
 //------------------------------------------------------------------------unit-stats------------------------------------------------------------
 +!getType(Unit,Stat) : true
 	<- .nth(0,Unit,Stat).
@@ -195,7 +197,6 @@ getKnowledgeId(Knowledge, Stat) :-
 											Type \== "knowledge" & 
 											jason.getKnowledgeInReach(UnitID, Knowledge) & //desired action for domination mode - higher priority
 											getKnowledgeId(Knowledge, TargetObject) & 
-//											.print("IM HEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE ", TargetObject, " ", Type) &
 											TargetObject \== Type & //check if this intention isn't the same as
 											.print("Unit: ", UnitID, " adding possible based intention(knowledge): ", Knowledge)
 	<-	jason.addIntention(UnitID, TargetObject, 0, "knowledge").
@@ -226,7 +227,6 @@ getKnowledgeId(Knowledge, Stat) :-
 		jason.addIntention(UnitID, TargetObject, 1, "knowledge");
 		!addEnemyBases(UnitID);
 		!addPossibleIntention(UnitID, "knowledge");
-		.print("HEREEEEEEE");
 		!moveUnit(Unit).
 		
 +!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isDominationMode & jason.getNearestFreeEnemy(UnitID,Enemy) 

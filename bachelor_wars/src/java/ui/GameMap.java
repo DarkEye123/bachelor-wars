@@ -136,8 +136,9 @@ public class GameMap extends JPanel implements ActionListener{
 			
 			baseList.add(base);
 			if (base.getType() != GameSettings.PLAYER) {
-				view.env.addAgent(base.getName(), base.getAgent()); //add agent to the game
-				base.setAgent(base.getName());
+				String name = base.getName().replace(" ", "_").toLowerCase();
+				view.env.addAgent(name, base.getAgent()); //add agent to the game
+				base.setAgent(name);
 				view.env.addPercept(base.getAgent(), Literal.parseLiteral("agentID("+base.getOwner()+")"));
 			}
 			base.setMapWidth(settings.getMapColumns()); //set number of cells in a row

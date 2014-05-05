@@ -9,8 +9,13 @@ actualKnowledge(unknown)[source(percept)].
 freeSlots(unknown)[source(percept)].
 maximumSlots(unknown)[source(percept)].
 fightingPower(unknown)[source(percept)].
-movingPower(unknown)[source(percept)].
-type(unknown)[source(Ag)]. //type can be attacker(enemy diversion till seizer has money for better units), seizer (economy later attack)
+movingCapability(unknown)[source(percept)].
+allies([])[source(percept)].
+role(unknown)[source(Ag)]. //type can be attacker(enemy diversion till seizer has money for better units), seizer (economy later attack)
+//agreementCounter(1)[source(Ag)].
+round(unknown)[source(percept)].
+understandSimple("yes").
+compatibleAllies([]).
 
 //-----------------------------------------------------------------------Intentions-----------------------------------------------------------
 killIntention(0). //damage with atk
@@ -21,13 +26,42 @@ anihilation(1).
 madness(2).
 
 //-----------------------------------------------------------------------Rules----------------------------------------------------------------
-enoughSlots :- freeSlots(N)[source(percept)] & N > 0 & .print("free slots: ",N).
-isKillingIntention(Type) :- killIntention(N) & N == Type.
-isSeizeIntention(Type) :- seizeIntention(N) & N == Type.
+enoughSlots :- 
+	freeSlots(N)[source(percept)] & 
+	N > 0 & 
+	.print("free slots: ",N).
+	
+isWithoutUnits :- 
+	freeSlots(N)[source(percept)] & 
+	maximumSlots(M)[source(percept)] & 
+	N == M.
+	
+isKillingIntention(Type) :- 
+	killIntention(N) & 
+	N == Type.
+	
+isSeizeIntention(Type) :- 
+	seizeIntention(N) & 
+	N == Type.
 
-isDominationMode :- mode(N) & domination(M) & N == M.
-isAnihilationMode :- mode(N) & anihilation(M) & N == M.
-isMadnessMode :- mode(N) & madness(M) & N == M.
+isDominationMode :- 
+	mode(N) & 
+	domination(M) & 
+	N == M.
+	
+isAnihilationMode :- 
+	mode(N) & 
+	anihilation(M) & 
+	N == M.
+	
+isMadnessMode :- 
+	mode(N) & 
+	madness(M) & 
+	N == M.
+
+canAsk :- 
+	round(N) & 
+	N mod 10 == 1. //there is need some time for given role to play
 
 //---------------------------------------------------------------------Rule-Variants-Of-Goals-For-Unit-Stats----------------------------------
 getType(Unit,Stat) :- 
@@ -58,40 +92,8 @@ getKnowledgeId(Knowledge, Stat) :-
 	
 //------------------------------------------------------------------------unit-stats------------------------------------------------------------
 
-//!start.
-
-+!getUnitByMovement([], []).
-
-+!getUnitByMovement([H|B], [X|C]) : true
-	<- 	!drawPositionInList(H, 5, X); 
-		!test(B, C).
-
-+!drawPositionInList(InputList, PositionToDraw, FinalList) : true 
-	<- 	!getType(InputList, Type);
-		!getID(InputList, ID);
-		.nth(PositionToDraw, InputList, Ret);
-		FinalList = [Ret, Type, ID].
-		
-+!drawPositionInList([], _, []).
 
 
-//+!makeList([], X, [X]).
-//	
-//+!makeList([H|B], X, [H|C]) : true
-//	<- !test(B, X, C).
-
-
-//+!test([], X, X).
-//	
-//+!test([H|B], X, [H|C]) : true
-//	<- !test(B, X, C).
-	
-	
-//+!start : true <- .max([[1, "test1"],[3, "test2"],[0, "test4"],[2, "test3"]], X); .print(X).
-//+!start :true <- !test([1,2,4], 3, Y); .print(Y).
-//+!start :true <- !test([1,2,4], [[3]], Y); .print(Y).
-//+!start :true <- !test([], 3, Y); .print(Y); !test(Y, 1, X); .println(X).
-//+!start :true <- !test([ [1, 2, 3], [5, 6, 7] ], 1, Y); .print(Y).
 
 +!getType(Unit,Stat) : true
 	<- .nth(0,Unit,Stat).
@@ -140,6 +142,26 @@ getKnowledgeId(Knowledge, Stat) :-
 	<- .nth(5,Base,Stat).
 	
 //====================================================================================================================================================
+
+//!start.
+
+//+!makeList([], X, [X]).
+//	
+//+!makeList([H|B], X, [H|C]) : true
+//	<- !test(B, X, C).
+
+
+//+!test([], X, X).
+//	
+//+!test([H|B], X, [H|C]) : true
+//	<- !test(B, X, C).
+	
+	
+//+!start : true <- .max([[1, "test1"],[3, "test2"],[0, "test4"],[2, "test3"]], X); .print(X).
+//+!start :true <- !test([1,2,4], 3, Y); .print(Y).
+//+!start :true <- !test([1,2,4], [[3]], Y); .print(Y).
+//+!start :true <- !test([], 3, Y); .print(Y); !test(Y, 1, X); .println(X).
+//+!start :true <- !test([ [1, 2, 3], [5, 6, 7] ], 1, Y); .print(Y).
 
 
 
@@ -209,7 +231,6 @@ getKnowledgeId(Knowledge, Stat) :-
 											Type \== "knowledge" & 
 											jason.getKnowledgeInReach(UnitID, Knowledge) & //desired action for domination mode - higher priority
 											getKnowledgeId(Knowledge, TargetObject) & 
-//											.print("IM HEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE ", TargetObject, " ", Type) &
 											TargetObject \== Type & //check if this intention isn't the same as
 											.print("Unit: ", UnitID, " adding possible based intention(knowledge): ", Knowledge)
 	<-	jason.addIntention(UnitID, TargetObject, 0, "knowledge").
@@ -240,7 +261,6 @@ getKnowledgeId(Knowledge, Stat) :-
 		jason.addIntention(UnitID, TargetObject, 1, "knowledge");
 		!addEnemyBases(UnitID);
 		!addPossibleIntention(UnitID, "knowledge");
-		.print("HEREEEEEEE");
 		!moveUnit(Unit).
 		
 +!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isDominationMode & jason.getNearestFreeEnemy(UnitID,Enemy) 
@@ -384,11 +404,105 @@ getKnowledgeId(Knowledge, Stat) :-
 		 
 -!check_action(ID): true <- update_percepts; mark_done.
 
+//=====================================================================================================================================================================
+
++!getUnitByMovement([], []). //this chooses a unit with the best moving ability (creation)
+
++!getUnitByMovement([H|B], [X|C]) : true
+	<- 	!drawPositionInList(H, 5, X); 
+		!test(B, C).
+
++!drawPositionInList(InputList, PositionToDraw, FinalList) : true 
+	<- 	!getType(InputList, Type);
+		!getID(InputList, ID);
+		.nth(PositionToDraw, InputList, Ret);
+		FinalList = [Ret, Type, ID].
+		
++!drawPositionInList([], _, []).
+//====================================================================================================================================================================
++!knowledge_distance_evaluation [source(self)] : isWithoutUnits
+	<- 	?agentID(ID);
+		jason.getBestDistance(ID, "base", "knowledge", N);
+		+evaluated_knowledge_distance(N).
+		
++!knowledge_distance_evaluation [source(Ag)] : isWithoutUnits
+	<- 	?agentID(ID);
+		jason.getBestDistance(ID, "base", "knowledge", N);
+		.send(Ag, tell, evaluated_knowledge_distance(N)).
+//====================================================================================================================================================================
++!ask_moving_capability([H|B], [C|G]) : true
+	<- 	.send(H, askOne, movingCapability(N), U);
+		+U;
+		?movingCapability(X)[source(H)];
+		C=[X, H];
+		!ask_moving_capability(B, G).
+
++!ask_moving_capability(_, []).
+
++!ask_knowledge_distance_evaluation([H|B], [C|G]) : true
+	<-  
+//		!askUnderstandSimple(H);
+		.send(H, achieve, knowledge_distance_evaluation);
+		.wait({+evaluated_knowledge_distance(X)[source(H)]});
+		?evaluated_knowledge_distance(X)[source(H)];
+		C=[X, H];
+		!ask_knowledge_distance_evaluation(B, G).
+		
++!ask_knowledge_distance_evaluation(_, []).
+
++!agree_with_allies : canAsk & allies(Allies) & Allies \== []
+	<- 	?round(Round);
+		.my_name(Name);
+		for (.member(Ally, Allies)) {
+			?compatibleAllies(Compatible);
+			!askUnderstandSimple(Ally, Answer);
+			if (Answer == "yes") {
+				!appendList(Compatible, Ally, N);
+				.print("THIS IS: ", N);
+				-+compatibleAllies(N);
+			};
+		}; 
+		?compatibleAllies(Compatible);
+		.print("Compatible: ",Compatible);
+		if (Round \== 1) {
+			!ask_moving_capability(Compatible, MovingCapabilities); .print(MovingCapabilities);
+			?movingCapability(MovingCapability);
+			.max(MovingCapabilities, M);
+			.max([M,[MovingCapability, Name]], MaxMovingCapabilities);
+			.print("Actual choosen maximum moving capability: ", MaxMovingCapabilities);
+		};
+		!ask_knowledge_distance_evaluation(Compatible, KnowledgeDistanceEvaluations);
+		.print("Asked distance knowledge evaluation: ",KnowledgeDistanceEvaluations);
+		!knowledge_distance_evaluation;
+		?evaluated_knowledge_distance(KnowledgeDistanceEvaluation);
+		.min(KnowledgeDistanceEvaluations, N);
+		.min([N,[KnowledgeDistanceEvaluation, Name]], MinKnowledgeDistanceEvaluations);
+		.print("evaluated minimum knowledge distance for this agent: ", KnowledgeDistanceEvaluation);
+		.print("Actual choosen evaluated minimum knowledge distance: ", MinKnowledgeDistanceEvaluations);
+		.nth(1, MinKnowledgeDistanceEvaluations, Seizer);
+		if (Seizer == Name) {
+			+role(seizer);
+		}.
+		
++!agree_with_allies.
+
++!askUnderstandSimple(H, Answer) : true
+	<-	
+		.send(H, askOne, understandSimple(Answer));
+		.wait({+understandSimple(Answer)[source(H)]});
+		?understandSimple(Answer)[source(H)];
+		.print("Asked agent: ", H, " understands simple communication API (answer): ", Answer).
 
 +can_act <- 
 	.print("preparing actions"); 
-	update_percepts; 
+	update_percepts;
+	!agree_with_allies; 
 	mark_start; 
 	?agentID(N);
 	!check_action(N).
+	
++!appendList([], X, [X]).
+	
++!appendList([H|B], X, [H|C]) : true
+	<- !appendList(B, X, C).
 		
