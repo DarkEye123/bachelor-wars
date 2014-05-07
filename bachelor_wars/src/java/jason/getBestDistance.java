@@ -41,11 +41,12 @@ public class getBestDistance extends DefaultInternalAction {
     
     private int evaluateBaseKnowledgeDistance() {
     	LinkedList<Knowledge> knowledge = (LinkedList<Knowledge>) GameMap.getKnowledgeList().clone();
-    	knowledge.removeAll(base.getKnowledgeList());
+//    	knowledge.removeAll(base.getKnowledgeList());
     	int distance = 0;
     	for (Knowledge k:knowledge) {
-    		distance += Node.searchPath(base.getNode(), k.getNode(), true).size();
+    		distance += base.getNode().distance(k.getNode()); //need to be celan path without
     	}
+//    	System.out.println(distance + " " + base.getName());
     	return distance;
     }
 }

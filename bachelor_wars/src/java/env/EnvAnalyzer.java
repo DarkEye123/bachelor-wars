@@ -127,7 +127,22 @@ public class EnvAnalyzer {
 	public boolean analyzeEnvironment() {
 		return this.analyzeEnvironment(GameMap.getActiveBases().getFirst());
 	}
-
+	
+	public boolean isFriendlyOnly(Base activeBase) {
+		if (activeBase.getTeam() != null) {
+			if (GameMap.getBaseList().size() > 1) {
+				for (Base base:GameMap.getBaseList()) {
+					if (!activeBase.getTeam().equals(base.getTeam()))
+						return false;
+				}
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
 	/*
 	 * For mode Domination is winner if he posses atleast 80 percent of all resources for 3 rounds or 
 	 * if there is a limited number of rounds and nobody was able to possess them -> the one which
@@ -140,7 +155,7 @@ public class EnvAnalyzer {
 	public boolean analyzeEnvironment(Base activeBase) {
 			seizeKnowledge(activeBase);
 			deleteSeizedBases(getSeizedBases(activeBase));
-			if (GameMap.getBaseList().size() == 1) { // there is only one left, so it is winner
+			if (GameMap.getBaseList().size() == 1 || isFriendlyOnly(activeBase)) { // there is only one left, so it is winner
 				environment.view.getGameMap().setCanManipulate(false);
 				winner = GameMap.getBaseList().getFirst();
 				environment.view.getGameMap().printWinner(winner);
@@ -200,8 +215,12 @@ public class EnvAnalyzer {
 		synchronized (GameMap.countLock) {
 	    	for (Knowledge k:GameMap.getKnowledgeList()) {
 	    		for (Unit u:activeBase.getUnitList()) {
-	    			if (k.getNode().equals(u.getNode()) && k.STATE < GameMap.ROUND) //seized last round
+	    			if (k.getNode().equals(u.getNode()) && k.STATE < GameMap.ROUND) {//seized last round
 	    				k.setBase(activeBase);
+	    				for (Unit unit:activeBase.getUnitList()) { //agent seized this resource, delete intentions for seizing it
+	    					unit.getIntentions().remove(k);
+	    				}
+	    			}
 	    		}
 	    	}
 	    	int sum = settings.getIncomePerRound();

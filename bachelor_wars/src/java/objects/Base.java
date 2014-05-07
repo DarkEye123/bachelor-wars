@@ -233,7 +233,7 @@ public class Base extends GameObject implements Clickable{
 	
 	/**
 	 * This composes a list of all friendly units - so units from actual base are there too.
-	 * @return list of friendly units (EVERY unit which is NOT enemy)
+	 * @return list of friendly units (EVERY unit which is in the same team)
 	 */
 	public LinkedList<Unit> getFriendlyUnits() {
 		LinkedList<Unit> ret = new LinkedList<>();

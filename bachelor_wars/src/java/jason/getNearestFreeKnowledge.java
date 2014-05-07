@@ -23,6 +23,7 @@ public class getNearestFreeKnowledge extends jason.getNearest {
 	private static final long serialVersionUID = 3624829097798698211L;
 	
 	public boolean canRemove = true;
+	public boolean ignoreFriendlySeized = false;
 	
 	@Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {

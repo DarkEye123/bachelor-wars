@@ -292,7 +292,7 @@ public abstract class Unit extends GameObject implements Clickable {
 	//type, id, cost, hp, atk, mov, atkRange, sp, x, y, owner - later class
 	public String toString() {
 		return "[" + getType() + ", " + getId() + ", " + getCost() + ", " + getHp() + ", " +
-				getAtk() + ", " + getMov() + ", " + getBasicAtkRange() + ", " + 
+				getAtk() + ", " + (getMov() - 1) + ", " + getBasicAtkRange() + ", " + 
 				getX() + ", " + getY() + ", "  + getOwner() +  "]";
 	}
 
