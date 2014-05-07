@@ -10,6 +10,7 @@ import jason.asSyntax.Term;
 import java.util.LinkedList;
 
 import mapping.Wrapper;
+import objects.Base;
 import objects.Knowledge;
 import objects.units.Unit;
 import ui.GameMap;
@@ -30,6 +31,12 @@ public class getNearestFreeKnowledge extends jason.getNearest {
 		super.execute(ts, un, terms);
     	LinkedList<Knowledge> listOfInterest = (LinkedList<Knowledge>) GameMap.getKnowledgeList().clone();
     	listOfInterest.removeAll(unit.base.getKnowledgeList()); //remove already owned knowledge resources
+    	
+    	if (ignoreFriendlySeized) {
+    		for (Base base:unit.base.getAllies()) {
+    			listOfInterest.removeAll(base.getKnowledgeList());
+    		}
+    	}
     	
     	if (canRemove) {
     		LinkedList<Knowledge> toRemove = new LinkedList<>();

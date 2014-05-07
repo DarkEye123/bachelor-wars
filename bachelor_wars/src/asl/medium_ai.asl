@@ -18,6 +18,7 @@ understandSimple("yes").
 compatibleAllies([]).
 knowledgeDistances([]).
 movingCapabilities([]).
+test(1).
 
 //-----------------------------------------------------------------------Intentions-----------------------------------------------------------
 killIntention(0). //damage with atk
@@ -527,15 +528,18 @@ getKnowledgeId(Knowledge, Stat) :-
 	
 +evaluated_knowledge_distance(_)[source(self)].
 
-+evaluated_knowledge_distance(X)[source(Ag)] : true
+//+evaluated_knowledge_distance(X)[source(Ag)] : true
+@plan1 [atomic] +evaluated_knowledge_distance(X)[source(Ag)] : true
 	<- 	?knowledgeDistances(Val);
 		!appendList(Val, [X, Ag], NewVal);
+		.print("knowledge distance old val: ",Val);
 		.print("knowledge distance new val: ", X, " ", Ag, " ", NewVal);
 		-+knowledgeDistances(NewVal);
 		.length(NewVal, N);
 		?compatibleAllies(Compare);
 		.length(Compare, M);
 		-evaluated_knowledge_distance(X)[source(Ag)];
+//		.print("comparing sizes of lists: ", N, " ", M, " ", Compare);
 		if (N == M) { // here is possible set who is seizer and who is not
 			!checkSeizerRole(NewVal);
 		}.

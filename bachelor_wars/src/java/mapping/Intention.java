@@ -12,24 +12,18 @@ public class Intention {
 	
 	public Integer intention;
 	public Type type;
-	public Integer powerIndex = UNUSED; //index of used power from powerlist of given unit
 	
 	public Intention(Integer intention, Type type) {
 		this.intention = intention;
 		this.type = type;
 	}
 	
-	public Intention(Integer intention, Type type, Integer powerIndex) {
-		this(intention, type);
-		this.powerIndex = powerIndex;
-	}
-
 	@Override
 	public String toString() {
 		if (type == Type.TEMPORARY)
-			return "[" + intention + ", temporary," + powerIndex + "]";
+			return "[" + intention + ", temporary ]";
 		else
-			return "[" + intention + ", persistent," + powerIndex + "]";
+			return "[" + intention + ", persistent ]";
 	}
 	
 }
