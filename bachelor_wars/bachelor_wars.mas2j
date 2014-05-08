@@ -5,6 +5,7 @@ MAS bachelor_wars {
 	environment: env.GameEnv(gui)
 
 	agents:
+		spectator;
 		medium_ai;
 		simple_ai;
 

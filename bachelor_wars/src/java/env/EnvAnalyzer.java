@@ -15,7 +15,6 @@ public class EnvAnalyzer {
 	protected Base winner;
 	private HashMap<Base, Integer> statistics = new HashMap<>();
 	private int conditionCounter = 1;
-	private int baseCounter;
 	public Base winningBase;
 	
 	public EnvAnalyzer(GameEnv environment, GameSettings settings) {

@@ -43,6 +43,7 @@ public class Base extends GameObject implements Clickable{
 	private int basicIncome;
 	private int roundSurvived;
 	private String team;
+	private String role;
 	
 	/**
 	 * Constructor of Base
@@ -379,5 +380,13 @@ public class Base extends GameObject implements Clickable{
 	
 	public String getTeam() {
 		return team;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+	
+	public String getRole() {
+		return role;
 	}
 }

@@ -79,6 +79,7 @@ isMadnessMode :-
 canAsk :- 
 	round(N) & 
 	N mod 10 == 1. //there is need some time for given role to play
+//	N mod 2 == 1. //there is need some time for given role to play
 
 //---------------------------------------------------------------------Rule-Variants-Of-Goals-For-Unit-Stats----------------------------------
 getType(Unit,Stat) :- 
@@ -108,8 +109,10 @@ getKnowledgeId(Knowledge, Stat) :-
 	.nth(0,Knowledge,Stat).
 	
 //------------------------------------------------------------------------unit-stats------------------------------------------------------------
+//rrr[source(test)].
 
 //!start.
+//+!start : true <- ?rrr; -rrr[source(X)]; .print("ok"); !start.
 //+!start :true <- .max([ [1, 2, 3], [5, 6, 7] , [3, 10, 7] ], Y); .print(Y).
 
 
@@ -528,18 +531,15 @@ getKnowledgeId(Knowledge, Stat) :-
 	
 +evaluated_knowledge_distance(_)[source(self)].
 
-//+evaluated_knowledge_distance(X)[source(Ag)] : true
 @plan1 [atomic] +evaluated_knowledge_distance(X)[source(Ag)] : true
 	<- 	?knowledgeDistances(Val);
 		!appendList(Val, [X, Ag], NewVal);
-		.print("knowledge distance old val: ",Val);
 		.print("knowledge distance new val: ", X, " ", Ag, " ", NewVal);
 		-+knowledgeDistances(NewVal);
 		.length(NewVal, N);
 		?compatibleAllies(Compare);
 		.length(Compare, M);
 		-evaluated_knowledge_distance(X)[source(Ag)];
-//		.print("comparing sizes of lists: ", N, " ", M, " ", Compare);
 		if (N == M) { // here is possible set who is seizer and who is not
 			!checkSeizerRole(NewVal);
 		}.
@@ -570,6 +570,7 @@ getKnowledgeId(Knowledge, Stat) :-
 
 +!checkSeizerRole(KnowledgeDistances) : true
 	<-	.my_name(Name);
+		?team(Team);
 		.print("Seizer role parameters: ",KnowledgeDistances);
 		!knowledge_distance_evaluation(ThisDistance);
 		!appendList(KnowledgeDistances, [ThisDistance, Name], NewDistances);
@@ -578,44 +579,98 @@ getKnowledgeId(Knowledge, Stat) :-
 		.print("Actual choosen evaluated minimum knowledge distance: ", Min);
 		.nth(1, Min, Seizer);
 		-+knowledgeDistances([]);
-		.print("Seizer is: ", Seizer, " and my name is: ", Name);
 		if (Seizer == Name) {
 			.print("Setting seizer role");
+			jason.setRole(N, "seizer");
+			.send(spectator, achieve, setCurrentSeizer(Name, Team));
 			-+role(seizer);
 		} else {
 			.print("Setting attacker role");
+			jason.setRole(N, "attacker");
 			-+role(attacker);
 		}.
 
 +!agree_with_allies : canAsk & allies(Allies) & Allies \== []
 	<- 	?round(Round);
 		.my_name(Name);
-		-+compatibleAllies([]);
-		for (.member(Ally, Allies)) {
+		?team(Team);
+		.print("-------------------------------------------------------------------AGREEMENT--------------------------------------------------");
+		if (Round == 1) {
+			for (.member(Ally, Allies)) {
+				?compatibleAllies(Compatible);
+				!askUnderstandSimple(Ally, Answer);
+				if (Answer == "yes") {
+					!appendList(Compatible, Ally, N);
+					-+compatibleAllies(N);
+				};
+			}; 
 			?compatibleAllies(Compatible);
-			!askUnderstandSimple(Ally, Answer);
-			if (Answer == "yes") {
-				!appendList(Compatible, Ally, N);
-				-+compatibleAllies(N);
+			.print("Compatible: ",Compatible);
+			.send(spectator, achieve, addAgent(Name, Team)); //add agent into the team
+			if (Compatible \== []) {
+				!ask_knowledge_distances(Compatible);
+			} else {
+				jason.setRole(N, "unknown");
+				-+role(unknown);
 			};
-		}; 
-		?compatibleAllies(Compatible);
-		.print("Compatible: ",Compatible);
-		if (Compatible \== []) {
-			!ask_knowledge_distances(Compatible);
+		} else {
 //			if (Round \== 1) { //at the first round, nobody have moving capabilities to count on
 //				!ask_moving_capability(Compatible, MovingCapabilities); .print(MovingCapabilities);
 //			};
-		} else {
-			-+role(unknown);
+			?compatibleAllies(Compatible);
+			if (.length(Compatible) == 1) {
+				?role(X);
+				if (X == seizer) {
+					.print("Setting attacker role from seizer");
+					jason.setRole(N, "attacker");
+					-+role(attacker);
+				} else {
+					.print("Setting seizer role from attacker");
+					jason.setRole(N, "seizer");
+					-+role(seizer);
+				}
+			} else {
+				?role(X);
+				if (X == seizer) {
+					Pos=math.floor(math.random(.length(Compatible)));
+					.nth(Pos, Compatible, NewSeizer);
+					.send(NewSeizer, tell, canSwitch);
+//					.print("NEW SEIZER SHOULD BE ", NewSeizer);
+					.print("Setting attacker role from seizer");
+					jason.setRole(N, "attacker");
+					-+role(attacker);
+				} else {
+					?canSwitch;
+					-canSwitch[source(X)];
+					.print("Setting seizer role from attacker");
+					jason.setRole(N, "seizer");
+					-+role(seizer);
+				}
+			}
 		}.
+
+
+//+canSwitch[source(X)] : true
+//	<-	.print("canSwitch: Preparing ")
+
++!agree_with_allies: canSwitch[source(X)] //variant, where actual seizer sets seizer agent, which already take its turn.
+	<- 	-canSwitch[source(X)];
+		.print("Setting seizer role from attacker");
+		jason.setRole(N, "seizer");
+		-+role(seizer).
 		
 +!agree_with_allies: true
 	<-	?role(X);
 		-+role(X).
 		
+-!agree_with_allies : canAsk & allies(Allies) & Allies \== []
+	<-	.print("Setting attacker role from attacker");
+		jason.setRole(N, "attacker");
+	 	-+role(attacker).
+		
 -!agree_with_allies: true //there no role set
-	<- +role(unknown).
+	<- 	jason.setRole(N, "unknown");
+		+role(unknown).
 
 +!askUnderstandSimple(H, Answer) : true
 	<-	.send(H, askOne, understandSimple(Answer), understandSimple(Answer)[source(H)]);

@@ -224,6 +224,7 @@ public class GameEnv extends Environment {
 		        addPercept(base.getAgent(), Literal.parseLiteral("fightingPower("+base.getFightingPower()+")."));
 		        addPercept(base.getAgent(), Literal.parseLiteral("movingCapability("+base.getMovingCapability()+")."));
 		        addPercept(base.getAgent(), Literal.parseLiteral("round("+GameMap.ROUND+")."));
+		        addPercept(base.getAgent(), Literal.parseLiteral("team("+base.getTeam()+")."));
 		        LinkedList<String> allies = new LinkedList<>();
 		        for (Base b:base.getAllies()) {
 		        	allies.add(b.getAgent());
