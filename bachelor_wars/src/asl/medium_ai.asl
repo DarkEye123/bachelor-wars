@@ -18,7 +18,6 @@ understandSimple("yes").
 compatibleAllies([]).
 knowledgeDistances([]).
 movingCapabilities([]).
-test(1).
 
 //-----------------------------------------------------------------------Intentions-----------------------------------------------------------
 killIntention(0). //damage with atk
@@ -80,6 +79,7 @@ canAsk :-
 	round(N) & 
 	N mod 10 == 1. //there is need some time for given role to play
 //	N mod 2 == 1. //there is need some time for given role to play
+//	N mod 1 == 0. //there is need some time for given role to play
 
 //---------------------------------------------------------------------Rule-Variants-Of-Goals-For-Unit-Stats----------------------------------
 getType(Unit,Stat) :- 
@@ -568,9 +568,10 @@ getKnowledgeId(Knowledge, Stat) :-
 		!appendList(MovingCapabilities, [X, Name], NewVal);
 		.max(NewVal, Ret).
 
+//something like first round -> this is used when game starts and there is need for ideal seizer
 +!checkSeizerRole(KnowledgeDistances) : true
 	<-	.my_name(Name);
-		?team(Team);
+		?agentID(ID);
 		.print("Seizer role parameters: ",KnowledgeDistances);
 		!knowledge_distance_evaluation(ThisDistance);
 		!appendList(KnowledgeDistances, [ThisDistance, Name], NewDistances);
@@ -581,95 +582,124 @@ getKnowledgeId(Knowledge, Stat) :-
 		-+knowledgeDistances([]);
 		if (Seizer == Name) {
 			.print("Setting seizer role");
-			jason.setRole(N, "seizer");
-			.send(spectator, achieve, setCurrentSeizer(Name, Team));
+			+canSwitch;
 			-+role(seizer);
 		} else {
+			.send(Seizer, askOne, canSwitch, U); //ask setted seizer agent that he knows, that he was choosen to be first
+			if (U == false) {
+				.print("seizer: ", Seizer, " is being told, tha he can switch");
+				.send(Seizer, tell, canSwitch);
+			}
 			.print("Setting attacker role");
-			jason.setRole(N, "attacker");
+			jason.setRole(ID, "attacker");
 			-+role(attacker);
 		}.
 
-+!agree_with_allies : canAsk & allies(Allies) & Allies \== []
-	<- 	?round(Round);
-		.my_name(Name);
-		?team(Team);
++!agree_with_allies : canAsk & allies(Allies) & Allies \== [] & round(Round) & Round == 1
+	<- 	.my_name(Name);
 		.print("-------------------------------------------------------------------AGREEMENT--------------------------------------------------");
-		if (Round == 1) {
-			for (.member(Ally, Allies)) {
-				?compatibleAllies(Compatible);
-				!askUnderstandSimple(Ally, Answer);
-				if (Answer == "yes") {
-					!appendList(Compatible, Ally, N);
-					-+compatibleAllies(N);
-				};
-			}; 
-			?compatibleAllies(Compatible);
-			.print("Compatible: ",Compatible);
-			.send(spectator, achieve, addAgent(Name, Team)); //add agent into the team
-			if (Compatible \== []) {
-				!ask_knowledge_distances(Compatible);
-			} else {
-				jason.setRole(N, "unknown");
-				-+role(unknown);
-			};
+		!getCompatible;
+		?compatibleAllies(Compatible);
+		.print("Compatible: ",Compatible);
+		if (Compatible \== []) {
+			!ask_knowledge_distances(Compatible);
 		} else {
-//			if (Round \== 1) { //at the first round, nobody have moving capabilities to count on
-//				!ask_moving_capability(Compatible, MovingCapabilities); .print(MovingCapabilities);
-//			};
-			?compatibleAllies(Compatible);
-			if (.length(Compatible) == 1) {
-				?role(X);
-				if (X == seizer) {
-					.print("Setting attacker role from seizer");
-					jason.setRole(N, "attacker");
-					-+role(attacker);
-				} else {
-					.print("Setting seizer role from attacker");
-					jason.setRole(N, "seizer");
-					-+role(seizer);
-				}
-			} else {
-				?role(X);
-				if (X == seizer) {
-					Pos=math.floor(math.random(.length(Compatible)));
-					.nth(Pos, Compatible, NewSeizer);
-					.send(NewSeizer, tell, canSwitch);
-//					.print("NEW SEIZER SHOULD BE ", NewSeizer);
-					.print("Setting attacker role from seizer");
-					jason.setRole(N, "attacker");
-					-+role(attacker);
-				} else {
-					?canSwitch;
-					-canSwitch[source(X)];
-					.print("Setting seizer role from attacker");
-					jason.setRole(N, "seizer");
-					-+role(seizer);
-				}
-			}
+			jason.setRole(N, "unknown");
+			-+role(unknown);
 		}.
 
-
-//+canSwitch[source(X)] : true
-//	<-	.print("canSwitch: Preparing ")
-
-+!agree_with_allies: canSwitch[source(X)] //variant, where actual seizer sets seizer agent, which already take its turn.
-	<- 	-canSwitch[source(X)];
-		.print("Setting seizer role from attacker");
-		jason.setRole(N, "seizer");
+//This is actual seizer for this actual agreement	
++!agree_with_allies : 	canAsk & 
+						allies(Allies) & Allies \== [] & 
+						compatibleAllies(Compatible) & Compatible \== [] & 
+						imSeizer(Pos, Mark) & round(ActualMark) & 
+						Mark \== ActualMark & not isSeizerRole 
+	<-	
+		.print("-------------------------------------------------------------------AGREEMENT--------------------------------------------------");
+		.my_name(Name);
+		?agentID(ID);
+		.nth(Pos, Compatible, NewSeizer);
+		NewPos = math.floor(math.random(.length(Compatible)));
+		.send(NewSeizer, tell, imSeizer(NewPos, ActualMark));
+		-imSeizer(Pos, Mark)[source(Ag)];
+		-canSwitch[source(Ag)];
+		?role(Role);
+		.print("Setting seizer role from: ", Role, " with mark: ", Mark, " and actual mark: ", ActualMark);
+		jason.setRole(ID, "seizer"); //set role and everything connected with resources within this role
 		-+role(seizer).
+		
+//This is last seizer (turning into attacker) for this actual agreement	
++!agree_with_allies : 	canAsk & 
+						allies(Allies) & Allies \== [] & 
+						compatibleAllies(Compatible) & Compatible \== [] & 
+						imSeizer(Pos, Mark) & round(ActualMark) & 
+						Mark \== ActualMark
+	<-	
+		-imSeizer(Pos, Mark)[source(Ag)];
+		-canSwitch[source(Ag)];
+		.print("-------------------------------------------------------------------AGREEMENT--------------------------------------------------");
+		.my_name(Name);
+		?role(Role);
+		?agentID(ID);
+		.print("Setting attacker role from: ", Role);
+		jason.setRole(ID, "attacker");
+		-+role(attacker).
+		
+		
++!agree_with_allies : 	canAsk & 
+						allies(Allies) & Allies \== [] & 
+						compatibleAllies(Compatible) & Compatible \== []
+	<-	
+		.print("-------------------------------------------------------------------AGREEMENT--------------------------------------------------");
+		.my_name(Name);
+		?role(Role);
+		?agentID(ID);
+		.print("Setting attacker role from: ", Role);
+		jason.setRole(ID, "attacker");
+		-+role(attacker).
+
++!getCompatible : allies(Allies) & Allies \== []
+	<- 	.my_name(Name);
+		for (.member(Ally, Allies)) {
+			?compatibleAllies(Compatible);
+			!askUnderstandSimple(Ally, Answer);
+			if (Answer == "yes") {
+				!appendList(Compatible, Ally, N);
+				-+compatibleAllies(N);
+			};
+		}. 
+
++canSwitch : compatibleAllies(Compatible) & Compatible \== []
+	<-	//here it is tricky, because next seizer is tagged here (successor is tagged but he is playing his role when next agreement shows up)
+		?agentID(ID);
+		.my_name(Name);
+		?round(Mark);
+		.nth(0, Compatible, NewSeizer); //get new seizer
+		NewPos = math.floor(math.random(.length(Compatible)));
+		.send(NewSeizer, tell, imSeizer(NewPos, Mark)); //mark this seizer, so he cant play this role till new agreement
+		.print("canSwitch: Preparing myself into seizer role ");
+		jason.setRole(ID, "seizer"). //set role and everything connected with resources within this role
+		
++canSwitch : true
+	<-	!getCompatible;
+	 	?compatibleAllies(Compatible);
+		?agentID(ID);
+		.my_name(Name);
+		?round(Mark);
+		.nth(0, Compatible, NewSeizer); //get new seizer
+		NewPos = math.floor(math.random(.length(Compatible)));
+		.send(NewSeizer, tell, imSeizer(NewPos, Mark)); //mark this seizer, so he cant play this role till new agreement
+		.print("canSwitch: Preparing myself into seizer role ");
+		jason.setRole(ID, "seizer"); //set role and everything connected with resources within this role
+		-+compatibleAllies([]). //empty, because this agent hasn't been on the move yet
 		
 +!agree_with_allies: true
 	<-	?role(X);
 		-+role(X).
 		
--!agree_with_allies : canAsk & allies(Allies) & Allies \== []
-	<-	.print("Setting attacker role from attacker");
-		jason.setRole(N, "attacker");
-	 	-+role(attacker).
-		
 -!agree_with_allies: true //there no role set
-	<- 	jason.setRole(N, "unknown");
+	<- 	?agentID(ID);
+		jason.setRole(ID, "unknown");
 		+role(unknown).
 
 +!askUnderstandSimple(H, Answer) : true

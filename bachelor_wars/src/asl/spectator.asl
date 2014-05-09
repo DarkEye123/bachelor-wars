@@ -9,8 +9,6 @@ currentSeizer(Y)[team(X)]. //curent agent id of seizer
 
 /* Plans */
 
-//!start.
-
 +!appendList([], X, [X]).
 	
 +!appendList([H|B], X, [H|C]) : true
@@ -30,7 +28,7 @@ currentSeizer(Y)[team(X)]. //curent agent id of seizer
 	<- 	!getAgentIndex(Tail, Element, Pos1);
 		Pos = Pos1 + 1.
 		
-+!getNextSeizer(Team, Player) : true
++?getNextSeizer(Team, Player) : true
 	<- 	?currentNumPlayersInTeam(List)[team(Team)];
 		?currentSeizer(ActualSeizer)[team(Team)];
 		!getAgentIndex(List, ActualSeizer, Pos);
@@ -40,9 +38,11 @@ currentSeizer(Y)[team(X)]. //curent agent id of seizer
 		
 		
 //+!start : true <- !addAgent(test, killers); !addAgent(tester, killers); !addAgent(test123, fuckers); 
-//	!setCurrentSeizer(test123, fuckers); ?currentSeizer(X)[team(fuckers)]; .print(X); 
-//	!getNextSeizer(fuckers, Player); .print(Player); 
-//	!setCurrentSeizer(Player, fuckers); !getNextSeizer(fuckers, Y); .print(Y).
+//	.my_name(Name);
+//	!setCurrentSeizer(test, killers);
+//	.send(Name, askOne, getNextSeizer(killers,P1), getNextSeizer(killers,P1)); .print(P1);
+//	!setCurrentSeizer(tester, killers);
+//	.send(Name, askOne, getNextSeizer(killers,Help), getNextSeizer(killers,Help)); .print(Help).
 	
 
 	
