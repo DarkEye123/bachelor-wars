@@ -24,52 +24,30 @@ import ui.GameMap;
 public class getNearestFreeKnowledge extends jason.getNearest {
 	private static final long serialVersionUID = 3624829097798698211L;
 	
-	public boolean canRemove = true;
+	public boolean canRemoveWithIntention = true;
 	public boolean ignoreFriendlySeized = false;
+	public boolean calledByChildClass = false;
 	
-	private static final float SEIZER_PERCENTAGE = 80.0f;
-	
-	public LinkedList<Knowledge> get80() {
-		LinkedList<Knowledge> output = new LinkedList<>();
-		TreeMap<Integer, Integer> source = new TreeMap<>();
-		int treshold = (int) (((float)GameMap.getKnowledgeList().size()/100.0f) * SEIZER_PERCENTAGE);
-		for (Knowledge k:GameMap.getKnowledgeList()) {
-			source.put(k.getId(), unit.base.getNode().distance(k.getNode()));
-		}
-		
-		int num = GameMap.getKnowledgeList().size();
-		while (num > treshold) {
-			--num;
-			int min = Integer.MAX_VALUE;
-			int keyToRemove = 0;
-			for (Integer key:source.keySet()) {
-				if (source.get(key) < min) {
-					min = source.get(key);
-					keyToRemove = key;
-				}
-			}
-			source.remove(keyToRemove);
-		}
-		for (Knowledge k:GameMap.getKnowledgeList()) {
-			if ( source.keySet().contains(k.getId()) )
-				output.add(k);
-		}
-		return output;
-	}
 	
 	@Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {
 		super.execute(ts, un, terms);
-    	LinkedList<Knowledge> listOfInterest = (LinkedList<Knowledge>) GameMap.getKnowledgeList().clone();
-    	listOfInterest.removeAll(unit.base.getKnowledgeList()); //remove already owned knowledge resources
+    	LinkedList<Knowledge> listOfInterest;
     	
-    	if (ignoreFriendlySeized) {
-    		for (Base base:unit.base.getAllies()) {
-    			listOfInterest.removeAll(base.getKnowledgeList());
-    		}
+    	Base base = unit.base;
+    	if (!base.getAllies().isEmpty() && !base.getRole().equals("unknown")) { //if agent have allies and there is somebody that understand his communication API too
+    			if (!calledByChildClass) {
+    				listOfInterest = base.getAvailableKnowledge();
+    			} else { //percept all knowledge on the map to be able tell, if some of them is in reach
+    				listOfInterest = (LinkedList<Knowledge>) GameMap.getKnowledgeList().clone();
+    			}
+    	} else {
+    		listOfInterest = (LinkedList<Knowledge>) GameMap.getKnowledgeList().clone();
     	}
     	
-    	if (canRemove) {
+    	listOfInterest.removeAll(unit.base.getKnowledgeList()); //remove already owned knowledge resources
+    	
+    	if (canRemoveWithIntention) {
     		LinkedList<Knowledge> toRemove = new LinkedList<>();
 	    	for (Knowledge knowledge:listOfInterest) { //search knowledge resources that are free, but have some unit with intention assigned
 	    		for (Unit u:unit.base.getUnitList()) { //search for units from agent base that already have this 
@@ -81,6 +59,13 @@ public class getNearestFreeKnowledge extends jason.getNearest {
 	    	}
 	    	listOfInterest.removeAll(toRemove); //remove already assigned knowledge resources
     	}
+    	
+    	if (ignoreFriendlySeized && !base.getRole().equals("seizer")) { //ignore already seized resources by ally, if actual base is seizer, this request is not proper
+    		for (Base b:base.getAllies()) {
+    			listOfInterest.removeAll(b.getKnowledgeList());
+    		}
+    	}
+    	
     	LinkedList<Wrapper> interests = findInterests(listOfInterest);
     	
     	return decideUnifier(un, terms, interests);

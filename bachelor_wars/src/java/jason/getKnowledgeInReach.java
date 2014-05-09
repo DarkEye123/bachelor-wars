@@ -15,7 +15,9 @@ public class getKnowledgeInReach extends jason.getNearestFreeKnowledge {
 
 	@Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {
-		canRemove = false;
+		canRemoveWithIntention = false;
+		ignoreFriendlySeized = true;
+		calledByChildClass = true;
 		int unitId = (int)((NumberTerm) terms[0]).solve();
     	unit = GameMap.searchUnit(unitId);
 		if (unit.base.getType() != GameSettings.SIMPLE_AI)

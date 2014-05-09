@@ -44,6 +44,7 @@ public class Base extends GameObject implements Clickable{
 	private int roundSurvived;
 	private String team;
 	private String role;
+	private LinkedList<Knowledge> availableKnowledge;
 	
 	/**
 	 * Constructor of Base
@@ -388,5 +389,28 @@ public class Base extends GameObject implements Clickable{
 	
 	public String getRole() {
 		return role;
+	}
+
+	public void setAvailableKnowledge(LinkedList<Knowledge> list) {
+		this.availableKnowledge = list;
+	}
+
+	public LinkedList<Knowledge> getAvailableKnowledge() {
+		return availableKnowledge;
+	}
+	
+	/**
+	 * Tries to find a "seizer" base among allies. It only checks allies, calling base is not included into check.
+	 * @return Base tagged with role as "seizer" or null otherwise.
+	 */
+	public Base findSeizerBase() {
+		for (Base base:getAllies()) {
+			if (base.getRole() != null) {
+				if (base.getRole().equals("seizer")) {
+					return base;
+				}
+			}
+		}
+		return null;
 	}
 }

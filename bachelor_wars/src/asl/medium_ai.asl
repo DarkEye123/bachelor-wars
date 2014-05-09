@@ -582,33 +582,46 @@ getKnowledgeId(Knowledge, Stat) :-
 		-+knowledgeDistances([]);
 		if (Seizer == Name) {
 			.print("Setting seizer role");
-			+canSwitch;
+			?canSwitch;
 			-+role(seizer);
 		} else {
-			.send(Seizer, askOne, canSwitch, U); //ask setted seizer agent that he knows, that he was choosen to be first
-			if (U == false) {
-				.print("seizer: ", Seizer, " is being told, tha he can switch");
-				.send(Seizer, tell, canSwitch);
-			}
+			.send(Seizer, askOne, canSwitch[source(Name)], U); //ask setted seizer agent that he knows, that he was choosen to be first
+//			if (U == false) {
+//				.print("seizer: ", Seizer, " is being told, tha he can switch");
+//				.send(Seizer, tell, canSwitch);
+//			}
 			.print("Setting attacker role");
 			jason.setRole(ID, "attacker");
 			-+role(attacker);
 		}.
+		
++?preparedIfSeizer: 	canAsk & 
+					allies(Allies) & Allies \== [] & 
+					compatibleAllies(Compatible) & Compatible \== [] & 
+					imSeizer(Pos, Mark) & round(ActualMark) & 
+					Mark \== ActualMark & not isSeizerRole
+	<-
+		?agentID(ID);
+		jason.setRole(ID, "seizer"); //set role and everything connected with resources within this role
+		.print("prepareIfSeizer: Preparing myself into seizer role - only setting internal tag for seizer ").
+		
++?preparedIfSeizer.
 
 +!agree_with_allies : canAsk & allies(Allies) & Allies \== [] & round(Round) & Round == 1
 	<- 	.my_name(Name);
 		.print("-------------------------------------------------------------------AGREEMENT--------------------------------------------------");
 		!getCompatible;
 		?compatibleAllies(Compatible);
+		?agentID(ID);
 		.print("Compatible: ",Compatible);
 		if (Compatible \== []) {
 			!ask_knowledge_distances(Compatible);
 		} else {
-			jason.setRole(N, "unknown");
+			jason.setRole(ID, "unknown");
 			-+role(unknown);
 		}.
 
-//This is actual seizer for this actual agreement	
+//This is actual seizer for this actual agreement - sets his successor	
 +!agree_with_allies : 	canAsk & 
 						allies(Allies) & Allies \== [] & 
 						compatibleAllies(Compatible) & Compatible \== [] & 
@@ -637,6 +650,9 @@ getKnowledgeId(Knowledge, Stat) :-
 	<-	
 		-imSeizer(Pos, Mark)[source(Ag)];
 		-canSwitch[source(Ag)];
+		for (.member(Ally,Compatible)) {
+			.send(Ally, askOne, preparedIfSeizer, U); //this will wait till seizer is internally set
+		};
 		.print("-------------------------------------------------------------------AGREEMENT--------------------------------------------------");
 		.my_name(Name);
 		?role(Role);
@@ -651,6 +667,9 @@ getKnowledgeId(Knowledge, Stat) :-
 						compatibleAllies(Compatible) & Compatible \== []
 	<-	
 		.print("-------------------------------------------------------------------AGREEMENT--------------------------------------------------");
+		for (.member(Ally,Compatible)) {
+			.send(Ally, askOne, preparedIfSeizer, U); //this will wait till seizer is internally set
+		};
 		.my_name(Name);
 		?role(Role);
 		?agentID(ID);
@@ -658,6 +677,9 @@ getKnowledgeId(Knowledge, Stat) :-
 		jason.setRole(ID, "attacker");
 		-+role(attacker).
 
+/*
+ * Checks for compatible allies -> alies that can understand common API for cooperation
+ */
 +!getCompatible : allies(Allies) & Allies \== []
 	<- 	.my_name(Name);
 		for (.member(Ally, Allies)) {
@@ -669,29 +691,54 @@ getKnowledgeId(Knowledge, Stat) :-
 			};
 		}. 
 
-+canSwitch : compatibleAllies(Compatible) & Compatible \== []
+/*
+ * Checks for compatible allies -> alies that can understand common API for cooperation
+ * Delete agent, which actually waits for response from this agent, to prevent deadlock, we have to skip asking him
+ */		
++!getCompatible(Ag) : allies(Allies) & Allies \== []
+	<- 	.my_name(Name);
+		for (.member(Ally, Allies)) {
+			?compatibleAllies(Compatible);
+			if (Ag \== Ally) {
+				!askUnderstandSimple(Ally, Answer);
+				if (Answer == "yes") {
+					!appendList(Compatible, Ally, N);
+					-+compatibleAllies(N);
+				};
+			} else {
+				!appendList(Compatible, Ag, N);
+				-+compatibleAllies(N);
+			}
+		}. 
+
++?canSwitch : compatibleAllies(Compatible) & Compatible \== [] & not canSwitch
 	<-	//here it is tricky, because next seizer is tagged here (successor is tagged but he is playing his role when next agreement shows up)
+		+canSwitch;
 		?agentID(ID);
-		.my_name(Name);
-		?round(Mark);
-		.nth(0, Compatible, NewSeizer); //get new seizer
-		NewPos = math.floor(math.random(.length(Compatible)));
-		.send(NewSeizer, tell, imSeizer(NewPos, Mark)); //mark this seizer, so he cant play this role till new agreement
-		.print("canSwitch: Preparing myself into seizer role ");
-		jason.setRole(ID, "seizer"). //set role and everything connected with resources within this role
-		
-+canSwitch : true
-	<-	!getCompatible;
-	 	?compatibleAllies(Compatible);
-		?agentID(ID);
-		.my_name(Name);
-		?round(Mark);
-		.nth(0, Compatible, NewSeizer); //get new seizer
-		NewPos = math.floor(math.random(.length(Compatible)));
-		.send(NewSeizer, tell, imSeizer(NewPos, Mark)); //mark this seizer, so he cant play this role till new agreement
-		.print("canSwitch: Preparing myself into seizer role ");
 		jason.setRole(ID, "seizer"); //set role and everything connected with resources within this role
+		.my_name(Name);
+		?round(Mark);
+		.nth(0, Compatible, NewSeizer); //get new seizer
+		NewPos = math.floor(math.random(.length(Compatible)));
+		.send(NewSeizer, tell, imSeizer(NewPos, Mark)); //mark this seizer, so he cant play this role till new agreement
+		.print("canSwitch: Preparing myself into seizer role ").
+		
++?canSwitch[source(Ag)] : not canSwitch 
+	<-	
+		+canSwitch;
+		?agentID(ID);
+		jason.setRole(ID, "seizer"); //set role and everything connected with resources within this role
+		!getCompatible(Ag); 
+	 	?compatibleAllies(Compatible);
+		.my_name(Name);
+		?round(Mark);
+		.nth(0, Compatible, NewSeizer); //get new seizer
+		NewPos = math.floor(math.random(.length(Compatible)));
+		.send(NewSeizer, tell, imSeizer(NewPos, Mark)); //mark this seizer, so he cant play this role till new agreement
+		.print("canSwitch: Preparing myself into seizer role ");
 		-+compatibleAllies([]). //empty, because this agent hasn't been on the move yet
+
++?canSwitch.
 		
 +!agree_with_allies: true
 	<-	?role(X);
