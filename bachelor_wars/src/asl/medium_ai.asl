@@ -30,6 +30,7 @@ madness(2).
 //----------------------------------------------------------------------Available-Roles-------------------------------------------------------
 seizer(seizer).
 attacker(attacker).
+unknown(unknown).
 
 //-----------------------------------------------------------------------Rules----------------------------------------------------------------
 enoughSlots :- 
@@ -50,6 +51,11 @@ isSeizerRole :-
 isAttackerRole :- 
 	role(X) &
 	attacker(Y) & 
+	X == Y.
+	
+isUnknownRole :- 
+	role(X) &
+	unknown(Y) & 
 	X == Y.
 	
 isKillingIntention(Type) :- 
@@ -77,7 +83,7 @@ isMadnessMode :-
 
 canAsk :- 
 	round(N) & 
-	N mod 10 == 1. //there is need some time for given role to play
+	N mod 5 == 1. //there is need some time for given role to play
 //	N mod 2 == 1. //there is need some time for given role to play
 //	N mod 1 == 0. //there is need some time for given role to play
 
@@ -105,7 +111,7 @@ getOwner(Unit,Stat) :-
 getTypeOfIntention(Intention, Type) :- 
 	.nth(1,Intention, Pom) & .nth(0,Pom, Type).
 
-getKnowledgeId(Knowledge, Stat) :-
+getSeizedObjectID(Knowledge, Stat) :-
 	.nth(0,Knowledge,Stat).
 	
 //------------------------------------------------------------------------unit-stats------------------------------------------------------------
@@ -138,7 +144,7 @@ getKnowledgeId(Knowledge, Stat) :-
 //------------------------------------------------------------------------knowledge-stats------------------------------------------------------------	
 +!getKnowledgePosition([H|B], P) : true
 	<- P=B.
-+!getKnowledgeId(Knowledge, Stat) : true
++!getSeizedObjectID(Knowledge, Stat) : true
 	<- .nth(0,Knowledge,Stat).
 	
 //------------------------------------------------------------------------intentions-stats------------------------------------------------------------
@@ -242,7 +248,7 @@ getKnowledgeId(Knowledge, Stat) :-
 +!addPossibleIntention(UnitID, Type) : 	isDominationMode & 
 											Type \== "knowledge" & 
 											jason.getKnowledgeInReach(UnitID, Knowledge) & //desired action for domination mode - higher priority
-											getKnowledgeId(Knowledge, TargetObject) & 
+											getSeizedObjectID(Knowledge, TargetObject) & 
 											TargetObject \== Type & //check if this intention isn't the same as
 											.print("Unit: ", UnitID, " adding possible based intention(knowledge): ", Knowledge)
 	<-	jason.addIntention(UnitID, TargetObject, 0, "knowledge").
@@ -261,7 +267,7 @@ getKnowledgeId(Knowledge, Stat) :-
 +!addPossibleIntention(UnitID, Type) : 	isAnihilationMode & 
 										Type \== "knowledge" & 
 										jason.getKnowledgeInReach(UnitID, Knowledge) & //desired action for domination mode - higher priority
-										getKnowledgeId(Knowledge, TargetObject) & 
+										getSeizedObjectID(Knowledge, TargetObject) & 
 										TargetObject \== Type & //check if this intention isn't the same as
 										.print("Unit: ", UnitID, " adding possible based intention(knowledge): ", Knowledge)
 	<-	jason.addIntention(UnitID, TargetObject, 0, "knowledge").
@@ -288,7 +294,7 @@ getKnowledgeId(Knowledge, Stat) :-
 +!addPossibleIntention(UnitID, Type) : 	isMadnessMode & 
 											Type \== "knowledge" & 
 											jason.getKnowledgeInReach(UnitID, Knowledge) & //desired action for domination mode - higher priority
-											getKnowledgeId(Knowledge, TargetObject) & 
+											getSeizedObjectID(Knowledge, TargetObject) & 
 											TargetObject \== Type & //check if this intention isn't the same as
 											.print("Unit: ", UnitID, " adding possible based intention(knowledge): ", Knowledge)
 	<-	jason.addIntention(UnitID, TargetObject, 0, "knowledge").
@@ -315,7 +321,7 @@ getKnowledgeId(Knowledge, Stat) :-
 //####################################################################--MODE-DOMINATION--##########################################################################
 +!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isDominationMode & jason.getNearestFreeKnowledge(UnitID,Knowledge) 
 	& .print("Unit: ", UnitID, " to knowledge: ", Knowledge, " adding intention")
-	<-	!getKnowledgeId(Knowledge, TargetObject);
+	<-	!getSeizedObjectID(Knowledge, TargetObject);
 		jason.addIntention(UnitID, TargetObject, 1, "knowledge");
 		!addEnemyBases(UnitID);
 		!addPossibleIntention(UnitID, "knowledge");
@@ -352,7 +358,7 @@ getKnowledgeId(Knowledge, Stat) :-
 		
 +!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isAnihilationMode & jason.getNearestFreeKnowledge(UnitID,Knowledge) 
 	& .print("Unit: ", UnitID, " to knowledge: ", Knowledge, " adding intention")
-	<-	!getKnowledgeId(Knowledge, TargetObject);
+	<-	!getSeizedObjectID(Knowledge, TargetObject);
 		jason.addIntention(UnitID, TargetObject, 1, "knowledge");
 		!addEnemyBases(UnitID);
 		!addPossibleIntention(UnitID, "knowledge");
@@ -390,7 +396,7 @@ getKnowledgeId(Knowledge, Stat) :-
 
 +!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isMadnessMode & jason.getNearestFreeKnowledge(UnitID,Knowledge) 
 	& .print("Unit: ", UnitID, " to knowledge: ", Knowledge, " adding intention")
-	<-	!getKnowledgeId(Knowledge, TargetObject);
+	<-	!getSeizedObjectID(Knowledge, TargetObject);
 		jason.addIntention(UnitID, TargetObject, 1, "knowledge");
 		!addEnemyBases(UnitID);
 		!addPossibleIntention(UnitID, "knowledge");
@@ -403,7 +409,7 @@ getKnowledgeId(Knowledge, Stat) :-
 //--------------------------------------------------------------------Intention-Checks------------------------------------------------------------------------------
 +!checkSurrounding(Unit, Intention) : getTypeOfIntention(Intention, Type) & isSeizeIntention(Type) //TODO base seize
 	<- 	.nth(0, Intention, Knowledge); //get id of actual intention
-		!getKnowledgeId(Knowledge,TargetObject);
+		!getSeizedObjectID(Knowledge,TargetObject);
 		!getID(Unit, UnitID);
 		!addPossibleIntention(UnitID, TargetObject). //check for new temporary intention
 		
@@ -437,7 +443,7 @@ getKnowledgeId(Knowledge, Stat) :-
 	<- 	.nth(0, Intention, Object);
 		!getKnowledgePosition(Object, Place);
 		move(UnitID, Place); //move unit in that direction
-		!getKnowledgeId(Object, TargetObject);
+		!getSeizedObjectID(Object, TargetObject);
 		do_intention_if_possible(UnitID, TargetObject).
 
 //===================================================================================================================================================================
@@ -739,6 +745,12 @@ getKnowledgeId(Knowledge, Stat) :-
 		-+compatibleAllies([]). //empty, because this agent hasn't been on the move yet
 
 +?canSwitch.
+
++!agree_with_allies: allies(Allies) & Allies == [] & not isUnknownRole
+	<- 
+		?agentID(ID);
+		jason.setRole(ID, "unknown");
+		+role(unknown).
 		
 +!agree_with_allies: true
 	<-	?role(X);

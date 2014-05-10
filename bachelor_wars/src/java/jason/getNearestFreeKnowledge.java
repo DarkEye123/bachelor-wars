@@ -35,7 +35,8 @@ public class getNearestFreeKnowledge extends jason.getNearest {
     	LinkedList<Knowledge> listOfInterest;
     	
     	Base base = unit.base;
-    	if (!base.getAllies().isEmpty() && !base.getRole().equals("unknown")) { //if agent have allies and there is somebody that understand his communication API too
+    	if (!base.getAllies().isEmpty() && base.getRole() != null &&
+    		!base.getRole().equals("unknown")) { //if agent have allies and there is somebody that understand his communication API too
     			if (!calledByChildClass) {
     				listOfInterest = base.getAvailableKnowledge();
     			} else { //percept all knowledge on the map to be able tell, if some of them is in reach
@@ -60,7 +61,8 @@ public class getNearestFreeKnowledge extends jason.getNearest {
 	    	listOfInterest.removeAll(toRemove); //remove already assigned knowledge resources
     	}
     	
-    	if (ignoreFriendlySeized && !base.getRole().equals("seizer")) { //ignore already seized resources by ally, if actual base is seizer, this request is not proper
+    	if (ignoreFriendlySeized && base.getRole() != null &&  
+    		!base.getRole().equals("seizer")) { //ignore already seized resources by ally, if actual base is seizer, this request is not proper
     		for (Base b:base.getAllies()) {
     			listOfInterest.removeAll(b.getKnowledgeList());
     		}

@@ -40,21 +40,45 @@ public class getSortedIntentions extends DefaultInternalAction {
 	}
 
 	protected int by = -1;
+	Unit unit;
+	
+	private boolean canAdd(Intention intention, boolean canRemoveTemporary, int pathLength) {
+		if (canRemoveTemporary) {
+			if (intention.type == Intention.Type.TEMPORARY) {
+				if (pathLength > unit.getMov()) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 	
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {
     	int unitID = (int)((NumberTerm) terms[0]).solve();
     	int mode = (int)((NumberTerm) terms[1]).solve();
     	
-    	Unit unit = GameMap.searchUnit(unitID);
+    	unit = GameMap.searchUnit(unitID);
     	
     	HashMap<GameObject, Intention> intentions = (HashMap<GameObject, Intention>) (unit.getIntentions()).clone();
     	LinkedList<Wrapper> wrapper = new LinkedList<>();
     	
     	boolean allEmpty = true;
+    	String role = unit.base.getRole();
+    	boolean canRemoveTemporary = false;
+    	boolean isSeizer = false;
+    	if (role != null && role.equals("seizer")) {
+    		canRemoveTemporary = true;
+    		isSeizer = true;
+		}
+    	
     	for (GameObject obj:intentions.keySet()) { //iterate over all object in intention map
     		LinkedList<Node> path = Node.searchPath(unit.getNode(), obj.getNode(), false); //firt try find a possible ways to the object of given intention
-    		wrapper.add(new Wrapper(unit, obj, path));
+    		if ( canAdd(intentions.get(obj), canRemoveTemporary, path.size()) ) {
+    			wrapper.add(new Wrapper(unit, obj, path));
+    		} else {
+    			path.clear();
+    		}
     		if ( allEmpty && !path.isEmpty()) //there is atleast one possible intention (path was found)
     			allEmpty = false;
     	}
@@ -62,7 +86,9 @@ public class getSortedIntentions extends DefaultInternalAction {
     		wrapper.clear();
     		for (GameObject obj:intentions.keySet()) { //iterate over all object in intention map
     			LinkedList<Node> path = Node.searchPath(unit.getNode(), obj.getNode(), true); //finds way to intentions but ignore units (they can move next round)
-    			wrapper.add(new Wrapper(unit, obj, path));
+    			if ( canAdd(intentions.get(obj), canRemoveTemporary, path.size()) ) {
+        			wrapper.add(new Wrapper(unit, obj, path));
+        		}
     		}
     	} else { //some possible paths were found
     		LinkedList<Wrapper> remove = new LinkedList<>(); //we need to remove all empty paths
@@ -80,6 +106,10 @@ public class getSortedIntentions extends DefaultInternalAction {
     		LinkedList<SemanticIntention> ret = new LinkedList<>();
     		for (Wrapper o:wrapper) {
     			ret.add(new SemanticIntention(o.to, intentions.get(o.to)));
+    			if (isSeizer) {
+    				if (intentions.get(o.to).intention == Unit.SEIZE && o.path.size() <= unit.getMov()) //for seizer role, seize intention in range has bigger priority
+    					ret.addFirst(ret.removeLast());
+    			}
     		}
     		un.unifies(terms[2], ListTermImpl.parseList(ret.toString()));
     	}

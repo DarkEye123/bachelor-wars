@@ -8,8 +8,8 @@ import java.awt.Toolkit;
 public class CommonBachelor extends Unit {
 	public static final int TYPE = 1024;
 	private static final int COST = 80;
-    public static final int ATK = 10;
-    public static final int HP = 40;
+    public static final int ATK = 15;
+    public static final int HP = 50;
     public static final int MOV = 7;
     private static final String NAME = "Common Bachelor";
     private static final CommonBachelor prototype = new CommonBachelor();

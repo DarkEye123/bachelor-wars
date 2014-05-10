@@ -201,7 +201,10 @@ public class Base extends GameObject implements Clickable{
 		g.setColor(Color.lightGray);
 		g.drawRoundRect(posX, posY, cellSizeW*2, cellSizeH*2, ARC_W, ARC_H);
 		g.setColor(Color.black);
-		GameMap.drawString(g, Math.round(posX+(0.3f*cellSizeW)), Math.round(posY+(0.5f*cellSizeH)), GameMap.defaultFont, getName());
+		if (getTeam() != null)
+			GameMap.drawString(g, Math.round(posX+(0.3f*cellSizeW)), Math.round(posY+(0.5f*cellSizeH)), GameMap.defaultFont, getName() + " team: " + getTeam() );
+		else
+			GameMap.drawString(g, Math.round(posX+(0.3f*cellSizeW)), Math.round(posY+(0.5f*cellSizeH)), GameMap.defaultFont, getName());
 	}
 
 	/**
