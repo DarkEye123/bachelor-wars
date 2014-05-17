@@ -1,4 +1,4 @@
-// Agent medium_ai in project bachelor_wars
+// Agent advanced_ai in project bachelor_wars
 
 /* Initial beliefs and rules */
 
@@ -115,11 +115,6 @@ getSeizedObjectID(Knowledge, Stat) :-
 	.nth(0,Knowledge,Stat).
 	
 //------------------------------------------------------------------------unit-stats------------------------------------------------------------
-//rrr[source(test)].
-
-//!start.
-//+!start : true <- ?rrr; -rrr[source(X)]; .print("ok"); !start.
-//+!start :true <- .max([ [1, 2, 3], [5, 6, 7] , [3, 10, 7] ], Y); .print(Y).
 
 
 +!getType(Unit,Stat) : true
@@ -228,6 +223,7 @@ getSeizedObjectID(Knowledge, Stat) :-
 		.print("(atk ability) created unit id: ", UnitID).
 
 //-----------------------------------------------------------------------------------------NO-ROLE----------------------------------
+
 +!getRandomUnit(Units,Unit) : true
 	<-	X=math.floor(math.random(.length(Units)));
 		.nth(X, Units, Unit);.
@@ -241,6 +237,14 @@ getSeizedObjectID(Knowledge, Stat) :-
 		!getID(Unit, UnitID);
 		.print("created unit id: ", UnitID).
 
+//------------------------------------------------------------------------------------------BY-STRATEGY----------------------------------
+
+
+
+//+!createByMovStrategy(ID, Units, Unit) : round(Round) & Round
+//	<-	!getUnitByMovement(Units, ListByMov);
+//		.max(ListByMov, Best);
+//		.nth(0,Best,Mov);
 
 //-----------------------------------------------------------------Possible-Intentions--------------------------------------------------------------------------		
 //####################################################################--MODE-DOMINATION--##########################################################################
@@ -485,8 +489,11 @@ getSeizedObjectID(Knowledge, Stat) :-
 //--------------------------------------------------------------------------NO-ROLE----------------------------------------------------------------------------------
 		
 
-+!check_action(ID): enoughSlots & jason.getAffordableUnits(ID, Units)
-	<- 	!createRandomUnit(ID, Units, Unit); //here is unit created from a template and actual created unit is given
++!check_action(ID): enoughSlots & jason.getAffordableUnitGroupsByMovStrategy(ID, Groups) & isDominationMode
+	<- 	
+		.nth(0, Groups, Group);
+		.print("Choosing group: (no role and domination mode)", Group)
+		!createByMovStrategy(ID, Units, Unit); //here is unit created from a template and actual created unit is given
 		update_percepts;
 		!moveUnit(Unit);
 		update_percepts;
@@ -592,10 +599,6 @@ getSeizedObjectID(Knowledge, Stat) :-
 			-+role(seizer);
 		} else {
 			.send(Seizer, askOne, canSwitch[source(Name)], U); //ask setted seizer agent that he knows, that he was choosen to be first
-//			if (U == false) {
-//				.print("seizer: ", Seizer, " is being told, tha he can switch");
-//				.send(Seizer, tell, canSwitch);
-//			}
 			.print("Setting attacker role");
 			jason.setRole(ID, "attacker");
 			-+role(attacker);
@@ -770,10 +773,6 @@ getSeizedObjectID(Knowledge, Stat) :-
 	.print("preparing actions"); 
 	update_percepts;
 	!agree_with_allies. 
-//	mark_start; 
-//	?agentID(N);
-//	mark_done.
-//	!check_action(N).
 	
 +!appendList([], X, [X]).
 	

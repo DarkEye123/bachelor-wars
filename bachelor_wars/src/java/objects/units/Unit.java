@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -23,7 +24,7 @@ import ui.GameView;
  * Abstract class that represents a unit in general view. It provide fields that all units should share.
  * @author Matej Leško <xlesko04@stud.fit.vutbr.cz>
  */
-public abstract class Unit extends GameObject implements Clickable {
+public abstract class Unit extends GameObject implements Clickable, Comparable<Unit> {
 	private static final int TIME_TO_WAIT = 50;
 	private static final int HEALTH_QUOTE = 50;
 	
@@ -324,5 +325,24 @@ public abstract class Unit extends GameObject implements Clickable {
 
 	public void setOldLocation(Location oldLocation) {
 		this.oldLocation = oldLocation;
+	}
+	
+	@Override
+	public int compareTo(Unit o) { //TODO if there will be sorting by other abilities, sort function should be done with synchronized
+		return getCost() - o.getCost();
+	}
+	
+	public static void main(String[] args) {
+		LinkedList<Unit> AVAILABLE_UNITS = new LinkedList<>();
+		AVAILABLE_UNITS.add(FirstYear.getPrototype());
+		AVAILABLE_UNITS.add(SecondYear.getPrototype());
+		AVAILABLE_UNITS.add(ThirdYear.getPrototype());
+		AVAILABLE_UNITS.add(FourthYear.getPrototype());
+		AVAILABLE_UNITS.add(CommonBachelor.getPrototype());
+		AVAILABLE_UNITS.add(FitBachelor.getPrototype());
+		
+		System.out.println("BEFORE: \n" + AVAILABLE_UNITS);
+		Collections.sort(AVAILABLE_UNITS);
+		System.out.println("after: \n" + AVAILABLE_UNITS);
 	}
 }

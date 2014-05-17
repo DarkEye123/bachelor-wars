@@ -10,6 +10,7 @@ import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Term;
 
+import java.util.Collections;
 import java.util.LinkedList;
 
 import mapping.GameSettings;
@@ -19,12 +20,13 @@ import ui.GameMap;
 
 public class getAffordableUnits extends DefaultInternalAction {
 	private static final long serialVersionUID = -92287919131743061L;
-
+	LinkedList<Unit> available;
+	Base base;
 	@Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {
     	int agentID = (int)((NumberTerm) terms[0]).solve();
-    	Base base = GameMap.searchBase(agentID);
-    	LinkedList<Unit> available = new LinkedList<>();
+    	base = GameMap.searchBase(agentID);
+    	available = new LinkedList<>();
     	
     	for (Unit u:GameSettings.AVAILABLE_UNITS) {
 //    		System.out.println("base knowledge: " + base.getKnowledge() + " unit knowledge: " + u.getCost());
@@ -37,7 +39,7 @@ public class getAffordableUnits extends DefaultInternalAction {
     		return false;
     	
     	
-    	
+    	Collections.sort(available);
     	ListTerm list = ListTermImpl.parseList(available.toString());
     	un.unifies(terms[1], list);
     	

@@ -115,12 +115,6 @@ getSeizedObjectID(Knowledge, Stat) :-
 	.nth(0,Knowledge,Stat).
 	
 //------------------------------------------------------------------------unit-stats------------------------------------------------------------
-//rrr[source(test)].
-
-//!start.
-//+!start : true <- ?rrr; -rrr[source(X)]; .print("ok"); !start.
-//+!start :true <- .max([ [1, 2, 3], [5, 6, 7] , [3, 10, 7] ], Y); .print(Y).
-
 
 +!getType(Unit,Stat) : true
 	<- .nth(0,Unit,Stat).
@@ -592,10 +586,6 @@ getSeizedObjectID(Knowledge, Stat) :-
 			-+role(seizer);
 		} else {
 			.send(Seizer, askOne, canSwitch[source(Name)], U); //ask setted seizer agent that he knows, that he was choosen to be first
-//			if (U == false) {
-//				.print("seizer: ", Seizer, " is being told, tha he can switch");
-//				.send(Seizer, tell, canSwitch);
-//			}
 			.print("Setting attacker role");
 			jason.setRole(ID, "attacker");
 			-+role(attacker);
@@ -770,10 +760,6 @@ getSeizedObjectID(Knowledge, Stat) :-
 	.print("preparing actions"); 
 	update_percepts;
 	!agree_with_allies. 
-//	mark_start; 
-//	?agentID(N);
-//	mark_done.
-//	!check_action(N).
 	
 +!appendList([], X, [X]).
 	

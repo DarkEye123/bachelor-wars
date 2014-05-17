@@ -2,6 +2,7 @@ package ui.menu;
 import jason.environment.grid.Location;
 
 import java.awt.Color;
+import java.awt.Menu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -18,19 +19,19 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.netbeans.lib.awtextra.AbsoluteConstraints;
-
-import cartago.new_array;
 import mapping.GameSettings;
 import objects.Base;
 import objects.Knowledge;
+
+import org.netbeans.lib.awtextra.AbsoluteConstraints;
+
 import ui.GameView;
 import env.GameEnv;
 
 
 public class GameSettingsMenu extends Menu {
 	private javax.swing.JPanel agentSelectPanel;
-	private javax.swing.JRadioButton anihilationModeButton;
+	private javax.swing.JRadioButton annihilationModeButton;
 	private javax.swing.JSlider boostSlider;
 	private javax.swing.JButton buttonStart;
 	private javax.swing.JPanel colorPanelP1;
@@ -52,7 +53,7 @@ public class GameSettingsMenu extends Menu {
 	private javax.swing.JSpinner incomePerKnowledge;
 	private javax.swing.JSpinner incomePerRound;
 	private javax.swing.JButton buttonExit;
-	private javax.swing.JCheckBox boostCheckBox;
+	private javax.swing.JCheckBox obstaclesCheckBox;
 	private javax.swing.JComboBox jComboBox1;
 	private javax.swing.JComboBox jComboBox2;
 	private javax.swing.JComboBox jComboBox3;
@@ -91,9 +92,11 @@ public class GameSettingsMenu extends Menu {
 	private javax.swing.JSlider rowsSlider;
 	private JFrame frame;
 	private ArrayList<JComboBox> comboArray;
+	
+	GameEnv env;
 
 	public GameSettingsMenu(GameEnv env) {
-		super(env);
+		this.env = env;
 		initComponents();
 	}
 	
@@ -154,7 +157,7 @@ public class GameSettingsMenu extends Menu {
 		mapGenerationPanel = new javax.swing.JPanel();
 		knowledgeSlider = new javax.swing.JSlider();
 		jLabel7 = new javax.swing.JLabel();
-		boostCheckBox = new javax.swing.JCheckBox();
+		obstaclesCheckBox = new javax.swing.JCheckBox();
 		boostSlider = new javax.swing.JSlider();
 		jLabel8 = new javax.swing.JLabel();
 		columnsSlider = new javax.swing.JSlider();
@@ -165,7 +168,7 @@ public class GameSettingsMenu extends Menu {
 		resolution = new javax.swing.JList();
 		modePanel = new javax.swing.JPanel();
 		modeDominationButton = new javax.swing.JRadioButton();
-		anihilationModeButton = new javax.swing.JRadioButton();
+		annihilationModeButton = new javax.swing.JRadioButton();
 		madnessModeButton = new javax.swing.JRadioButton();
 		jScrollPane2 = new javax.swing.JScrollPane();
 		descriptionPane = new javax.swing.JTextPane();
@@ -460,18 +463,24 @@ public class GameSettingsMenu extends Menu {
 		jLabel7.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 		mapGenerationPanel.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 40, -1, 30));
 
-		boostCheckBox.setText("Allow boost");
-		mapGenerationPanel.add(boostCheckBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, -1, 30));
+		obstaclesCheckBox.setText("Allow obstacles");
+		obstaclesCheckBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boostSlider.setEnabled(obstaclesCheckBox.isSelected());
+			}
+		});
+		mapGenerationPanel.add(obstaclesCheckBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, -1, 30));
 
 		boostSlider.setMaximum(25);
 		boostSlider.setMinimum(1);
-		boostSlider.setToolTipText("How big is probability of generation of boost per round - default 12 %");
-		boostSlider.setValue(12);
+		boostSlider.setToolTipText("How much obstacles will be generated - default 6 %");
+		boostSlider.setValue(6);
 		boostSlider.setEnabled(false);
 		mapGenerationPanel.add(boostSlider, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 200, -1, -1));
 
-		jLabel8.setText("%");
-		mapGenerationPanel.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 200, -1, -1));
+//		jLabel8.setText("%");
+//		mapGenerationPanel.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 200, -1, -1));
 
 		columnsSlider.setMaximum(60);
 		columnsSlider.setMinimum(18);
@@ -520,10 +529,10 @@ public class GameSettingsMenu extends Menu {
 		});
 		modePanel.add(modeDominationButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 30, -1, -1));
 
-		modeButtonGroup.add(anihilationModeButton);
-		anihilationModeButton.setText("Anihilation");
-		modePanel.add(anihilationModeButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, -1, -1));
-		anihilationModeButton.addActionListener(new java.awt.event.ActionListener() {
+		modeButtonGroup.add(annihilationModeButton);
+		annihilationModeButton.setText("Annihilation");
+		modePanel.add(annihilationModeButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, -1, -1));
+		annihilationModeButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				modeAnihilationButtonActionPerformed(evt);
 			}
@@ -681,7 +690,7 @@ public class GameSettingsMenu extends Menu {
 		settings.setMapRows(rowsSlider.getValue());
 		settings.setMapColumns(columnsSlider.getValue());
 		settings.setNumKnowledgeResources(knowledgeSlider.getValue());
-		settings.setBoostEnabled(boostCheckBox.isSelected());
+		settings.setObstaclesEnabled(obstaclesCheckBox.isSelected());
 		settings.setBoostProbability(boostSlider.getValue());
 
 //======================================Resolution==============================================================
@@ -694,8 +703,8 @@ public class GameSettingsMenu extends Menu {
 			settings.setMode(GameSettings.DOMINATION);
 			settings.setWinQuota(Integer.parseInt(value.getValue().toString()));
 		}
-		if (anihilationModeButton.isSelected())
-			settings.setMode(GameSettings.ANIHLIATION);
+		if (annihilationModeButton.isSelected())
+			settings.setMode(GameSettings.ANNIHLIATION);
 		if (madnessModeButton.isSelected()) {
 			settings.setMode(GameSettings.MADNESS);
 			settings.setWinQuota(Integer.parseInt(value.getValue().toString()));

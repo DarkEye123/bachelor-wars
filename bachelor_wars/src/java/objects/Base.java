@@ -57,6 +57,10 @@ public class Base extends GameObject implements Clickable{
 		baseNodes = baseNodes();
 	}
 	
+	public Base() {
+		//for test purpose only
+	}
+
 	public int getFreeSlots() {
 		return freeSlots;
 	}

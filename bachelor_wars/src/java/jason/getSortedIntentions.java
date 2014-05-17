@@ -119,7 +119,7 @@ public class getSortedIntentions extends DefaultInternalAction {
 	    		int [] pom = {Unit.SEIZE, Unit.KILL};
 	    		un.unifies(terms[2], ListTermImpl.parseList(getSortedInt(unit, wrapper, intentions, pom).toString()));
 	    	}
-	    	if (mode == GameSettings.ANIHLIATION) {
+	    	if (mode == GameSettings.ANNIHLIATION) {
 	    		int [] pom = {Unit.KILL, Unit.SEIZE};
 	    		un.unifies(terms[2], ListTermImpl.parseList(getSortedInt(unit, wrapper, intentions, pom).toString()));
 	    	}

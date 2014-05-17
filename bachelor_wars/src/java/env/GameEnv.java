@@ -2,33 +2,25 @@ package env;
 
 
 import jason.NoValueException;
-import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.NumberTerm;
-import jason.asSyntax.NumberTermImpl;
-import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.environment.Environment;
-import jason.environment.grid.Location;
 
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import mapping.GameSettings;
 import mapping.Node;
 import objects.Base;
 import objects.GameObject;
-import objects.Knowledge;
-import objects.units.FirstYear;
 import objects.units.Unit;
 import ui.GameMap;
 import ui.GameView;
-import ui.menu.MainMenu;
+import ui.menu.GameSettingsMenu;
 
 public class GameEnv extends Environment {
 	
@@ -51,8 +43,8 @@ public class GameEnv extends Environment {
 //    	System.out.println(test);
     	
         if (args.length == 1 && args[0].equals("gui")) { 
-        	MainMenu menu = new MainMenu(this);
-        	menu.init();
+        	GameSettingsMenu menu = new GameSettingsMenu(this);
+//        	GameSettingsMenu.init();
         }
     }
     

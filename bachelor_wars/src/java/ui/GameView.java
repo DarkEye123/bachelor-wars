@@ -11,17 +11,15 @@ import java.awt.GridBagLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import mapping.GameSettings;
 import env.EnvAnalyzer;
 import env.GameEnv;
-import ui.ControlMenu;
-import ui.ControlPanel;
-import ui.menu.MainMenu;
-import mapping.GameSettings;
 
 
 public class GameView extends JPanel {
 
 	private static final long serialVersionUID = 4375482311151482280L;
+	private static final String TITLE = "Bachelor Wars";
 	
 	protected Font defaultFont = new Font("Arial", Font.BOLD, 10);
 	
@@ -54,7 +52,7 @@ public class GameView extends JPanel {
 	}
 
 	public GameView(GameSettings settings) {
-		this(MainMenu.TITLE);
+		this(TITLE);
 		this.settings = settings;
 		setComponentSize(new Dimension(settings.getWidth(), settings.getHeight()), frame);
 		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH | JFrame.MAXIMIZED_VERT);

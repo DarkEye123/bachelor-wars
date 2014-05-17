@@ -7,5 +7,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Jason"/>
 	<classpathentry kind="lib" path="lib"/>
 	<classpathentry kind="lib" path="lib/AbsoluteLayout.jar"/>
+	<classpathentry kind="lib" path="lib/combinatoricslib-2.0.jar" sourcepath="/home/darkeye/Downloads/combinatoricslib-2.0_src.zip"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

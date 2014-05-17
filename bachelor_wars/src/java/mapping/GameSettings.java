@@ -36,7 +36,7 @@ public class GameSettings {
 	public static final int ADVANCED_AI = 3;
 
 	//-----------------------------------------------------------------------MODES----------------------------------------------------------------------
-	public static final int DOMINATION = 0, ANIHLIATION = 1, MADNESS = 2;
+	public static final int DOMINATION = 0, ANNIHLIATION = 1, MADNESS = 2;
 	public static final int DOMINATION_WIN_ROUNDS = 3;//, ANIHLIATION = 1, MADNESS = 2;
 	public static final float DOMINATION_WIN_PERCENTAGE = 80.0f;
 	public static final int MADNESS_KILL = 25;
@@ -201,7 +201,7 @@ public class GameSettings {
 		this.mapRows = mapRows;
 	}
 
-	public void setBoostEnabled(boolean enabled) {
+	public void setObstaclesEnabled(boolean enabled) {
 		boostEnabled = enabled;
 	}
 
