@@ -12,6 +12,7 @@ import java.util.List;
 import objects.Base;
 import objects.GameObject;
 import objects.Knowledge;
+import objects.Obstacle;
 import objects.units.Unit;
 import ui.GameMap;
 
@@ -95,6 +96,13 @@ public class Node {
 	
 	public boolean containKnowledge() {
 		if (getSpecificObject(Knowledge.class) != null)
+			return true;
+		else
+			return false;
+	}
+	
+	public boolean containObstacle() {
+		if (getSpecificObject(Obstacle.class) != null)
 			return true;
 		else
 			return false;
@@ -237,7 +245,7 @@ public class Node {
 			
 			for (Node neighbour:current.neighbours) {
 				if (neighbour != null && !closedSet.contains(neighbour)) {
-					if ( (!neighbour.containUnit() || (neighbour.equals(to) && dontCloseLastNode)) || ignoreUnits) {
+					if ( (neighbour.isFree() || (neighbour.equals(to) && dontCloseLastNode)) || ignoreUnits) {
 						int tentativeGScore = current.gScore + current.distance(to);
 						
 						if (!openSet.contains(neighbour) || tentativeGScore < neighbour.gScore) {
@@ -265,7 +273,7 @@ public class Node {
 		if (ignoreUnits) {
 			LinkedList<Node> temp = new LinkedList<Node>();
 			for (Node node:ret) {
-				if (!node.containUnit() || node.equals(from)) {
+				if (node.isFree() || node.equals(from)) {
 //					System.out.println("adding node: " + node);
 					temp.add(node);
 				} else {
@@ -279,6 +287,17 @@ public class Node {
 		return ret;
 	}
 	
+	/**
+	 * Used to get if given node is free. It means it is not a blocking node.
+	 * @return true if node is free, false otherwise.
+	 */
+	public boolean isFree() {
+		for (GameObject o: gameObjects) {
+			if (!o.getClass().equals(Knowledge.class) && !o.getClass().equals(Base.class))
+				return false;
+		}
+		return true;
+	}
 
 	@Override
 	public String toString() {

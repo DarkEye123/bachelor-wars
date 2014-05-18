@@ -27,7 +27,7 @@ public class GameView extends JPanel {
 	GameSettings settings;
 
 	JFrame frame;
-	ControlMenu controlMenu;
+	StatisticalPanel controlMenu;
 	ControlPanel controlPanel;
 	GameEnv env;
 	
@@ -55,7 +55,7 @@ public class GameView extends JPanel {
 		this(TITLE);
 		this.settings = settings;
 		setComponentSize(new Dimension(settings.getWidth(), settings.getHeight()), frame);
-		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH | JFrame.MAXIMIZED_VERT);
+//		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH | JFrame.MAXIMIZED_VERT);
 		this.setSize(frame.getSize());
 		this.setPreferredSize(frame.getSize());
 	}
@@ -91,10 +91,10 @@ public class GameView extends JPanel {
 //			gameMap.repaint();
 //	}
 	
-	public ControlMenu createControlMenu(GridBagConstraints constraints) {
-		ControlMenu controlMenu = new ControlMenu(this);
+	public StatisticalPanel createControlMenu(GridBagConstraints constraints) {
+		StatisticalPanel controlMenu = new StatisticalPanel(this);
 		controlMenu.setBackground(Color.yellow);
-		Dimension size = new Dimension(this.getWidth(), Math.round(this.getHeight() * ControlMenu.HEIGHT_MULTIPLIER));
+		Dimension size = new Dimension(this.getWidth(), Math.round(this.getHeight() * StatisticalPanel.HEIGHT_MULTIPLIER));
 		setComponentSize(size, controlMenu);
 		this.add(controlMenu, constraints);
 		controlMenu.repaint();
@@ -140,11 +140,11 @@ public class GameView extends JPanel {
 		this.frame = frame;
 	}
 
-	public ControlMenu getControlMenu() {
+	public StatisticalPanel getControlMenu() {
 		return controlMenu;
 	}
 
-	public void setControlMenu(ControlMenu controlMenu) {
+	public void setControlMenu(StatisticalPanel controlMenu) {
 		this.controlMenu = controlMenu;
 	}
 

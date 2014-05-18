@@ -53,6 +53,8 @@ public class GamePanel extends JPanel{
 		int iwidth = Math.round(width - (width * ICON_PADDING_X));
 		int iheight = Math.round(height - (height * ICON_PADDING_Y));
 		
+		Color playerColor = controlPanel.view.getGameMap().getPlayerBase().getColor();
+		
 		for (Unit u:GameSettings.AVAILABLE_UNITS) {
 			
 			ImagePanel picture = new ImagePanel(u.getImage(), iwidth, iheight);
@@ -81,7 +83,9 @@ public class GamePanel extends JPanel{
 			panel.add(picture, iconstraints);
 			++x;
 			this.add(panel, constraints);
-			panel.setBackground(new Color(rand.nextFloat(),rand.nextFloat(),rand.nextFloat()));
+//			panel.setBackground(new Color(rand.nextFloat(),rand.nextFloat(),rand.nextFloat()));
+			panel.setBackground(playerColor);
+			picture.setBackground(playerColor);
 			panel.repaint();
 		}
 	}

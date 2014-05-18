@@ -26,7 +26,7 @@ import objects.units.Unit;
 import mapping.GameSettings;
 
 
-public class ControlMenu extends JPanel implements ActionListener{
+public class StatisticalPanel extends JPanel implements ActionListener{
 	private static final long serialVersionUID = -2262922170788475187L;
 	
 	public static final float HEIGHT_MULTIPLIER = 0.05f;
@@ -46,7 +46,7 @@ public class ControlMenu extends JPanel implements ActionListener{
 	String maxRounds;
 	Base playerBase;
 	
-	public ControlMenu(GameView gameView) {
+	public StatisticalPanel(GameView gameView) {
 		view = gameView;
 		pic = Toolkit.getDefaultToolkit().getImage("pics/ControlMenu.jpeg");
 		if (view.settings.getMaxRounds() == GameSettings.INFINITE)

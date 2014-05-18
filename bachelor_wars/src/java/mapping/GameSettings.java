@@ -60,8 +60,7 @@ public class GameSettings {
 	private int mapColumns = GSize, mapRows = GSize; //grid size
 	private int width = WINDOW_WIDTH, height = WINDOW_HEIGHT; // pixel size of screen
 	private int numKnowledgeResources = DEFAULT_KNOWLEDGE_RESOURCES;
-	private boolean boostEnabled;
-	private float boostProbability;
+	private int numObstacles;
 	private int mode;
 	private int treshold = INFINITE;
 	private HashMap<String, ArrayList<Integer>> teams;
@@ -201,22 +200,6 @@ public class GameSettings {
 		this.mapRows = mapRows;
 	}
 
-	public void setObstaclesEnabled(boolean enabled) {
-		boostEnabled = enabled;
-	}
-
-	public void setBoostProbability(int value) {
-		boostProbability = (float) value / 100;
-	}
-
-	public boolean isBoostEnabled() {
-		return boostEnabled;
-	}
-
-	public float getBoostProbability() {
-		return boostProbability;
-	}
-
 	public int getMode() {
 		return mode;
 	}
@@ -245,5 +228,13 @@ public class GameSettings {
 	
 	public void setWinQuota(int quota) {
 		winQuota = quota;
+	}
+
+	public void setNumObstacles(int value) {
+		numObstacles = value;
+	}
+	
+	public int getNumObstacles() {
+		return numObstacles;
 	}
 }

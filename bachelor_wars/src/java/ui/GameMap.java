@@ -8,6 +8,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Menu;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.RenderingHints;
@@ -30,6 +31,7 @@ import mapping.Node;
 import objects.Base;
 import objects.GameObject;
 import objects.Knowledge;
+import objects.Obstacle;
 import objects.units.CommonBachelor;
 import objects.units.FirstYear;
 import objects.units.FitBachelor;
@@ -58,6 +60,7 @@ public class GameMap extends JPanel implements ActionListener{
 	private static LinkedList<Base> baseList = new LinkedList<Base>();
 	private static LinkedList<Base> activeBasesInRound = new LinkedList<Base>();
 	private static LinkedList<Knowledge> knowledgeList = new LinkedList<Knowledge>();
+	private static LinkedList<Obstacle> obstacleList = new LinkedList<Obstacle>();
 	private LinkedList<Location> movementLocations = new LinkedList<Location>();
 	private LinkedList<Location> atkLocations = new LinkedList<Location>();
 	public static final Object countLock = new Object();
@@ -84,6 +87,9 @@ public class GameMap extends JPanel implements ActionListener{
 		mouseListener = new MapMouseInputAdapter(this);
 		initBases();
 		generateKnowledgeResources(settings.getNumKnowledgeResources());
+		generateObstacles(settings.getNumObstacles());
+		System.out.println(knowledgeList);
+		System.out.println(obstacleList);
 		this.addMouseListener(mouseListener);
 		new Timer(100, this).start();
 	}
@@ -94,11 +100,33 @@ public class GameMap extends JPanel implements ActionListener{
 		int y;
 		
 		for (int i = 0; i < numKnowledgeResources; ++i) {
-			x = rand.nextInt( (settings.getMapColumns() - 2 * GameSettings.DEFAULT_KNOWLEDGE_PADDING) ) + GameSettings.DEFAULT_KNOWLEDGE_PADDING - 1;
-			y = rand.nextInt( (settings.getMapRows() - 2 * GameSettings.DEFAULT_KNOWLEDGE_PADDING) ) + GameSettings.DEFAULT_KNOWLEDGE_PADDING - 1;
+			while (true) {
+				x = rand.nextInt( (settings.getMapColumns() - 2 * GameSettings.DEFAULT_KNOWLEDGE_PADDING) ) + GameSettings.DEFAULT_KNOWLEDGE_PADDING - 1;
+				y = rand.nextInt( (settings.getMapRows() - 2 * GameSettings.DEFAULT_KNOWLEDGE_PADDING) ) + GameSettings.DEFAULT_KNOWLEDGE_PADDING - 1;
+				if (!Node.getNode(x, y).containKnowledge() && !Node.getNode(x, y).containObstacle())
+					break;
+			}
 			Knowledge knowledge = new Knowledge(new Location(x,y), new Dimension(cellSizeW,cellSizeH));
 			knowledgeList.add( knowledge );
 			Node.getNode(x, y).add(knowledge);
+		}
+	}
+	
+	private void generateObstacles(int numObstacles) {
+		Random rand = new Random();
+		int x;
+		int y;
+		
+		for (int i = 0; i < numObstacles; ++i) {
+			while (true) {
+				x = rand.nextInt( (settings.getMapColumns() - 2 * GameSettings.DEFAULT_KNOWLEDGE_PADDING) ) + GameSettings.DEFAULT_KNOWLEDGE_PADDING - 1;
+				y = rand.nextInt( (settings.getMapRows() - 2 * GameSettings.DEFAULT_KNOWLEDGE_PADDING) ) + GameSettings.DEFAULT_KNOWLEDGE_PADDING - 1;
+				if (!Node.getNode(x, y).containKnowledge() && !Node.getNode(x, y).containObstacle())
+					break;
+			}
+			Obstacle obstacle = new Obstacle(new Location(x,y), new Dimension(cellSizeW,cellSizeH));
+			obstacleList.add( obstacle );
+			Node.getNode(x, y).add(obstacle);
 		}
 	}
 
@@ -218,13 +246,6 @@ public class GameMap extends JPanel implements ActionListener{
 	/** updates only one position of the grid */
     public void update(int x, int y) {
         drawEmpty(this.getGraphics(), x, y);
-    }
-
-    public void drawObstacle(Graphics g, int x, int y) {
-        g.setColor(Color.darkGray);
-        g.fillRect(x * cellSizeW + 1, y * cellSizeH+1, cellSizeW-1, cellSizeH-1);
-        g.setColor(Color.black);
-        g.drawRect(x * cellSizeW + 2, y * cellSizeH+2, cellSizeW-4, cellSizeH-4);
     }
 
     public void drawResource(Graphics g, int x, int y, Color c, int id) {
@@ -413,6 +434,9 @@ public class GameMap extends JPanel implements ActionListener{
 		        }
 		        for (Knowledge knowledge:knowledgeList) {
 		        	knowledge.draw(g2, cellSizeW, cellSizeH);
+		        }
+		        for (Obstacle obstacle:obstacleList) {
+		        	obstacle.draw(g2, cellSizeW, cellSizeH);
 		        }
 		       
 		        for (Unit unit:unitList) {

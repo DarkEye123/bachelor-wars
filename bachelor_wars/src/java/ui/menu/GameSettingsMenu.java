@@ -32,7 +32,7 @@ import env.GameEnv;
 public class GameSettingsMenu extends Menu {
 	private javax.swing.JPanel agentSelectPanel;
 	private javax.swing.JRadioButton annihilationModeButton;
-	private javax.swing.JSlider boostSlider;
+	private javax.swing.JSlider obstaclesSlider;
 	private javax.swing.JButton buttonStart;
 	private javax.swing.JPanel colorPanelP1;
 	private javax.swing.JPanel colorPanelP2;
@@ -158,7 +158,7 @@ public class GameSettingsMenu extends Menu {
 		knowledgeSlider = new javax.swing.JSlider();
 		jLabel7 = new javax.swing.JLabel();
 		obstaclesCheckBox = new javax.swing.JCheckBox();
-		boostSlider = new javax.swing.JSlider();
+		obstaclesSlider = new javax.swing.JSlider();
 		jLabel8 = new javax.swing.JLabel();
 		columnsSlider = new javax.swing.JSlider();
 		jLabel9 = new javax.swing.JLabel();
@@ -467,17 +467,17 @@ public class GameSettingsMenu extends Menu {
 		obstaclesCheckBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				boostSlider.setEnabled(obstaclesCheckBox.isSelected());
+				obstaclesSlider.setEnabled(obstaclesCheckBox.isSelected());
 			}
 		});
 		mapGenerationPanel.add(obstaclesCheckBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, -1, 30));
 
-		boostSlider.setMaximum(25);
-		boostSlider.setMinimum(1);
-		boostSlider.setToolTipText("How much obstacles will be generated - default 6 %");
-		boostSlider.setValue(6);
-		boostSlider.setEnabled(false);
-		mapGenerationPanel.add(boostSlider, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 200, -1, -1));
+		obstaclesSlider.setMaximum(25);
+		obstaclesSlider.setMinimum(1);
+		obstaclesSlider.setToolTipText("How much obstacles will be generated - default 6 %");
+		obstaclesSlider.setValue(6);
+		obstaclesSlider.setEnabled(false);
+		mapGenerationPanel.add(obstaclesSlider, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 200, -1, -1));
 
 //		jLabel8.setText("%");
 //		mapGenerationPanel.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 200, -1, -1));
@@ -690,8 +690,8 @@ public class GameSettingsMenu extends Menu {
 		settings.setMapRows(rowsSlider.getValue());
 		settings.setMapColumns(columnsSlider.getValue());
 		settings.setNumKnowledgeResources(knowledgeSlider.getValue());
-		settings.setObstaclesEnabled(obstaclesCheckBox.isSelected());
-		settings.setBoostProbability(boostSlider.getValue());
+		if (obstaclesCheckBox.isSelected())
+			settings.setNumObstacles(obstaclesSlider.getValue());
 
 //======================================Resolution==============================================================
 		String [] split= ((String)resolution.getSelectedValue()).split(" x ");
