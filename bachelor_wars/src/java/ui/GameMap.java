@@ -129,6 +129,21 @@ public class GameMap extends JPanel implements ActionListener{
 			Node.getNode(x, y).add(obstacle);
 		}
 	}
+	
+	public static int computeQuadrant(int x, int y, Base base) {
+		int delimWidth = base.getMapWidth() / 2;
+    	int delimHeight = base.getMapHeight() / 2;
+    	
+    	if (x <= delimWidth && y <= delimHeight) {
+    		return 1;
+    	} else if (x > delimWidth && y <= delimHeight) {
+    		return 2;
+    	} else if (x <= delimWidth && y > delimHeight) {
+    		return 3;
+    	} else {
+    		return 4;
+    	}
+	}
 
 	private void initBases() {
 		Dimension gridSize = new Dimension(cellSizeW,cellSizeH);
@@ -171,6 +186,7 @@ public class GameMap extends JPanel implements ActionListener{
 			}
 			base.setMapWidth(settings.getMapColumns()); //set number of cells in a row
 			base.setMapHeight(settings.getMapRows()); //set number of cells in a column
+			base.setQuadrant(computeQuadrant(base.getX(), base.getY(), base));
 			Node.getNode(base.getX(), base.getY()).add(base);
 			base.setBasicIncome(settings.getIncomePerRound());
 		}
@@ -345,6 +361,7 @@ public class GameMap extends JPanel implements ActionListener{
 	    	synchronized (countLock) {
 	    		unitList.add(unit); //list of all units
 	    	}
+	    	unit.quadrantBase = base; //first quadrant base is its base
 	    	Node.getNode(unit.getX(),unit.getY()).add(unit);
 	    	repaint();
 	    	return unit;

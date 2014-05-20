@@ -190,9 +190,9 @@ public class GameEnv extends Environment {
 			int unitID = (int)(((NumberTerm)action.getTerm(0)).solve());
 			Unit unit = GameMap.searchUnit(unitID);
 			Node node = Node.getNode(action.getTermsArray());
-			waitForDraw();
+//			waitForDraw();
 			view.getGameMap().drawPossibleMovement(unit);
-			waitForDraw();
+//			waitForDraw();
 			reInit(false);
 //			System.out.println("Node: " + node.getX() + " " + node.getY());
 			unit.setLocation(node, view);

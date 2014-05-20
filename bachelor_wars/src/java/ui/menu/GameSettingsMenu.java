@@ -118,7 +118,7 @@ public class GameSettingsMenu extends Menu {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 		} catch (Exception e) {
 			e.printStackTrace();
-			x = 880;
+			x = 900;
 			y = 630;
 		}
 		frame = new JFrame();

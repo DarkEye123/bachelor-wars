@@ -34,6 +34,7 @@ public class getAffordableUnitGroupsByDefenseStrategy extends jason.getAffordabl
 	
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {
+    	canUnify = false;
     	if ((boolean)super.execute(ts, un, terms) == false) {
     		return false;
     	}

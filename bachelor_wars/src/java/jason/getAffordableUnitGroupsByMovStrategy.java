@@ -35,7 +35,8 @@ public class getAffordableUnitGroupsByMovStrategy extends jason.getAffordableUni
 	
 	@Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {
-    	if ((boolean)super.execute(ts, un, terms) == false) {
+		canUnify = false;
+		if ((boolean)super.execute(ts, un, terms) == false) {
     		return false;
     	}
     	
@@ -48,6 +49,7 @@ public class getAffordableUnitGroupsByMovStrategy extends jason.getAffordableUni
     	Collections.sort(groups);
     	Collections.reverse(groups);
     	ListTerm list = ListTermImpl.parseList(groups.toString());
+    	System.out.println("PASSING: " + list);
     	un.unifies(terms[1], list);
     	
         return true;

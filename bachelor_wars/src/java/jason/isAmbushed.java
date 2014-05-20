@@ -2,6 +2,7 @@
 
 package jason;
 
+import objects.Base;
 import objects.units.Unit;
 import ui.GameMap;
 import jason.asSemantics.DefaultInternalAction;
@@ -10,17 +11,18 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Term;
 
-public class shouldHeal extends DefaultInternalAction {
-	private static final long serialVersionUID = -8888047598107442001L;
 
-	@Override
+
+public class isAmbushed extends DefaultInternalAction {
+
+    @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {
-		int unitID = (int)((NumberTerm)terms[0]).solve();
-		Unit unit = GameMap.searchUnit(unitID);
-		
-		if (unit.needHeal())
-			return true;
-		else
-			return false;
+    	int baseID = (int)((NumberTerm) terms[0]).solve();
+    	Base base = GameMap.searchBase(baseID);
+    	
+    	if (base.enemiesInQuadrant.size() >= base.countAlliesInbaseQuadrant() )
+    		return true;
+    	else 
+    		return false;
     }
 }

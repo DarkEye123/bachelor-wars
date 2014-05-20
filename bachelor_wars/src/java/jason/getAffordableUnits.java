@@ -20,6 +20,7 @@ import ui.GameMap;
 
 public class getAffordableUnits extends DefaultInternalAction {
 	private static final long serialVersionUID = -92287919131743061L;
+	protected boolean canUnify = true; //to be able unify the result for inherited actions, this class can not unify its result
 	LinkedList<Unit> available;
 	Base base;
 	@Override
@@ -41,7 +42,9 @@ public class getAffordableUnits extends DefaultInternalAction {
     	
     	Collections.sort(available);
     	ListTerm list = ListTermImpl.parseList(available.toString());
-    	un.unifies(terms[1], list);
+    	System.out.println(canUnify);
+    	if (canUnify)
+    		un.unifies(terms[1], list);
     	
     	return true;
     	

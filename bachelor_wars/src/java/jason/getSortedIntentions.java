@@ -16,6 +16,7 @@ import mapping.GameSettings;
 import mapping.Intention;
 import mapping.Node;
 import mapping.Wrapper;
+import objects.Base;
 import objects.GameObject;
 import objects.units.Unit;
 import ui.GameMap;
@@ -104,11 +105,22 @@ public class getSortedIntentions extends DefaultInternalAction {
     	
     	if (getBy() == DISTANCE) {
     		LinkedList<SemanticIntention> ret = new LinkedList<>();
+    		boolean wasAlreadyAdded = false;
     		for (Wrapper o:wrapper) {
     			ret.add(new SemanticIntention(o.to, intentions.get(o.to)));
-    			if (isSeizer) {
-    				if (intentions.get(o.to).intention == Unit.SEIZE && o.path.size() <= unit.getMov()) //for seizer role, seize intention in range has bigger priority
-    					ret.addFirst(ret.removeLast());
+    			
+    			if (unit.base.getType() != GameSettings.SIMPLE_AI) {
+	    			if (o.to.getClass().equals(Base.class) && o.path.size() <= unit.getMov()*2) {//base is near within 2 rounds
+	    				ret.addFirst(ret.removeLast());
+	    				wasAlreadyAdded = true;
+	    			}
+	    			
+	    			if (isSeizer && !wasAlreadyAdded) {
+	    				if (intentions.get(o.to).intention == Unit.SEIZE && o.path.size() <= unit.getMov()) {//for seizer role, seize intention in range has bigger priority
+	    					ret.addFirst(ret.removeLast());
+	    					wasAlreadyAdded = true;
+	    				}
+	    			}
     			}
     		}
     		un.unifies(terms[2], ListTermImpl.parseList(ret.toString()));

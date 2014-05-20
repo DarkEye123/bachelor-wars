@@ -59,6 +59,8 @@ public abstract class Unit extends GameObject implements Clickable, Comparable<U
 	protected int mov;
 	protected int cost;
 	protected int atk;
+	protected int quadrant = 0;
+	public Base quadrantBase;
 	public Base base; //it's like owner from GameObject but due to some dependencies is better set a base on it's own too
 	private boolean canFillMovement = true;
 	private Location oldLocation;
@@ -146,6 +148,10 @@ public abstract class Unit extends GameObject implements Clickable, Comparable<U
 			}
 			GameMap.removeUnit(this);
 			getNode().remove(this);
+			synchronized (GameMap.countLock) {
+				if (quadrantBase != null)
+					quadrantBase.enemiesInQuadrant.remove(this);
+			}
 		}
 	}
 	
@@ -244,6 +250,39 @@ public abstract class Unit extends GameObject implements Clickable, Comparable<U
 			}
 		}
     }
+	
+	private Base findQuadrantBase(int quadrant) {
+		for (Base base:GameMap.getBaseList()) {
+			if (base.getQuadrant() == quadrant)
+				return base;
+		}
+		return null;
+	}
+	
+	public void setQuadrant(int quadrant) {
+		synchronized (GameMap.countLock) {
+			if (quadrantBase != null) {
+				if (quadrantBase.getQuadrant() != quadrant) {
+					quadrantBase.enemiesInQuadrant.remove(this);
+					quadrantBase = findQuadrantBase(quadrant);
+					if (quadrantBase != null) {
+						if (!base.equals(quadrantBase) && !base.getAllies().contains(quadrantBase)) //if it is not home base or allied base
+							quadrantBase.enemiesInQuadrant.add(this);
+					}
+				}
+			} else { //if tehre was no base in quadrant
+				if (this.quadrant != quadrant) { //and unit recently changes its quadrant
+					this.quadrant = quadrant;
+					quadrantBase = findQuadrantBase(quadrant);
+					if (quadrantBase != null) {
+						if (!base.equals(quadrantBase) && !base.getAllies().contains(quadrantBase)) //if it is not home base or allied base
+							quadrantBase.enemiesInQuadrant.add(this);
+					}
+				}
+			}
+		}
+	}
+	
 
 	/**
 	 * Finds a path and sets position on the grid to given node or to the nearest postion to that node.
@@ -262,16 +301,17 @@ public abstract class Unit extends GameObject implements Clickable, Comparable<U
 		for (int x = 0; x < path.size() && x < getMov(); ++x) {
 			g.setColor(Color.red);
 			g.drawRoundRect(node.getX() * cellSizeW, node.getY() * cellSizeH, cellSizeW, cellSizeH, ARC_W, ARC_H); //draw target intention
-			waitForDraw();
+//			waitForDraw();
 			Node t = path.get(x);
 			setLocation(new Location(t.getX(), t.getY()));
-			waitForDraw();
+			//waitForDraw();
 			view.repaint();
 			synchronized (GameMap.countLock) {
 				view.getGameMap().getAtkLocations().clear();
 			}
 			view.getGameMap().repaint();
 		}
+		setQuadrant(GameMap.computeQuadrant(getX(), getY(), base));
 	}
 
 	public GameObject searchIntentionTargetById(int id) {
@@ -345,4 +385,9 @@ public abstract class Unit extends GameObject implements Clickable, Comparable<U
 		Collections.sort(AVAILABLE_UNITS);
 		System.out.println("after: \n" + AVAILABLE_UNITS);
 	}
+
+	public Base getQuadrantBase() {
+		return quadrantBase;
+	}
+
 }

@@ -18,7 +18,7 @@ import objects.Base;
 import objects.Knowledge;
 import ui.GameMap;
 
-public class getBestDistance extends DefaultInternalAction {
+public class getKnowledgeDistance extends DefaultInternalAction {
 	private static final long serialVersionUID = -7527603402622537945L;
 	
 	Base base;
@@ -26,16 +26,8 @@ public class getBestDistance extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] terms) throws Exception {
     	int agentID = (int)((NumberTerm) terms[0]).solve();
     	base = GameMap.searchBase(agentID);
-    	String source = ((StringTermImpl) terms[1]).getString();
-    	String target = ((StringTermImpl) terms[2]).getString();
-		
-		if (source.equals("base")) {
-			if (target.equals("knowledge")) {
-				int ret = evaluateBaseKnowledgeDistance();
-				un.unifies(terms[3], ASSyntax.createNumber(ret));
-			}
-		}
-		
+    	int ret = evaluateBaseKnowledgeDistance();
+    	un.unifies(terms[1], ASSyntax.createNumber(ret));
         return true;
     }
     
@@ -44,7 +36,7 @@ public class getBestDistance extends DefaultInternalAction {
 //    	knowledge.removeAll(base.getKnowledgeList());
     	int distance = 0;
     	for (Knowledge k:knowledge) {
-    		distance += base.getNode().distance(k.getNode()); //need to be celan path without
+    		distance += base.getNode().distance(k.getNode()); //need to be clean path without
     	}
 //    	System.out.println(distance + " " + base.getName());
     	return distance;

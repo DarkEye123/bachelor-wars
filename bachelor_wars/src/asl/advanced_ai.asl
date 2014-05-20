@@ -71,7 +71,7 @@ isDominationMode :-
 	domination(M) & 
 	N == M.
 	
-isAnihilationMode :- 
+isAnnihilationMode :- 
 	mode(N) & 
 	anihilation(M) & 
 	N == M.
@@ -188,25 +188,15 @@ getSeizedObjectID(Knowledge, Stat) :-
 +!getMostMovableUnit(Units,Unit) : true
 	<-	!getUnitByMovement(Units, ListByMov);
 		.max(ListByMov, Best);
-		.nth(0,Best,Mov);
-		if (Mov >= 4) { //there is need for units with higher movement ability
-			.nth(1, Best, Unit); //set type
-		} else {
-			Unit = "none";
-		}.
+		.nth(1, Best, Unit). //set type
 
-+!createUnitAbilityMov(ID, Units, Unit) : true 
++!createUnitAbilityMov(ID, Units, Unit) : true  //here is changed functionality, its drawing from the fastest combination, so chose the fastest as first, to get futher
 	<- 	!getMostMovableUnit(Units, U);
-		if (U \== "none") {
-			.print("(mov ability) choosing unit: ", U, "from ", Units);
-			create_unit(ID, U);
-			?created_unit(Unit); //here is unit id created
-			!getID(Unit, UnitID);
-			.print("(mov ability) created unit id: ", UnitID);
-		} else {
-			Unit = U;
-			.print("(mov ability) saving for another unit");
-		}.
+		.print("(mov ability) choosing unit: ", U, "from ", Units);
+		create_unit(ID, U);
+		?created_unit(Unit); //here is unit id created
+		!getID(Unit, UnitID);
+		.print("(mov ability) created unit id: ", UnitID).
 		
 //-----------------------------------------------------------------------------------------ATTACKER-ROLE----------------------------------
 +!getMostAtkUnit(Units,Unit) : true
@@ -268,7 +258,7 @@ getSeizedObjectID(Knowledge, Stat) :-
 
 //####################################################################--MODE-ANIHILATION--##########################################################################
 
-+!addPossibleIntention(UnitID, Type) : 	isAnihilationMode & 
++!addPossibleIntention(UnitID, Type) : 	isAnnihilationMode & 
 										Type \== "knowledge" & 
 										jason.getKnowledgeInReach(UnitID, Knowledge) & //desired action for domination mode - higher priority
 										getSeizedObjectID(Knowledge, TargetObject) & 
@@ -276,7 +266,7 @@ getSeizedObjectID(Knowledge, Stat) :-
 										.print("Unit: ", UnitID, " adding possible based intention(knowledge): ", Knowledge)
 	<-	jason.addIntention(UnitID, TargetObject, 0, "knowledge").
 		
-+!addPossibleIntention(UnitID, Type) : 	isAnihilationMode &
++!addPossibleIntention(UnitID, Type) : 	isAnnihilationMode &
 										Type \== "enemy" &
 										jason.getEnemyUnitInReach(UnitID, EnemyUnit) &
 										getID(EnemyUnit, TargetObject) &
@@ -351,7 +341,7 @@ getSeizedObjectID(Knowledge, Stat) :-
 
 //####################################################################--MODE-ANIHILIATION--##########################################################################
 		
-+!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isAnihilationMode & jason.getNearestFreeEnemy(UnitID,Enemy) 
++!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isAnnihilationMode & jason.getNearestFreeEnemy(UnitID,Enemy) 
 	& .print("Unit: ", UnitID, " to free enemy: ", Enemy, " adding intention")
 	<-	!getID(Enemy,TargetObject);
 		jason.addIntention(UnitID, TargetObject, 1, "enemy");
@@ -360,7 +350,7 @@ getSeizedObjectID(Knowledge, Stat) :-
 		!moveUnit(Unit).
 		
 		
-+!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isAnihilationMode & jason.getNearestFreeKnowledge(UnitID,Knowledge) 
++!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isAnnihilationMode & jason.getNearestFreeKnowledge(UnitID,Knowledge) 
 	& .print("Unit: ", UnitID, " to knowledge: ", Knowledge, " adding intention")
 	<-	!getSeizedObjectID(Knowledge, TargetObject);
 		jason.addIntention(UnitID, TargetObject, 1, "knowledge");
@@ -369,7 +359,7 @@ getSeizedObjectID(Knowledge, Stat) :-
 		!moveUnit(Unit).
 		
 		
-+!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isAnihilationMode & jason.getNearestEnemy(UnitID,Enemy) 
++!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isAnnihilationMode & jason.getNearestEnemy(UnitID,Enemy) 
 	& .print("Unit: ", UnitID, " to enemy: ", Enemy, " adding intention")
 	<-	!getPostion(Enemy,Place);
 		!getID(Enemy,TargetObject);
@@ -459,28 +449,43 @@ getSeizedObjectID(Knowledge, Stat) :-
 		
 +!listUnits([]).
 
+//+!listQuandrantUnits(ID, [Unit|Units]): true
+//	<- 	
+//		jason.addIntention(UnitID, TargetObject, 0, "enemy");
+//		update_percepts;
+//		!moveUnit(Unit); 
+//		!listUnits(Units).
+//		
+//+!listUnits(_,[]).
+//
+//+!check_action(ID): jason.isAmbushed(ID) & jason.getUnitsInQuadrant(ID, Units) //agent found out, that he is probably ambushed
+//	<-	!listQuandrantUnits(ID, Units);
+//		update_percepts;
+//		!check_action(ID).
+
 +!check_action(ID): jason.getUsableUnits(ID, Units)
 	<-	!listUnits(Units);
 		update_percepts;
 		!check_action(ID).
 //--------------------------------------------------------------------------SEIZER-ROLE------------------------------------------------------------------------------
 
-+!check_action(ID): enoughSlots & jason.getAffordableUnits(ID, Units) & isSeizerRole
-	<- 	!createUnitAbilityMov(ID, Units, Unit); //here is unit created from a template and actual created unit is given
++!check_action(ID): enoughSlots & isSeizerRole & jason.getAffordableUnitGroupsByMovStrategy(ID, UnitsGroups) 
+	<- 	.nth(0, UnitsGroups, Group);
+		.print("Choosing group: (seizer role mode)", UnitsGroups, " from: ", Groups );
+		.nth(1, Group, Units);
+		!createUnitAbilityMov(ID, Units, Unit); //here is unit created from a template and actual created unit is given
 		update_percepts;
-		if (Unit \== "none") {
-			!moveUnit(Unit);
-			update_percepts;
-			!check_action(ID);
-		} else {
-			update_percepts; 
-			mark_done;
-		}.
+		!moveUnit(Unit);
+		update_percepts;
+		!check_action(ID).
 		
 //--------------------------------------------------------------------------ATTACKER-ROLE------------------------------------------------------------------------------
 
-+!check_action(ID): enoughSlots & jason.getAffordableUnits(ID, Units) & isAttackerRole
-	<- 	!createUnitAbilityAtk(ID, Units, Unit); //here is unit created from a template and actual created unit is given
++!check_action(ID): enoughSlots & isAttackerRole & jason.getAffordableUnitGroupsByAtkStrategy(ID, UnitsGroups)
+	<- 	.nth(0, UnitsGroups, Group);
+		.print("Choosing group: (seizer role mode)", UnitsGroups, " from: ", Groups );
+		.nth(1, Group, Units);
+		!createUnitAbilityAtk(ID, Units, Unit); //here is unit created from a template and actual created unit is given
 		update_percepts;
 		!moveUnit(Unit);
 		update_percepts;
@@ -489,11 +494,30 @@ getSeizedObjectID(Knowledge, Stat) :-
 //--------------------------------------------------------------------------NO-ROLE----------------------------------------------------------------------------------
 		
 
-+!check_action(ID): enoughSlots & jason.getAffordableUnitGroupsByMovStrategy(ID, Groups) & isDominationMode
++!check_action(ID): enoughSlots & isDominationMode & jason.getAffordableUnitGroupsByMovStrategy(ID, Groups)
 	<- 	
 		.nth(0, Groups, Group);
-		.print("Choosing group: (no role and domination mode)", Group)
-		!createByMovStrategy(ID, Units, Unit); //here is unit created from a template and actual created unit is given
+		.print("Choosing group: (no role and domination mode)", Group, " from: ", Groups );
+		.nth(1, Group, Units);
+		!createUnitAbilityMov(ID, Units, Unit); //here is unit created from a template and actual created unit is given
+		update_percepts;
+		!moveUnit(Unit);
+		update_percepts;
+		!check_action(ID).
+		
++!check_action(ID): enoughSlots & isAnnihilationMode & jason.getAffordableUnitGroupsByAtkStrategy(ID, Groups)
+	<- 	
+		.nth(0, Groups, Group);
+		.print("Choosing group: (no role and annihilation mode)", Group, " from: ", Groups );
+		.nth(1, Group, Units);
+		!createUnitAbilityAtk(ID, Units, Unit); //here is unit created from a template and actual created unit is given
+		update_percepts;
+		!moveUnit(Unit);
+		update_percepts;
+		!check_action(ID).
+		
++!check_action(ID): enoughSlots & isMadnessMode & jason.getAffordableUnits(ID, Units)
+	<- 	!createUnitAbilityAtk(ID, Units, Unit); //here is unit created from a template and actual created unit is given
 		update_percepts;
 		!moveUnit(Unit);
 		update_percepts;
@@ -505,12 +529,12 @@ getSeizedObjectID(Knowledge, Stat) :-
 
 +!knowledge_distance_evaluation(N): true
 	<- 	?agentID(ID);
-		jason.getBestDistance(ID, "base", "knowledge", N).
+		jason.getKnowledgeDistance(ID, N).
 		
 +!knowledge_distance_evaluation [source(self)].
 +!knowledge_distance_evaluation [source(Ag)] : true
 	<- 	?agentID(ID);
-		jason.getBestDistance(ID, "base", "knowledge", N);
+		jason.getKnowledgeDistance(ID, N);
 		.send(Ag, tell, evaluated_knowledge_distance(N)).
 //============================================================================Asks====================================================================================
 +!ask_moving_capability([H|B]) : true

@@ -23,6 +23,7 @@ public class Base extends GameObject implements Clickable{
 	public final static Dimension DEFAULT_BASE_SIZE = new Dimension(2,2); //size on grid (x,y)
 	private static final int ARC_W = 12, ARC_H = 12;
 	
+	public LinkedList<Unit> enemiesInQuadrant = new LinkedList<Unit>();
 	private LinkedList<Unit> unitList = new LinkedList<Unit>();
 	private LinkedList<Unit> usableUnits = new LinkedList<Unit>();
 	private LinkedList<Knowledge> knowledgeList = new LinkedList<Knowledge>();
@@ -44,6 +45,7 @@ public class Base extends GameObject implements Clickable{
 	private int roundSurvived;
 	private String team;
 	private String role;
+	private int quadrant;
 	private LinkedList<Knowledge> availableKnowledge;
 	
 	/**
@@ -419,5 +421,39 @@ public class Base extends GameObject implements Clickable{
 			}
 		}
 		return null;
+	}
+
+	public int getMapWidth() {
+		return mapWidth;
+	}
+
+	public int getMapHeight() {
+		return mapHeight;
+	}
+
+	public int getQuadrant() {
+		return quadrant;
+	}
+
+	public void setQuadrant(int quadrant) {
+		this.quadrant = quadrant;
+	}
+	
+	public int countAlliesInbaseQuadrant() {
+		int ret = 0;
+		for (Unit u:getFriendlyUnits()) {
+			if (u.getQuadrantBase().equals(this))
+				ret++;
+		}
+		return ret;
+	}
+	
+	public LinkedList<Unit> getUsableUnitsInQuadrant() {
+		LinkedList<Unit> ret = new LinkedList<>();
+		for (Unit u:getUsableUnits()) {
+			if (u.getQuadrantBase().equals(this))
+				ret.add(u);
+		}
+		return ret;
 	}
 }

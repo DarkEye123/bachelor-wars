@@ -63,7 +63,7 @@ isDominationMode :-
 	domination(M) & 
 	N == M.
 	
-isAnihilationMode :- 
+isAnnihilationMode :- 
 	mode(N) & 
 	anihilation(M) & 
 	N == M.
@@ -166,7 +166,7 @@ getKnowledgeId(Knowledge, Stat) :-
 
 //####################################################################--MODE-ANIHILATION--##########################################################################
 
-+!addPossibleIntention(UnitID, Type) : 	isAnihilationMode & 
++!addPossibleIntention(UnitID, Type) : 	isAnnihilationMode & 
 										Type \== "knowledge" & 
 										jason.getKnowledgeInReach(UnitID, Knowledge) & //desired action for domination mode - higher priority
 										getKnowledgeId(Knowledge, TargetObject) & 
@@ -174,7 +174,7 @@ getKnowledgeId(Knowledge, Stat) :-
 										.print("Unit: ", UnitID, " adding possible based intention(knowledge): ", Knowledge)
 	<-	jason.addIntention(UnitID, TargetObject, 0, "knowledge").
 		
-+!addPossibleIntention(UnitID, Type) : 	isAnihilationMode &
++!addPossibleIntention(UnitID, Type) : 	isAnnihilationMode &
 										Type \== "enemy" &
 										jason.getEnemyUnitInReach(UnitID, EnemyUnit) &
 										getID(EnemyUnit, TargetObject) &
@@ -249,7 +249,7 @@ getKnowledgeId(Knowledge, Stat) :-
 
 //####################################################################--MODE-ANIHILIATION--##########################################################################
 		
-+!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isAnihilationMode & jason.getNearestFreeEnemy(UnitID,Enemy) 
++!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isAnnihilationMode & jason.getNearestFreeEnemy(UnitID,Enemy) 
 	& .print("Unit: ", UnitID, " to free enemy: ", Enemy, " adding intention")
 	<-	!getID(Enemy,TargetObject);
 		jason.addIntention(UnitID, TargetObject, 1, "enemy");
@@ -258,7 +258,7 @@ getKnowledgeId(Knowledge, Stat) :-
 		!moveUnit(Unit).
 		
 		
-+!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isAnihilationMode & jason.getNearestFreeKnowledge(UnitID,Knowledge) 
++!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isAnnihilationMode & jason.getNearestFreeKnowledge(UnitID,Knowledge) 
 	& .print("Unit: ", UnitID, " to knowledge: ", Knowledge, " adding intention")
 	<-	!getKnowledgeId(Knowledge, TargetObject);
 		jason.addIntention(UnitID, TargetObject, 1, "knowledge");
@@ -267,7 +267,7 @@ getKnowledgeId(Knowledge, Stat) :-
 		!moveUnit(Unit).
 		
 		
-+!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isAnihilationMode & jason.getNearestEnemy(UnitID,Enemy) 
++!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID) & isAnnihilationMode & jason.getNearestEnemy(UnitID,Enemy) 
 	& .print("Unit: ", UnitID, " to enemy: ", Enemy, " adding intention")
 	<-	!getPostion(Enemy,Place);
 		!getID(Enemy,TargetObject);

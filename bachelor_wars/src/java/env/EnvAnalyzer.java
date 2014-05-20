@@ -164,10 +164,18 @@ public class EnvAnalyzer {
 			if (settings.getMode() == GameSettings.DOMINATION) {
 				Base base = findDominantBase(activeBase);
 					if (conditionCounter == settings.getWinQuota() && base.equals(winningBase)) {
-						environment.view.getGameMap().setCanManipulate(false);
-						winner = winningBase;
-						environment.view.getGameMap().printWinner(winner);
-						return true;
+						if (activeBase.equals(winningBase)) { //can win only if the winner is on his move
+							if (winningBase.getKnowledgeList().size() >= settings.getTreshold()) {
+								environment.view.getGameMap().setCanManipulate(false);
+								winner = winningBase;
+								environment.view.getGameMap().printWinner(winner);
+								return true;
+							} else {
+								winningBase = null;
+								conditionCounter = 1; //winning rounds were cut off
+							}
+						}
+						return false;
 					} else {
 						if (winningBase == null)
 							winningBase = base;
@@ -175,7 +183,8 @@ public class EnvAnalyzer {
 //						System.out.println(base.getKnowledgeList().size() + " " + settings.getTreshold());
 						
 						if (winningBase.equals(base) && base.getKnowledgeList().size() >= settings.getTreshold()) {
-							conditionCounter++;
+							if (activeBase.equals(winningBase)) //increment counter only if the right winning base is on its move
+								conditionCounter++;
 						} else {
 							if (base.getKnowledgeList().size() >= settings.getTreshold()) { //there is another base, that gets into leading in this round - need to has same conditions
 								winningBase = base;

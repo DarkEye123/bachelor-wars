@@ -142,7 +142,8 @@ public class getAffordableUnitGroups extends jason.getAffordableUnits {
     			return false;
     		
     		ListTerm list = ListTermImpl.parseList(combinations.toString());
-        	un.unifies(terms[1], list);
+    		if (canUnify)
+    			un.unifies(terms[1], list);
     		return true;
     	}
     }
