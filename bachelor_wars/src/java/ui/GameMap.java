@@ -183,6 +183,8 @@ public class GameMap extends JPanel implements ActionListener{
 				view.env.addAgent(name, base.getAgent()); //add agent to the game
 				base.setAgent(name);
 				view.env.addPercept(base.getAgent(), Literal.parseLiteral("agentID("+base.getOwner()+")"));
+			} else {
+				base.addKnowledge(400); //TODO delete before bp is done, hack
 			}
 			base.setMapWidth(settings.getMapColumns()); //set number of cells in a row
 			base.setMapHeight(settings.getMapRows()); //set number of cells in a column

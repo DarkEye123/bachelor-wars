@@ -15,7 +15,9 @@ role. //type can be attacker(enemy diversion till seizer has money for better un
 //agreementCounter(1)[source(Ag)].
 round(unknown)[source(percept)].
 understandSimple("yes").
+understandComplex("yes").
 compatibleAllies([]).
+compatibleAlliesComplex([]).
 knowledgeDistances([]).
 movingCapabilities([]).
 
@@ -35,8 +37,8 @@ unknown(unknown).
 //-----------------------------------------------------------------------Rules----------------------------------------------------------------
 enoughSlots :- 
 	freeSlots(N)[source(percept)] & 
-	N > 0 & 
-	.print("free slots: ",N).
+	N > 0. 
+	//.print("free slots: ",N).
 	
 isWithoutUnits :- 
 	freeSlots(N)[source(percept)] & 
@@ -337,6 +339,7 @@ getSeizedObjectID(Knowledge, Stat) :-
 		jason.addIntention(UnitID, TargetObject, 1, "enemy");
 		!addEnemyBases(UnitID);
 		!moveUnit(Unit).
+		
 //##################################################################################################################################################################
 
 //####################################################################--MODE-ANIHILIATION--##########################################################################
@@ -397,6 +400,10 @@ getSeizedObjectID(Knowledge, Stat) :-
 		!moveUnit(Unit).
 //##################################################################################################################################################################
 
++!moveUnit(Unit): getID(Unit, UnitID) & not jason.hasIntention(UnitID)
+	<- 	!addEnemyBases(UnitID);
+		!moveUnit(Unit).
+
 //===================================================================================================================================================================
 
 
@@ -449,19 +456,26 @@ getSeizedObjectID(Knowledge, Stat) :-
 		
 +!listUnits([]).
 
-//+!listQuandrantUnits(ID, [Unit|Units]): true
-//	<- 	
-//		jason.addIntention(UnitID, TargetObject, 0, "enemy");
-//		update_percepts;
-//		!moveUnit(Unit); 
-//		!listUnits(Units).
-//		
-//+!listUnits(_,[]).
-//
-//+!check_action(ID): jason.isAmbushed(ID) & jason.getUnitsInQuadrant(ID, Units) //agent found out, that he is probably ambushed
-//	<-	!listQuandrantUnits(ID, Units);
-//		update_percepts;
-//		!check_action(ID).
++!listQuandrantUnits(ID, [Unit|Units]): true
+	<- 	
+		update_percepts;
+		!getID(Unit,UnitID);
+		jason.getEnemiesInQuadrant(ID, Enemies);
+		for (.member(Enemy,Enemies)) {
+			!getID(Enemy,TargetObject);
+			.print("adding defensive intentions for: ", Enemy);
+			jason.addIntention(UnitID, TargetObject, 0, "enemy");
+		};
+		update_percepts;
+		!moveUnit(Unit); 
+		!listQuandrantUnits(ID, Units).
+		
++!listQuandrantUnits(_,[]).
+
++!check_action(ID): jason.isAmbushed(ID) & jason.getUnitsInQuadrant(ID, Units) //agent found out, that he is probably ambushed
+	<-	!listQuandrantUnits(ID, Units);
+		update_percepts;
+		!check_action(ID).
 
 +!check_action(ID): jason.getUsableUnits(ID, Units)
 	<-	!listUnits(Units);
@@ -471,33 +485,35 @@ getSeizedObjectID(Knowledge, Stat) :-
 
 +!check_action(ID): enoughSlots & isSeizerRole & jason.getAffordableUnitGroupsByMovStrategy(ID, UnitsGroups) 
 	<- 	.nth(0, UnitsGroups, Group);
-		.print("Choosing group: (seizer role mode)", UnitsGroups, " from: ", Groups );
+		.print("Choosing group: (seizer role mode)", Group, " from: ", UnitsGroups );
 		.nth(1, Group, Units);
 		!createUnitAbilityMov(ID, Units, Unit); //here is unit created from a template and actual created unit is given
 		update_percepts;
 		!moveUnit(Unit);
 		update_percepts;
+		.print("POSLEDNAA SEIZER UNIT: ", Unit);
 		!check_action(ID).
-		
+
 //--------------------------------------------------------------------------ATTACKER-ROLE------------------------------------------------------------------------------
 
 +!check_action(ID): enoughSlots & isAttackerRole & jason.getAffordableUnitGroupsByAtkStrategy(ID, UnitsGroups)
 	<- 	.nth(0, UnitsGroups, Group);
-		.print("Choosing group: (seizer role mode)", UnitsGroups, " from: ", Groups );
+		.print("Choosing group: (attacker role mode)", Group, " from: ", UnitsGroups );
 		.nth(1, Group, Units);
 		!createUnitAbilityAtk(ID, Units, Unit); //here is unit created from a template and actual created unit is given
 		update_percepts;
 		!moveUnit(Unit);
 		update_percepts;
+		.print("POSLEDNAA ATTACKER UNIT: ", Unit);
 		!check_action(ID).
 		 
 //--------------------------------------------------------------------------NO-ROLE----------------------------------------------------------------------------------
 		
 
-+!check_action(ID): enoughSlots & isDominationMode & jason.getAffordableUnitGroupsByMovStrategy(ID, Groups)
++!check_action(ID): enoughSlots & isDominationMode & jason.getAffordableUnitGroupsByMovStrategy(ID, UnitsGroups)
 	<- 	
-		.nth(0, Groups, Group);
-		.print("Choosing group: (no role and domination mode)", Group, " from: ", Groups );
+		.nth(0, UnitsGroups, Group);
+		.print("Choosing group: (no role and domination mode)", Group, " from: ", UnitsGroups );
 		.nth(1, Group, Units);
 		!createUnitAbilityMov(ID, Units, Unit); //here is unit created from a template and actual created unit is given
 		update_percepts;
@@ -505,10 +521,10 @@ getSeizedObjectID(Knowledge, Stat) :-
 		update_percepts;
 		!check_action(ID).
 		
-+!check_action(ID): enoughSlots & isAnnihilationMode & jason.getAffordableUnitGroupsByAtkStrategy(ID, Groups)
++!check_action(ID): enoughSlots & isAnnihilationMode & jason.getAffordableUnitGroupsByAtkStrategy(ID, UnitsGroups)
 	<- 	
-		.nth(0, Groups, Group);
-		.print("Choosing group: (no role and annihilation mode)", Group, " from: ", Groups );
+		.nth(0, UnitsGroups, Group);
+		.print("Choosing group: (no role and annihilation mode)", Group, " from: ", UnitsGroups );
 		.nth(1, Group, Units);
 		!createUnitAbilityAtk(ID, Units, Unit); //here is unit created from a template and actual created unit is given
 		update_percepts;
@@ -585,11 +601,13 @@ getSeizedObjectID(Knowledge, Stat) :-
 +role(seizer) : true
 	<-	mark_start; 
 		?agentID(N);
+		.print("Playing role SEIZER");
 		!check_action(N).
 		
 +role(attacker) : true
 	<-	mark_start; 
 		?agentID(N);
+		.print("Playing role ATTACKER");
 		!check_action(N).
 		
 +role(unknown) : true //act as normal agent
@@ -722,6 +740,12 @@ getSeizedObjectID(Knowledge, Stat) :-
 				!appendList(Compatible, Ally, N);
 				-+compatibleAllies(N);
 			};
+			?compatibleAlliesComplex(CompatibleComplex);
+			!askUnderstandComplex(Ally, AnswerComplex);
+			if (AnswerComplex == "yes") {
+				!appendList(CompatibleComplex, Ally, N);
+				-+compatibleAlliesComplex(N);
+			};
 		}. 
 
 /*
@@ -732,15 +756,23 @@ getSeizedObjectID(Knowledge, Stat) :-
 	<- 	.my_name(Name);
 		for (.member(Ally, Allies)) {
 			?compatibleAllies(Compatible);
+			?compatibleAlliesComplex(CompatibleComplex);
 			if (Ag \== Ally) {
 				!askUnderstandSimple(Ally, Answer);
 				if (Answer == "yes") {
 					!appendList(Compatible, Ally, N);
 					-+compatibleAllies(N);
 				};
+				!askUnderstandComplex(Ally, AnswerComplex);
+				if (AnswerComplex == "yes") {
+					!appendList(CompatibleComplex, Ally, N);
+					-+compatibleAlliesComplex(N);
+				};
 			} else {
-				!appendList(Compatible, Ag, N);
+				!appendList(Compatible, Ag, N); //agent originally which asked this question
 				-+compatibleAllies(N);
+				!appendList(CompatibleComplex, Ag, N);
+				-+compatibleAlliesComplex(N);
 			}
 		}. 
 
@@ -787,16 +819,29 @@ getSeizedObjectID(Knowledge, Stat) :-
 	<- 	?agentID(ID);
 		jason.setRole(ID, "unknown");
 		+role(unknown).
+		
+//=============================================================================================================================================================
+
+//+!agree_coordinated_attack: not inCoordAtk & 
+//							allies(Allies) & Allies \== [] & 
+//							compatibleAlliesComplex(Compatible) & Compatible \== []
+//	<- 
+
++!agree_coordinated_attack.
 
 +!askUnderstandSimple(H, Answer) : true
 	<-	.send(H, askOne, understandSimple(Answer), understandSimple(Answer)[source(H)]);
-//		understandSimple(Answer)[source(H)] = U;
 		.print("Asked agent: ", H, " understands simple communication API (answer): ", Answer).
+		
++!askUnderstandComplex(H, Answer) : true
+	<-	.send(H, askOne, understandComplex(Answer), understandComplex(Answer)[source(H)]);
+		.print("Asked agent: ", H, " understands complex communication API (answer): ", Answer).
 
 +can_act <- 
 	.print("preparing actions"); 
 	update_percepts;
-	!agree_with_allies. 
+	!agree_with_allies.
+//	!agree_coordinated_attack. 
 	
 +!appendList([], X, [X]).
 	

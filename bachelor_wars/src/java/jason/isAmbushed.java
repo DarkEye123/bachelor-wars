@@ -20,6 +20,9 @@ public class isAmbushed extends DefaultInternalAction {
     	int baseID = (int)((NumberTerm) terms[0]).solve();
     	Base base = GameMap.searchBase(baseID);
     	
+    	System.out.println("ENEMIES IN QUADRANT: " + base.enemiesInQuadrant);
+    	System.out.println("COUNTED ALLIES: " + base.countAlliesInbaseQuadrant());
+    	
     	if (base.enemiesInQuadrant.size() >= base.countAlliesInbaseQuadrant() )
     		return true;
     	else 

@@ -301,10 +301,10 @@ public abstract class Unit extends GameObject implements Clickable, Comparable<U
 		for (int x = 0; x < path.size() && x < getMov(); ++x) {
 			g.setColor(Color.red);
 			g.drawRoundRect(node.getX() * cellSizeW, node.getY() * cellSizeH, cellSizeW, cellSizeH, ARC_W, ARC_H); //draw target intention
-//			waitForDraw();
+			waitForDraw();
 			Node t = path.get(x);
 			setLocation(new Location(t.getX(), t.getY()));
-			//waitForDraw();
+			waitForDraw();
 			view.repaint();
 			synchronized (GameMap.countLock) {
 				view.getGameMap().getAtkLocations().clear();

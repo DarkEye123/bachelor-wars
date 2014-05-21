@@ -195,8 +195,10 @@ public class StatisticalPanel extends JPanel implements ActionListener{
 		public void mouseClicked(MouseEvent e) {
 			view.getGameMap().setCanManipulate(false);
 			if (playerBase != null) {
-				for (Unit u:playerBase.getUnitList())
+				for (Unit u:playerBase.getUnitList()) {
 					u.setLocation(u.getOldLocation());
+					u.setQuadrant(GameMap.computeQuadrant(u.getX(), u.getY(), playerBase));
+				}
 				view.getGameMap().clearMovement();
 				view.getGameMap().repaint();
 			}

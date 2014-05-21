@@ -66,9 +66,11 @@ public class getNearestFreeKnowledge extends jason.getNearest {
     		for (Base b:base.getAllies()) {
     			listOfInterest.removeAll(b.getKnowledgeList());
     		}
-    	}
+    	} //TODO here is bugged, when no enemy is on the map and all knowledge is away
     	
     	LinkedList<Wrapper> interests = findInterests(listOfInterest);
+    	
+//    	System.out.println("LIST JEEEEE: " + listOfInterest);
     	
     	return decideUnifier(un, terms, interests);
     }

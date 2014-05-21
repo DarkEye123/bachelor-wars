@@ -33,6 +33,7 @@ actualKnowledge(unknown)[source(percept)].
 freeSlots(unknown)[source(percept)].
 maximumSlots(unknown)[source(percept)].
 understandSimple("no").
+understandComplex("no").
 
 //-----------------------------------------------------------------------Intentions-----------------------------------------------------------
 killIntention(0). //damage with atk
@@ -144,63 +145,13 @@ getKnowledgeId(Knowledge, Stat) :-
 		!getID(Unit, UnitID);
 		.print("created unit id: ", UnitID).
 
-//-----------------------------------------------------------------Class-Based-Intentions--------------------------------------------------------------------------		
-//####################################################################--MODE-DOMINATION--##########################################################################
-
-+!addPossibleIntention(UnitID, Type) : 	isDominationMode & 
-											Type \== "knowledge" & 
-											jason.getKnowledgeInReach(UnitID, Knowledge) & //desired action for domination mode - higher priority
-											getKnowledgeId(Knowledge, TargetObject) & 
-											TargetObject \== Type & //check if this intention isn't the same as
-											.print("Unit: ", UnitID, " adding possible based intention(knowledge): ", Knowledge)
-	<-	jason.addIntention(UnitID, TargetObject, 0, "knowledge").
-		
-+!addPossibleIntention(UnitID, Type) : 	isDominationMode &
-											Type \== "enemy" &
+//#################################################################################################################################################################
++!addPossibleIntention(UnitID, Type) : 		Type \== "enemy" &
 											jason.getEnemyUnitInReach(UnitID, EnemyUnit) &
 											getID(EnemyUnit, TargetObject) &
 											TargetObject \== Type &//default action for every unit if none of previous is possible
 											.print("Unit: ", UnitID, " adding possible based intention(enemy): ", EnemyUnit)
 	<-	jason.addIntention(UnitID, TargetObject, 0, "enemy").
-//#################################################################################################################################################################
-
-//####################################################################--MODE-ANIHILATION--##########################################################################
-
-+!addPossibleIntention(UnitID, Type) : 	isAnnihilationMode & 
-										Type \== "knowledge" & 
-										jason.getKnowledgeInReach(UnitID, Knowledge) & //desired action for domination mode - higher priority
-										getKnowledgeId(Knowledge, TargetObject) & 
-										TargetObject \== Type & //check if this intention isn't the same as
-										.print("Unit: ", UnitID, " adding possible based intention(knowledge): ", Knowledge)
-	<-	jason.addIntention(UnitID, TargetObject, 0, "knowledge").
-		
-+!addPossibleIntention(UnitID, Type) : 	isAnnihilationMode &
-										Type \== "enemy" &
-										jason.getEnemyUnitInReach(UnitID, EnemyUnit) &
-										getID(EnemyUnit, TargetObject) &
-										TargetObject \== Type &//default action for every unit if none of previous is possible
-										.print("Unit: ", UnitID, " adding possible based intention(enemy): ", EnemyUnit)
-	<-	jason.addIntention(UnitID, TargetObject, 0, "enemy").
-//#################################################################################################################################################################
-
-//####################################################################--MODE-MADNESS--##########################################################################
-
-+!addPossibleIntention(UnitID, Type) : 	isMadnessMode &
-											Type \== "enemy" &
-											jason.getEnemyUnitInReach(UnitID, EnemyUnit) &
-											getID(EnemyUnit, TargetObject) &
-											TargetObject \== Type &//default action for every unit if none of previous is possible
-											.print("Unit: ", UnitID, " adding possible based intention(enemy): ", EnemyUnit)
-	<-	jason.addIntention(UnitID, TargetObject, 0, "enemy").
-	
-+!addPossibleIntention(UnitID, Type) : 	isMadnessMode & 
-											Type \== "knowledge" & 
-											jason.getKnowledgeInReach(UnitID, Knowledge) & //desired action for domination mode - higher priority
-											getKnowledgeId(Knowledge, TargetObject) & 
-											TargetObject \== Type & //check if this intention isn't the same as
-											.print("Unit: ", UnitID, " adding possible based intention(knowledge): ", Knowledge)
-	<-	jason.addIntention(UnitID, TargetObject, 0, "knowledge").
-		
 //##################################################################################################################################################################
 
 +!addPossibleIntention(_, _). //end point if there is nothing in reach

@@ -15,6 +15,7 @@ role. //type can be attacker(enemy diversion till seizer has money for better un
 //agreementCounter(1)[source(Ag)].
 round(unknown)[source(percept)].
 understandSimple("yes").
+understandComplex("no").
 compatibleAllies([]).
 knowledgeDistances([]).
 movingCapabilities([]).

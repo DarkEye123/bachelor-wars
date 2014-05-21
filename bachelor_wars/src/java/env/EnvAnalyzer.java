@@ -249,8 +249,15 @@ public class EnvAnalyzer {
 				}
 				
 				GameMap.getUnitList().removeAll(seizedBase.getUnitList());
-				for (Unit u: GameMap.getUnitList()) {
-					u.getIntentions().remove(seizedBase);
+				for (Unit deletingUnit:seizedBase.getUnitList()) {
+					if (deletingUnit.getQuadrantBase() != null)
+						deletingUnit.getQuadrantBase().enemiesInQuadrant.remove(deletingUnit);
+				}
+				for (Unit mapUnit: GameMap.getUnitList()) {
+					mapUnit.getIntentions().remove(seizedBase);
+					for (Unit deletingUnit:seizedBase.getUnitList()) {
+						mapUnit.getIntentions().remove(deletingUnit);
+					}
 				}
 				LinkedList<Knowledge> test = (LinkedList<Knowledge>) seizedBase.getKnowledgeList().clone();
 				for (Knowledge k:test)

@@ -442,7 +442,7 @@ public class Base extends GameObject implements Clickable{
 	public int countAlliesInbaseQuadrant() {
 		int ret = 0;
 		for (Unit u:getFriendlyUnits()) {
-			if (u.getQuadrantBase().equals(this))
+			if (u.getQuadrantBase() != null && u.getQuadrantBase().equals(this))
 				ret++;
 		}
 		return ret;
@@ -451,7 +451,7 @@ public class Base extends GameObject implements Clickable{
 	public LinkedList<Unit> getUsableUnitsInQuadrant() {
 		LinkedList<Unit> ret = new LinkedList<>();
 		for (Unit u:getUsableUnits()) {
-			if (u.getQuadrantBase().equals(this))
+			if (u.getQuadrantBase() != null && u.getQuadrantBase().equals(this))
 				ret.add(u);
 		}
 		return ret;
