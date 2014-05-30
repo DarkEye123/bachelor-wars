@@ -7,8 +7,7 @@ To run application:
 
 1. Download Eclipse for Java developers -> http://www.eclipse.org/downloads/ (tested on versions Kepler SR1 and SR2)
 
-2. Install plugin for Jason from http://jason.sourceforge.net/mini-tutorial/eclipse-plugin/ (steps about installation of Jason 
-can be ignored)
+2. Install plugin for Jason from http://jason.sourceforge.net/mini-tutorial/eclipse-plugin/. Steps about installation of Jason can be ignored, if you want to follow these steps be sure you are using jason 1.4.0a or above)
 
 3. In Eclipse switch into Jason perspective
 
