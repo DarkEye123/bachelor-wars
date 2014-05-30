@@ -410,7 +410,7 @@ getSeizedObjectID(Knowledge, Stat) :-
 //--------------------------------------------------------------------Intention-Checks------------------------------------------------------------------------------
 +!checkSurrounding(Unit, Intention) : getTypeOfIntention(Intention, Type) & isSeizeIntention(Type) //TODO base seize
 	<- 	.nth(0, Intention, Knowledge); //get id of actual intention
-		!getSeizedObjectID(Knowledge,TargetObject);
+		!getSeizedObjectID(Knowledge,TargetObject); //this is for check, that actual surrounding object is not actual intention and it wont be rewritten by temporary intention
 		!getID(Unit, UnitID);
 		!addPossibleIntention(UnitID, TargetObject). //check for new temporary intention
 		
@@ -483,7 +483,7 @@ getSeizedObjectID(Knowledge, Stat) :-
 		!check_action(ID).
 //--------------------------------------------------------------------------SEIZER-ROLE------------------------------------------------------------------------------
 
-+!check_action(ID): enoughSlots & isSeizerRole & jason.getAffordableUnitGroupsByMovStrategy(ID, UnitsGroups) 
++!check_action(ID): enoughSlots & isSeizerRole & jason.getAffordableUnitGroupsByMovStrategy(ID, UnitsGroups) & not jason.isAmbushed(ID)
 	<- 	.nth(0, UnitsGroups, Group);
 		.print("Choosing group: (seizer role mode)", Group, " from: ", UnitsGroups );
 		.nth(1, Group, Units);
@@ -491,7 +491,16 @@ getSeizedObjectID(Knowledge, Stat) :-
 		update_percepts;
 		!moveUnit(Unit);
 		update_percepts;
-		.print("POSLEDNAA SEIZER UNIT: ", Unit);
+		!check_action(ID).
+		
++!check_action(ID): enoughSlots & isSeizerRole & jason.getAffordableUnitGroupsByAtkStrategy(ID, UnitsGroups) //if ambush, needs better units
+	<- 	.nth(0, UnitsGroups, Group);
+		.print("Choosing group: (seizer role mode)", Group, " from: ", UnitsGroups );
+		.nth(1, Group, Units);
+		!createUnitAbilityMov(ID, Units, Unit); //here is unit created from a template and actual created unit is given
+		update_percepts;
+		!moveUnit(Unit);
+		update_percepts;
 		!check_action(ID).
 
 //--------------------------------------------------------------------------ATTACKER-ROLE------------------------------------------------------------------------------
@@ -504,18 +513,28 @@ getSeizedObjectID(Knowledge, Stat) :-
 		update_percepts;
 		!moveUnit(Unit);
 		update_percepts;
-		.print("POSLEDNAA ATTACKER UNIT: ", Unit);
 		!check_action(ID).
 		 
 //--------------------------------------------------------------------------NO-ROLE----------------------------------------------------------------------------------
 		
 
-+!check_action(ID): enoughSlots & isDominationMode & jason.getAffordableUnitGroupsByMovStrategy(ID, UnitsGroups)
++!check_action(ID): enoughSlots & isDominationMode & jason.getAffordableUnitGroupsByMovStrategy(ID, UnitsGroups) & not jason.isAmbushed(ID)
 	<- 	
 		.nth(0, UnitsGroups, Group);
 		.print("Choosing group: (no role and domination mode)", Group, " from: ", UnitsGroups );
 		.nth(1, Group, Units);
 		!createUnitAbilityMov(ID, Units, Unit); //here is unit created from a template and actual created unit is given
+		update_percepts;
+		!moveUnit(Unit);
+		update_percepts;
+		!check_action(ID).
+		
++!check_action(ID): enoughSlots & isDominationMode & jason.getAffordableUnitGroupsByAtkStrategy(ID, UnitsGroups)
+	<- 	
+		.nth(0, UnitsGroups, Group);
+		.print("Choosing group: (no role and domination mode)", Group, " from: ", UnitsGroups );
+		.nth(1, Group, Units);
+		!createUnitAbilityMov(ID, Units, Unit); //seizer creates according atk strategy by chooses first units according mov strategy - faster better
 		update_percepts;
 		!moveUnit(Unit);
 		update_percepts;
@@ -532,8 +551,19 @@ getSeizedObjectID(Knowledge, Stat) :-
 		update_percepts;
 		!check_action(ID).
 		
-+!check_action(ID): enoughSlots & isMadnessMode & jason.getAffordableUnits(ID, Units)
++!check_action(ID): enoughSlots & isMadnessMode & jason.getAffordableUnits(ID, Units)  & not jason.isAmbushed(ID)
 	<- 	!createUnitAbilityAtk(ID, Units, Unit); //here is unit created from a template and actual created unit is given
+		update_percepts;
+		!moveUnit(Unit);
+		update_percepts;
+		!check_action(ID).
+		
++!check_action(ID): enoughSlots & isMadnessMode & jason.getAffordableUnitGroupsByAtkStrategy(ID, UnitsGroups) //if ambushed there should be some defense
+	<- 	
+		.nth(0, UnitsGroups, Group);
+		.print("Choosing group: (no role and annihilation mode)", Group, " from: ", UnitsGroups );
+		.nth(1, Group, Units);
+		!createUnitAbilityAtk(ID, Units, Unit); //here is unit created from a template and actual created unit is given
 		update_percepts;
 		!moveUnit(Unit);
 		update_percepts;
@@ -822,10 +852,35 @@ getSeizedObjectID(Knowledge, Stat) :-
 		
 //=============================================================================================================================================================
 
-//+!agree_coordinated_attack: not inCoordAtk & 
-//							allies(Allies) & Allies \== [] & 
-//							compatibleAlliesComplex(Compatible) & Compatible \== []
-//	<- 
++?canSuportAttack(Base, Answer) :	agentID(ID) &
+									not inCoordAtk & 
+									jason.hasMoreUnitsThan(ID, 2) & 
+									not jason.isAmbushed(ID) & Answer = "yes"
+	<- 	jason.devoteUnitsToAtack(ID, 2, Base);
+		+inCoordAtk.
+	
++?canSuportAttack(_, Answer) : Answer = "no".
+
++!agree_coordinated_attack: not inCoordAtk &
+							round(Round) & Round > 1 & 
+							allies(Allies) & Allies \== [] & 
+							compatibleAlliesComplex(Compatible) & Compatible \== [] &
+							agentID(ID) &
+							jason.hasMoreUnitsThan(ID, 2) & 
+							not jason.isAmbushed(ID)
+	<- 
+		jason.findWeakestEnemy(ID, Base);
+		.print("ASKING FOR COORDINATED ATTACK!! -> on Enemy", Base);
+		for(.member(Ally, Compatible)) {
+			!askForcoordinationOnBase(Base, Ally, Answer);
+			if (Answer == "yes") {
+				.print("Agent", Ally, " WILL SUPPORT COORDINATED ATTACK");
+				+inCoordAtk;
+				jason.devoteUnitsToAtack(ID, 2, Base);
+			} else {
+				.print("Agent", Ally, " CAN'T SUPPORT ATTACK");
+			};
+		}.
 
 +!agree_coordinated_attack.
 
@@ -837,11 +892,17 @@ getSeizedObjectID(Knowledge, Stat) :-
 	<-	.send(H, askOne, understandComplex(Answer), understandComplex(Answer)[source(H)]);
 		.print("Asked agent: ", H, " understands complex communication API (answer): ", Answer).
 
++!askForcoordinationOnBase(Base, Ally, Answer): true //base here is as ID of enemy -> like 1,2,3 etc
+	<-
+		.send(Ally, askOne, canSuportAttack(Base, Answer), canSuportAttack(Base, Answer)[source(Ally)]);
+		.print("Asked agent: ", Ally, " answered for coordinated attack: ", Answer).
+
 +can_act <- 
 	.print("preparing actions"); 
 	update_percepts;
-	!agree_with_allies.
-//	!agree_coordinated_attack. 
+//	!agree_with_allies.
+	!agree_with_allies;
+	!agree_coordinated_attack. 
 	
 +!appendList([], X, [X]).
 	

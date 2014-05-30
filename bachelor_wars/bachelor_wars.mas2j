@@ -6,9 +6,6 @@ MAS bachelor_wars {
 
 	agents:
 		advanced_ai;
-		tester2;
-		tester;
-		spectator;
 		medium_ai;
 		simple_ai;
 

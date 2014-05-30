@@ -109,7 +109,7 @@ public class getSortedIntentions extends DefaultInternalAction {
     		for (Wrapper o:wrapper) {
     			ret.add(new SemanticIntention(o.to, intentions.get(o.to)));
     			
-    			if (unit.base.getType() != GameSettings.SIMPLE_AI) {
+    			if (unit.base.getType() == GameSettings.ADVANCED_AI) {
 	    			if (o.to.getClass().equals(Base.class) && o.path.size() <= unit.getMov()*2) {//base is near within 2 rounds
 	    				ret.addFirst(ret.removeLast());
 	    				wasAlreadyAdded = true;
